@@ -16,7 +16,7 @@
   /* Header Layout */
   .header-flex { display: flex; align-items: center; gap: 25px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .header-flex.centered { flex-direction: column; text-align: center; justify-content: center; }
-  .header-flex.centered .quick-meta { justify-content: center; }
+  .header-flex.centered .quick-meta, .header-flex.centered .dress-container { justify-content: center; }
   
   .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); flex-shrink: 0; }
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 42px); margin: 5px 0; }
@@ -24,48 +24,28 @@
   .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; transition: opacity 0.2s; }
   .back-btn:hover { opacity: 0.7; }
   
-  .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; }
+  .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-bottom: 15px; }
+
+  /* Dress Code Chips in Header */
+  .dress-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .dress-chip { background: #f0f0f0; color: #666; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid var(--border); }
 
   /* Adaptive Content Layout */
   .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
   .main-content.centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
   .centered .description { text-align: center; }
 
-  /* MASONRY GALLERY */
+  /* Gallery */
   .gallery-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
-  .gallery-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 16px; 
-    margin-top: 20px;
-  }
-  .gallery-grid img { 
-    width: 100%; 
-    height: 350px; 
-    object-fit: cover; 
-    border-radius: 20px; 
-    border: 1px solid var(--border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .gallery-grid img:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 20px rgba(168, 127, 232, 0.15); 
-  }
-
-  .gallery-grid img:only-child { 
-    grid-column: 1 / -1; 
-    max-width: 100%; 
-    height: auto; 
-    max-height: 500px; 
-  }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+  .gallery-grid img { width: 100%; height: 350px; object-fit: cover; border-radius: 20px; border: 1px solid var(--border); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .gallery-grid img:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(168, 127, 232, 0.15); }
+  .gallery-grid img:only-child { grid-column: 1 / -1; max-width: 100%; height: auto; max-height: 500px; }
 
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
   
-  /* Sidebar Elements */
+  /* Sidebar */
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .info-box { background: #fcfaff; padding: 25px; border-radius: 24px; border: 1px solid var(--border); }
-  .info-box h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--theme-purple); letter-spacing: 1px; }
-  .dress-chip { display: inline-block; background: #eee; padding: 4px 10px; border-radius: 6px; font-size: 12px; margin: 2px; }
   .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; }
   .rsvp-btn:hover { transform: scale(1.02); }
 
@@ -76,9 +56,8 @@
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr !important; }
     .header-flex { flex-direction: column; text-align: center; }
-    .header-flex .quick-meta { justify-content: center; }
+    .header-flex .quick-meta, .header-flex .dress-container { justify-content: center; }
     .container { padding: 20px; }
-    .gallery-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -120,7 +99,7 @@
 
       const title = tData[3], timelineImg = tData[7], dress = tData[11];
       const rsvp = dData ? dData[2] : "";
-      const hasSidebar = !!(rsvp || dress);
+      const hasSidebar = !!rsvp; // Only has sidebar if RSVP link exists
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
@@ -137,6 +116,10 @@
                     <span>📍 ${tData[6]}</span>
                     <span>🎟️ ${formatPrice(tData[9], tData[10])}</span>
                 </div>
+                ${dress ? `
+                  <div class="dress-container">
+                    ${dress.split(',').map(d => `<span class="dress-chip">👗 ${d.trim()}</span>`).join('')}
+                  </div>` : ''}
             </div>
           </div>
 
@@ -144,7 +127,6 @@
             <div class="content-body">
               ${dData && dData[1] ? `<div class="description">${dData[1]}</div>` : ''}
               
-              <!-- Gallery First -->
               ${dData && dData[3] ? `
                 <div class="gallery-section">
                   <h3 style="font-size:12px; text-transform:uppercase; color:var(--theme-purple); letter-spacing:1px;">Event Highlights</h3>
@@ -153,14 +135,12 @@
                   </div>
                 </div>` : ''}
 
-              <!-- Video Second -->
               ${dData && dData[4] ? `<div class="video-container"><iframe src="${dData[4]}" allowfullscreen></iframe></div>` : ''}
             </div>
 
             ${hasSidebar ? `
               <div class="sidebar">
-                ${rsvp ? `<a href="${rsvp}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>` : ''}
-                ${dress ? `<div class="info-box"><h3>Dress Code</h3><div>${dress.split(',').map(d => `<span class="dress-chip">${d.trim()}</span>`).join('')}</div></div>` : ''}
+                <a href="${rsvp}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
               </div>` : ''}
           </div>
         </div>
