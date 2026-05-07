@@ -61,7 +61,7 @@
   .event-title { font-size: 22px; font-weight: 600; margin: 0 0 8px 0; }
   
   .details { font-size: 13px; opacity: 0.7; margin-bottom: 10px; line-height: 1.5; }
-  .price { font-weight: 600; color: var(--theme-pink); font-size: 14px; }
+  .dress-code { font-style: italic; color: var(--accent); margin-top: 4px; }
 
   .status-area { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; }
   .badge { padding: 4px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
@@ -97,16 +97,12 @@
   
   <select id="catFilter" onchange="filterEvents()">
     <option value="all">All Categories</option>
-    <!-- Script will add your categories here automatically -->
   </select>
 </div>
 
-<div class="timeline" id="timelineContainer">
-    <!-- This is where the magic happens -->
-</div>
+<div class="timeline" id="timelineContainer"></div>
 
 <script>
-  // Your specific Published CSV URL
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
@@ -129,11 +125,11 @@
           img: row[7] || "",
           cat: row[8] || "Event",
           minP: row[9] || "0",
-          maxP: row[10] || "0"
+          maxP: row[10] || "0",
+          dress: row[11] || "" // Mapping Column L (12th column)
         };
       }).sort((a, b) => a.date - b.date);
 
-      // Automatically populate categories in the dropdown
       const cats = [...new Set(allEvents.map(e => e.cat))];
       const catSelect = document.getElementById('catFilter');
       cats.forEach(c => {
@@ -183,6 +179,9 @@
       else if (diffDays === 1) countdownText = "Tomorrow!";
       else if (diffDays > 1) countdownText = `In ${diffDays} days`;
 
+      // Only show dress code line if it exists in the Sheet
+      let dressHtml = ev.dress ? `<div class="dress-code">👗 Dress Code: ${ev.dress}</div>` : '';
+
       return `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" onerror="this.src='https://via.placeholder.com/150?text=PLAVE'">
@@ -200,6 +199,7 @@
             <div class="details">
               📅 ${ev.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}<br>
               📍 ${ev.loc}
+              ${dressHtml}
             </div>
             <div style="display:flex; gap:15px; font-size:14px; font-weight:600;">
               <span style="color:var(--theme-purple);">⏰ ${formatTime(ev.startTime, ev.endTime)}</span>
