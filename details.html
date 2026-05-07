@@ -24,6 +24,9 @@
   
   .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-bottom: 15px; }
 
+  .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 5px; }
+  .cat-badge { background:#f3edff; color:var(--theme-purple); padding:3px 10px; border-radius:6px; font-size:10px; font-weight:700; text-transform:uppercase; }
+
   .dress-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .dress-chip { background: #f0f0f0; color: #666; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid var(--border); }
 
@@ -31,29 +34,12 @@
   .main-content.centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
   .centered .description { text-align: center; }
 
-  /* Cinematic Gallery */
   .gallery-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
-  .gallery-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 20px; 
-    margin-top: 20px; 
-  }
-  .gallery-grid img { 
-    width: 100%; 
-    aspect-ratio: 3 / 2; 
-    object-fit: cover;
-    border-radius: 16px; 
-    border: 1px solid var(--border); 
-    transition: transform 0.3s ease;
-  }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+  .gallery-grid img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); transition: transform 0.3s ease; }
   .gallery-grid img:only-child { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
 
-  .view-more-btn {
-    margin-top: 20px; background: none; border: 1px solid var(--theme-purple); 
-    color: var(--theme-purple); padding: 12px; border-radius: 12px; 
-    cursor: pointer; font-weight: 600; width: 100%; transition: all 0.2s;
-  }
+  .view-more-btn { margin-top: 20px; background: none; border: 1px solid var(--theme-purple); color: var(--theme-purple); padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: all 0.2s; }
   .view-more-btn:hover { background: #f3edff; }
 
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
@@ -68,7 +54,7 @@
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr !important; }
     .header-flex { flex-direction: column; text-align: center; }
-    .header-flex .quick-meta, .header-flex .dress-container { justify-content: center; }
+    .header-flex .quick-meta, .header-flex .tag-container, .header-flex .dress-container { justify-content: center; }
     .container { padding: 20px; }
   }
 </style>
@@ -107,7 +93,9 @@
 
     try {
       const [timelineRows, detailRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
-      const tData = timelineRows.find(r => r[13] === eventId); 
+      
+      // Update: Column 12 is now where the ID lives in the new structure
+      const tData = timelineRows.find(r => r[12] === eventId); 
       const dData = detailRows.find(r => r[0] === eventId);
 
       if (!tData) {
@@ -115,9 +103,30 @@
         return;
       }
 
-      const title = tData[3], timelineImg = tData[7], dress = tData[11];
+      // Column Mappings for NEW structure
+      const startDate = new Date(tData[0]);
+      const endDate = tData[1] ? new Date(tData[1]) : null;
+      const title = tData[2];
+      const startTime = tData[3];
+      const loc = tData[5];
+      const timelineImg = tData[6];
+      const categories = tData[7] ? tData[7].split(',').map(c => c.trim()) : [];
+      const minP = tData[8], maxP = tData[9], dress = tData[10], locLink = tData[11];
+      
       const rsvp = dData ? dData[2] : "";
       const hasSidebar = !!rsvp;
+
+      // Date Display Logic (Ranges)
+      let dateString = startDate.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+      if (endDate && endDate.getTime() !== startDate.getTime()) {
+        const sameMonth = startDate.getMonth() === endDate.getMonth();
+        const sameYear = startDate.getFullYear() === endDate.getFullYear();
+        if (sameMonth && sameYear) {
+            dateString = `${startDate.toLocaleString('en-US', { month: 'long' })} ${startDate.getDate()}–${endDate.getDate()}, ${startDate.getFullYear()}`;
+        } else {
+            dateString = `${startDate.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${endDate.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
+        }
+      }
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
@@ -126,13 +135,15 @@
           <div class="header-flex ${!hasSidebar ? 'centered' : ''}">
             <img src="${timelineImg}" class="event-logo">
             <div class="header-text">
-                <span style="background:#f3edff; color:var(--theme-purple); padding:3px 8px; border-radius:5px; font-size:10px; font-weight:700; text-transform:uppercase;">${tData[8]}</span>
+                <div class="tag-container">
+                  ${categories.map(c => `<span class="cat-badge">${c}</span>`).join('')}
+                </div>
                 <h1>${title}</h1>
                 <div class="quick-meta">
-                    <span>📅 ${tData[0]} ${new Date(2000, tData[1]-1).toLocaleString('default', {month:'long'})} ${tData[2]}</span>
-                    ${tData[4] ? `<span>⏰ ${tData[4]}</span>` : ''}
-                    ${(tData[6] && tData[6].toLowerCase() !== 'tba') ? `<span>📍 ${tData[6]}</span>` : ''}
-                    <span>🎟️ ${formatPrice(tData[9], tData[10])}</span>
+                    <span>📅 ${dateString}</span>
+                    ${startTime ? `<span>⏰ ${startTime}</span>` : ''}
+                    ${(loc && loc.toLowerCase() !== 'tba') ? `<span>📍 ${loc}</span>` : ''}
+                    <span>🎟️ ${formatPrice(minP, maxP)}</span>
                 </div>
                 ${dress ? `
                   <div class="dress-container">
@@ -164,6 +175,7 @@
             ${hasSidebar ? `
               <div class="sidebar">
                 <a href="${rsvp}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
+                ${locLink ? `<a href="${locLink}" target="_blank" style="text-align:center; font-size:12px; color:var(--theme-purple); text-decoration:none; font-weight:600;">Open in Google Maps ↗</a>` : ''}
               </div>` : ''}
           </div>
         </div>
@@ -171,7 +183,7 @@
 
     } catch (err) {
       console.error(err);
-      document.getElementById('details-root').innerHTML = "Error loading event details.";
+      document.getElementById('details-root').innerHTML = "<div style='text-align:center; padding:50px;'>Error loading event details. Please check your spreadsheet connection.</div>";
     }
   }
   init();
