@@ -50,11 +50,12 @@
   .tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
   .category-tag { 
     padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; 
-    text-transform: uppercase; background: #f3edff; color: #a87fe8;
+    text-transform: uppercase;
   }
 
-  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; opacity: 0.8; margin-bottom: 15px; }
-  .meta-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* The Original Info Look */
+  .info-list { display: flex; flex-direction: column; gap: 6px; font-size: 13px; opacity: 0.8; margin-bottom: 10px; }
+  .info-item { display: flex; align-items: center; gap: 8px; }
 
   .status-row { 
     display: flex; justify-content: space-between; align-items: flex-end; 
@@ -67,7 +68,6 @@
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
     .event-img { height: 160px; }
-    .meta-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -105,12 +105,11 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  // Color Mapping System
   const catColors = {
-    'Fan Gathering': { bg: '#e0f2ff', text: '#3182ce' }, // Blue
-    'Birthday': { bg: '#fff5f5', text: '#e53e3e' },     // Red
-    'Cafe': { bg: '#fefcbf', text: '#b7791f' },         // Yellow
-    'Default': { bg: '#f3edff', text: '#a87fe8' }       // Purple
+    'Fan Gathering': { bg: '#e0f2ff', text: '#3182ce' },
+    'Birthday': { bg: '#fff5f5', text: '#e53e3e' },
+    'Cafe': { bg: '#fefcbf', text: '#b7791f' },
+    'Default': { bg: '#f3edff', text: '#a87fe8' }
   };
 
   async function loadTimeline() {
@@ -126,7 +125,6 @@
           end: row[1] ? new Date(row[1]) : null,
           title: row[2] || "Untitled",
           startTime: row[3],
-          endTime: row[4],
           loc: row[5],
           img: row[6],
           categories: row[7] ? row[7].split(',').map(c => c.trim()) : [],
@@ -148,8 +146,8 @@
   }
 
   function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
-    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()}+`;
+    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
+    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
@@ -168,10 +166,11 @@
     container.innerHTML = filtered.map(ev => {
       const isPast = (ev.end || ev.start) < now;
       
-      // Date Logic
-      let dateStr = ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      let dateStr = ev.start.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
       if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
-        dateStr += ` – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric' })}`;
+        const sameMonth = ev.start.getMonth() === ev.end.getMonth();
+        if (sameMonth) dateStr = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
+        else dateStr = `${ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
       }
 
       const card = `
@@ -184,13 +183,13 @@
                 return `<span class="category-tag" style="background:${style.bg}; color:${style.text}">${c}</span>`;
               }).join('')}
             </div>
-            <h2 style="margin:0 0 12px 0; font-size:18px; line-height:1.2;">${ev.title}</h2>
+            <h2 style="margin:0 0 12px 0; font-size:20px; line-height:1.2;">${ev.title}</h2>
             
-            <div class="meta-grid">
-              <div class="meta-item">📅 ${dateStr}</div>
-              <div class="meta-item">📍 ${ev.loc || 'TBA'}</div>
-              <div class="meta-item">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              ${ev.dress ? `<div class="meta-item">👗 ${ev.dress}</div>` : ''}
+            <div class="info-list">
+              <div class="info-item">📅 ${dateStr}</div>
+              <div class="info-item">📍 ${ev.loc || 'TBA'}</div>
+              <div class="info-item">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
+              ${ev.dress ? `<div class="info-item">👗 ${ev.dress}</div>` : ''}
             </div>
 
             <div class="status-row">
