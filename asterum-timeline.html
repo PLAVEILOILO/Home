@@ -44,52 +44,66 @@
     background: var(--surface); 
     border-radius: 24px; 
     display: grid;
-    grid-template-columns: 180px 1fr; /* Fixed image width, flexible content */
+    grid-template-columns: 180px 1fr;
     border: 1px solid var(--border);
     box-shadow: 0 10px 30px rgba(168,127,232,0.05); 
     transition: transform 0.2s;
     overflow: hidden;
+    min-height: 200px;
   }
   .event-card:hover { transform: translateY(-3px); }
 
-  .event-img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    display: block;
-  }
+  .event-img { width: 100%; height: 100%; object-fit: cover; display: block; }
   
   .event-info { 
     display: flex; 
     flex-direction: column; 
-    padding: 20px;
-    min-width: 0; /* Prevents text overflow */
+    padding: 24px;
+    min-width: 0;
   }
 
+  .tag-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+  
   .category-tag { 
     display: inline-block; padding: 4px 12px; border-radius: 8px;
     background: #f3edff; color: var(--theme-purple);
     font-size: 10px; text-transform: uppercase; letter-spacing: 1px; 
-    font-weight: 700; margin-bottom: 8px;
+    font-weight: 700; width: fit-content;
   }
   
-  .event-title { font-size: clamp(18px, 5vw, 22px); font-weight: 600; margin: 0 0 10px 0; line-height: 1.2; }
+  .event-title { font-size: clamp(18px, 5vw, 22px); font-weight: 600; margin: 0 0 12px 0; line-height: 1.2; }
   
-  .details { font-size: 13px; opacity: 0.8; line-height: 1.6; margin-bottom: 12px; }
+  .details { font-size: 13px; opacity: 0.8; line-height: 1.6; margin-bottom: 12px; flex-grow: 1; }
 
-  /* Dress Code Chips */
-  .dress-container { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  /* Location Link Style */
+  .loc-link { 
+    color: inherit; 
+    text-decoration: none; 
+    transition: color 0.2s;
+  }
+  .loc-link:hover { 
+    color: var(--accent); 
+    text-decoration: underline; 
+  }
+
+  .dress-container { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .dress-chip {
-    padding: 2px 8px; border-radius: 6px;
-    background: #eee; font-size: 11px; font-weight: 500;
-    border: 1px solid rgba(0,0,0,0.05);
+    padding: 2px 10px; border-radius: 6px;
+    background: rgba(168, 127, 232, 0.08); 
+    color: var(--theme-purple);
+    font-size: 11px; font-weight: 600;
+    border: 1px solid rgba(168, 127, 232, 0.1);
   }
 
-  .status-area { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
-  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
+  .meta-group { display: flex; flex-direction: column; gap: 4px; }
+  .meta-item { font-size: 12px; font-weight: 600; }
+  
+  .badge-group { text-align: right; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; margin-bottom: 4px; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
-  .meta { font-size: 12px; font-weight: 600; display: flex; gap: 12px; flex-wrap: wrap; }
+  .countdown { font-size: 11px; font-weight: 700; color: var(--accent); }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
@@ -136,13 +150,20 @@
         title: row[3] || "Untitled",
         startTime: row[4] || "", endTime: row[5] || "",
         loc: row[6] || "TBA", img: row[7] || "", cat: row[8] || "Event",
-        minP: row[9] || "0", maxP: row[10] || "0", dress: row[11] || ""
+        minP: row[9] || "0", maxP: row[10] || "0", dress: row[11] || "",
+        locLink: row[12] || "" // Mapping Column M (13th column)
       })).sort((a, b) => a.date - b.date);
 
       const cats = [...new Set(allEvents.map(e => e.cat))];
       cats.forEach(c => { if(c) document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; });
       filterEvents();
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
+  }
+
+  function formatPrice(min, max) {
+    if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
+    if (min === max) return `₱${Number(min).toLocaleString()}`;
+    return `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
@@ -158,30 +179,52 @@
     });
 
     container.innerHTML = filtered.map(ev => {
-      const isPast = ev.date < now;
+      const diffDays = Math.ceil((ev.date - now) / (1000 * 60 * 60 * 24));
+      const isPast = diffDays < 0;
+      
+      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
+      let countdownText = "";
+      if (diffDays === 0) countdownText = "Happening Today!";
+      else if (diffDays === 1) countdownText = "Tomorrow!";
+      else if (diffDays > 1) countdownText = `In ${diffDays} days`;
+
       const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
       
+      // If there's a link, wrap location in an <a> tag, otherwise just show text
+      const locationDisplay = ev.locLink 
+        ? `<a href="${ev.locLink}" target="_blank" class="loc-link">📍 ${ev.loc}</a>` 
+        : `📍 ${ev.loc}`;
+
       return `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
-            <div class="category-tag">${ev.cat}</div>
+            <div class="tag-row">
+                <div class="category-tag">${ev.cat}</div>
+            </div>
             <h2 class="event-title">${ev.title}</h2>
             <div class="details">
               📅 ${ev.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}<br>
-              📍 ${ev.loc}
+              ${locationDisplay}
               ${ev.dress ? `<div class="dress-container">👚 ${dressChips}</div>` : ''}
             </div>
-            <div class="status-area">
-              <div class="meta">
-                <span style="color:var(--theme-purple);">⏰ ${ev.startTime}</span>
-                <span style="color:var(--theme-pink);">🎟️ ${ev.minP === "0" ? "Free" : "₱" + ev.minP}</span>
+            <div class="status-row">
+              <div class="meta-group">
+                <div class="meta-item" style="color:var(--theme-purple);">⏰ ${ev.startTime} ${ev.endTime ? ' – ' + ev.endTime : ''}</div>
+                <div class="meta-item" style="color:var(--theme-pink);">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
               </div>
-              ${isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">UPCOMING</span>'}
+              <div class="badge-group">
+                ${statusBadge}<br>
+                <span class="countdown">${isPast ? '' : countdownText}</span>
+              </div>
             </div>
           </div>
         </div>`;
     }).join('');
+
+    if(filtered.length === 0) {
+      container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found for this filter.</p>';
+    }
   }
   loadTimeline();
 </script>
