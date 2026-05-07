@@ -12,7 +12,6 @@
     --border: rgba(180,160,220,0.2);
     --text: #1e1530;
     --theme-purple: #a87fe8;
-    --theme-pink: #e87bb5;
     --accent: #6c5ce7;
   }
 
@@ -32,14 +31,31 @@
   header { text-align: center; margin: 20px 0 30px; }
   header h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 8vw, 38px); margin: 0; }
 
-  .controls { width: min(800px, 100%); display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; justify-content: center; }
-  select {
-    padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--border);
-    background: white; font-family: inherit; cursor: pointer; font-size: 13px; outline: none;
+  /* New Filter Chip Styles */
+  .filter-section { width: min(800px, 100%); display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; align-items: center; }
+  .filter-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  
+  .filter-chip {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .filter-chip:hover { border-color: var(--theme-purple); background: #fdfbff; }
+  .filter-chip.active {
+    background: var(--theme-purple);
+    color: white;
+    border-color: var(--theme-purple);
+    box-shadow: 0 4px 12px rgba(168, 127, 232, 0.3);
   }
 
   .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 20px; }
-  
   .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
 
   .event-card {
@@ -51,67 +67,28 @@
     box-shadow: 0 10px 30px rgba(168,127,232,0.05); 
     transition: transform 0.2s;
     overflow: hidden;
-    cursor: pointer;
   }
   .event-card:hover { transform: translateY(-3px); }
-
   .event-img { width: 100%; height: 100%; object-fit: cover; display: block; }
   
-  .event-info { 
-    display: flex; 
-    flex-direction: column; 
-    padding: 24px;
-    min-width: 0;
-  }
-
-  .tag-row { display: flex; align-items: flex-start; margin-bottom: 8px; }
-  
+  .event-info { display: flex; flex-direction: column; padding: 24px; min-width: 0; }
   .category-tag { 
     display: inline-block; padding: 4px 12px; border-radius: 8px;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 1px; 
-    font-weight: 700;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+    margin-bottom: 8px;
   }
   
   .event-title { font-size: clamp(18px, 5vw, 22px); font-weight: 600; margin: 0 0 10px 0; line-height: 1.2; }
-  
-  .details-list { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 8px; 
-    font-size: 13px; 
-    opacity: 0.8; 
-    line-height: 1.4;
-    margin-bottom: 4px;
-  }
-
-  .loc-link { color: inherit; text-decoration: none; }
-  .loc-link:hover { color: var(--accent); text-decoration: underline; }
-
-  .dress-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .dress-chip {
-    padding: 2px 10px; border-radius: 6px;
-    background: #f0f0f0; 
-    color: #666;
-    font-size: 11px; font-weight: 600;
-    border: 1px solid var(--border);
-  }
+  .details-list { display: flex; flex-direction: column; gap: 8px; font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
 
   .status-row { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-end; 
-    margin-top: auto; 
-    padding-top: 10px; 
-    border-top: 1px dashed var(--border); 
+    display: flex; justify-content: space-between; align-items: flex-end; 
+    margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); 
   }
-  .meta-group { display: flex; flex-direction: column; gap: 2px; }
   .meta-item { font-size: 12px; font-weight: 600; }
-  
-  .badge-group { text-align: right; }
-  .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; margin-bottom: 2px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
-  .countdown { font-size: 11px; font-weight: 700; color: var(--accent); }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
@@ -130,15 +107,18 @@
   <h1>Asterum <em>Timeline</em></h1>
 </header>
 
-<div class="controls">
-  <select id="timeFilter" onchange="filterEvents()">
-    <option value="upcoming">Upcoming</option>
-    <option value="past">Past Events</option>
-    <option value="all" selected>All Time</option>
-  </select>
-  <select id="catFilter" onchange="filterEvents()">
-    <option value="all">All Categories</option>
-  </select>
+<div class="filter-section">
+  <!-- Time Filters -->
+  <div class="filter-group" id="timeFilters">
+    <button class="filter-chip active" data-value="all" onclick="setTimeFilter(this)">All Time</button>
+    <button class="filter-chip" data-value="upcoming" onclick="setTimeFilter(this)">Upcoming</button>
+    <button class="filter-chip" data-value="past" onclick="setTimeFilter(this)">Past Events</button>
+  </div>
+  
+  <!-- Category Filters (Dynamic) -->
+  <div class="filter-group" id="catFilters">
+    <button class="filter-chip active" data-value="all" onclick="setCatFilter(this)">All Categories</button>
+  </div>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
@@ -146,6 +126,8 @@
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
+  let currentTimeFilter = 'all';
+  let currentCatFilter = 'all';
 
   const catColors = {
     "Anniversary": { bg: "#fff0f6", text: "#d63384" },
@@ -173,89 +155,86 @@
         id: row[13] || ""
       })).sort((a, b) => a.date - b.date);
 
-      const cats = [...new Set(allEvents.map(e => e.cat))];
-      cats.forEach(c => { if(c) document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; });
+      // Generate category chips
+      const cats = [...new Set(allEvents.map(e => e.cat))].filter(Boolean);
+      const catContainer = document.getElementById('catFilters');
+      cats.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-chip';
+        btn.textContent = c;
+        btn.dataset.value = c;
+        btn.onclick = () => setCatFilter(btn);
+        catContainer.appendChild(btn);
+      });
+
       filterEvents();
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
   }
 
+  function setTimeFilter(el) {
+    document.querySelectorAll('#timeFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
+    currentTimeFilter = el.dataset.value;
+    filterEvents();
+  }
+
+  function setCatFilter(el) {
+    document.querySelectorAll('#catFilters .filter-chip').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
+    currentCatFilter = el.dataset.value;
+    filterEvents();
+  }
+
   function formatPrice(min, max) {
     if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
-    if (min === max) return `₱${Number(min).toLocaleString()}`;
-    return `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
+    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
-    const timeVal = document.getElementById('timeFilter').value;
-    const catVal = document.getElementById('catFilter').value;
     const container = document.getElementById('timelineContainer');
     const now = new Date(); now.setHours(0,0,0,0);
 
     const filtered = allEvents.filter(ev => {
       const isPast = ev.date < now;
-      return ((timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast)) &&
-             ((catVal === 'all') || (ev.cat.trim() === catVal.trim()));
+      const timeMatch = (currentTimeFilter === 'all') || (currentTimeFilter === 'past' && isPast) || (currentTimeFilter === 'upcoming' && !isPast);
+      const catMatch = (currentCatFilter === 'all') || (ev.cat.trim() === currentCatFilter.trim());
+      return timeMatch && catMatch;
     });
 
     container.innerHTML = filtered.map(ev => {
       const diffDays = Math.ceil((ev.date - now) / (1000 * 60 * 60 * 24));
       const isPast = diffDays < 0;
-      
-      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
-      let countdownText = (diffDays === 0) ? "Happening Today!" : (diffDays === 1) ? "Tomorrow!" : (diffDays > 1) ? `In ${diffDays} days` : "";
-
-      const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
-      
-      // Smart Location Logic: Only show if loc is not empty and not "TBA"
-      const hasLocation = ev.loc && ev.loc !== "" && ev.loc.toLowerCase() !== "tba";
-      const locationDisplay = hasLocation 
-        ? `<div>${ev.locLink 
-            ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` 
-            : `📍 ${ev.loc}`}</div>` 
-        : "";
-
       const colors = catColors[ev.cat] || defaultColor;
+      const hasLocation = ev.loc && ev.loc.toLowerCase() !== "tba";
 
       const cardHtml = `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
-            <div class="tag-row">
-              <div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">
-                ${ev.cat}
-              </div>
-            </div>
+            <div><span class="category-tag" style="background:${colors.bg}; color:${colors.text}">${ev.cat}</span></div>
             <h2 class="event-title">${ev.title}</h2>
-            
             <div class="details-list">
               <div>📅 ${ev.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-              ${locationDisplay}
-              ${ev.dress ? `<div class="dress-row">👚 ${dressChips}</div>` : ''}
+              ${hasLocation ? `<div>📍 ${ev.loc}</div>` : ''}
             </div>
-
             <div class="status-row">
               <div class="meta-group">
-                ${ev.startTime ? `<div class="meta-item" style="color: #2E2E2E;">⏰ ${ev.startTime}${ev.endTime ? ' – ' + ev.endTime : ''}</div>` : ''}
+                ${ev.startTime ? `<div class="meta-item">⏰ ${ev.startTime}</div>` : ''}
                 <div class="meta-item" style="color: #963252;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
               </div>
               <div class="badge-group">
-                ${statusBadge}<br>
-                <span class="countdown">${isPast ? '' : countdownText}</span>
+                <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
               </div>
             </div>
           </div>
         </div>`;
 
-      return ev.id 
-        ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` 
-        : cardHtml;
-
+      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` : cardHtml;
     }).join('');
 
-    if(filtered.length === 0) {
-      container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found for this filter.</p>';
-    }
+    if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found for this filter.</p>';
   }
+
   loadTimeline();
 </script>
 </body>
