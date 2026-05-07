@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asterum | Event Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7ff; --surface: #ffffff; --text: #1e1530;
+    --theme-purple: #a87fe8; --accent: #6c5ce7; --border: rgba(180,160,220,0.2);
+  }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
+  .container { width: min(900px, 100%); background: var(--surface); padding: 40px; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+  
+  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
+  
+  .header-section { border-bottom: 1px solid var(--border); margin-bottom: 30px; padding-bottom: 20px; }
+  .cat-tag { background: #f3edff; color: var(--theme-purple); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 48px); margin: 15px 0 5px 0; }
+  
+  .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; opacity: 0.8; margin-top: 10px; }
+  
+  /* Carousel */
+  .carousel-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; margin: 30px 0; scrollbar-width: none; border-radius: 20px; }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-item { flex: 0 0 100%; scroll-snap-align: start; }
+  .carousel-item img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 20px; display: block; }
+
+  .main-content { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
+  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; }
+  
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .info-box { background: #fcfaff; padding: 25px; border-radius: 24px; border: 1px solid var(--border); }
+  .info-box h3 { margin-top: 0; font-size: 14px; text-transform: uppercase; color: var(--theme-purple); letter-spacing: 1px; }
+  
+  .dress-chip { display: inline-block; background: #eee; padding: 4px 10px; border-radius: 6px; font-size: 12px; margin: 2px; }
+  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; }
+  .rsvp-btn:hover { transform: scale(1.02); }
+
+  .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 24px; margin-top: 40px; }
+  .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+  @media (max-width: 768px) {
+    .main-content { grid-template-columns: 1fr; }
+    .container { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="details-root">Connecting to Asterum...</div>
+
+<script>
+  const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
+  const TIMELINE_GID = '1296117535';
+  const DETAILS_GID = '1063823403'; // Update this to your Second Tab's GID
+
+  async function fetchCSV(gid) {
+    const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`);
+    const csv = await response.text();
+    return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
+  }
+
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('id');
+    if (!eventId) return;
+
+    try {
+      const [timelineRows, detailRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
+      
+      // Look for the ID in Column N of the first sheet
+      const tData = timelineRows.find(r => r[13] === eventId); 
+      // Look for the ID in Column A of the second sheet
+      const dData = detailRows.find(r => r[0] === eventId);
+
+      if (!tData) {
+        document.getElementById('details-root').innerHTML = "Event not found.";
+        return;
+      }
+
+      // Map basic info from Timeline (Tab 1)
+      const dateStr = `${tData[0]} ${new Date(2000, tData[1]-1).toLocaleString('default', {month:'long'})} ${tData[2]}`;
+      const title = tData[3], time = tData[4], location = tData[6], cat = tData[8], dress = tData[11], mapLink = tData[12];
+      
+      // Map elaborate info from EventDetails (Tab 2)
+      // B=Desc, C=RSVP Link, D=Gallery (Comma separated), E=Video
+      const desc = dData ? dData[1] : "No description available.";
+      const rsvp = dData ? dData[2] : "";
+      const gallery = dData ? dData[3] : "";
+      const video = dData ? dData[4] : "";
+
+      let galleryHtml = '';
+      if (gallery) {
+        galleryHtml = `<div class="carousel-track">${gallery.split(',').map(img => `<div class="carousel-item"><img src="${img.trim()}"></div>`).join('')}</div>`;
+      } else {
+        galleryHtml = `<div class="carousel-track"><div class="carousel-item"><img src="${tData[7]}"></div></div>`;
+      }
+
+      document.getElementById('details-root').innerHTML = `
+        <a href="index.html" class="back-btn">← Back to Asterum Timeline</a>
+        
+        <div class="header-section">
+          <span class="cat-tag">${cat}</span>
+          <h1>${title}</h1>
+          <div class="quick-meta">
+            <span>📅 ${dateStr}</span>
+            <span>⏰ ${time}</span>
+            <span>📍 <a href="${mapLink}" target="_blank" style="color:inherit">${location}</a></span>
+          </div>
+        </div>
+
+        ${galleryHtml}
+
+        <div class="main-content">
+          <div class="description">
+            <h3 style="font-size:14px; text-transform:uppercase; color:var(--theme-purple);">About this event</h3>
+            ${desc}
+            
+            ${video ? `<div class="video-container"><iframe src="${video}" allowfullscreen></iframe></div>` : ''}
+          </div>
+
+          <div class="sidebar">
+            ${rsvp ? `<a href="${rsvp}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>` : ''}
+            
+            <div class="info-box">
+              <h3>Dress Code</h3>
+              <div>${dress ? dress.split(',').map(d => `<span class="dress-chip">${d.trim()}</span>`).join('') : 'Casual'}</div>
+            </div>
+
+            <p style="font-size:12px; opacity:0.6; text-align:center;">Prices and schedules are subject to change based on event organizers.</p>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      document.getElementById('details-root').innerHTML = "Error loading event details.";
+    }
+  }
+  init();
+</script>
+</body>
+</html>
