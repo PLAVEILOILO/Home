@@ -90,10 +90,10 @@
   .dress-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .dress-chip {
     padding: 2px 10px; border-radius: 6px;
-    background: #D9D9D9; 
-    color: #242424;
+    background: #f0f0f0; 
+    color: #666;
     font-size: 11px; font-weight: 600;
-    border: 1px solid rgba(168, 127, 232, 0.1);
+    border: 1px solid var(--border);
   }
 
   .status-row { 
@@ -147,7 +147,6 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  // Category Color Map
   const catColors = {
     "Anniversary": { bg: "#fff0f6", text: "#d63384" },
     "Birthdays": { bg: "#fff9db", text: "#f59f00" },
@@ -207,9 +206,13 @@
 
       const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
       
-      const locationDisplay = ev.locLink 
-        ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` 
-        : `📍 ${ev.loc}`;
+      // Smart Location Logic: Only show if loc is not empty and not "TBA"
+      const hasLocation = ev.loc && ev.loc !== "" && ev.loc.toLowerCase() !== "tba";
+      const locationDisplay = hasLocation 
+        ? `<div>${ev.locLink 
+            ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` 
+            : `📍 ${ev.loc}`}</div>` 
+        : "";
 
       const colors = catColors[ev.cat] || defaultColor;
 
@@ -226,7 +229,7 @@
             
             <div class="details-list">
               <div>📅 ${ev.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-              <div>${locationDisplay}</div>
+              ${locationDisplay}
               ${ev.dress ? `<div class="dress-row">👚 ${dressChips}</div>` : ''}
             </div>
 
