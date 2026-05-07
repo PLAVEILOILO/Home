@@ -121,31 +121,25 @@
       const csv = await response.text();
       const rows = csv.split(/\r?\n/)
         .map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()))
-        .filter(row => row.length > 3 && row[0] !== "Year");
+        .filter(row => row.length > 5 && row[0] !== "Start Date");
 
       allEvents = rows.map(row => {
-        const startDate = new Date(row[0], row[1] - 1, row[2]);
-        let endDate = null;
-        
-        // If "End Time" contains a date format (YYYY-MM-DD), treat it as a range
-        if (row[5] && row[5].includes('-') && row[5].length >= 8) {
-          endDate = new Date(row[5]);
-        }
+        const start = new Date(row[0]);
+        const end = row[1] ? new Date(row[1]) : null;
 
         return {
-          date: startDate,
-          endDate: endDate,
-          title: row[3] || "Untitled",
-          startTime: row[4],
-          endTime: row[5],
-          loc: row[6],
-          img: row[7],
-          categories: row[8] ? row[8].split(',').map(c => c.trim()) : [],
-          id: row[13]
+          start: start,
+          end: end,
+          title: row[2] || "Untitled",
+          startTime: row[3],
+          endTime: row[4],
+          loc: row[5],
+          img: row[6],
+          categories: row[7] ? row[7].split(',').map(c => c.trim()) : [],
+          id: row[12]
         };
-      }).sort((a, b) => a.date - b.date);
+      }).sort((a, b) => a.start - b.start);
 
-      // Unique categories for dropdown
       const uniqueCats = [...new Set(allEvents.flatMap(e => e.categories))].filter(Boolean);
       uniqueCats.forEach(c => {
         const opt = document.createElement('option');
@@ -164,30 +158,25 @@
     const now = new Date(); now.setHours(0,0,0,0);
 
     const filtered = allEvents.filter(ev => {
-      // For multi-day events, check if the END date is past.
-      const compareDate = ev.endDate || ev.date;
-      const isPast = compareDate < now;
-      
+      const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
       const catMatch = (catVal === 'all') || (ev.categories.includes(catVal));
       return timeMatch && catMatch;
     });
 
     container.innerHTML = filtered.map(ev => {
-      const compareDate = ev.endDate || ev.date;
-      const isPast = compareDate < now;
+      const isPast = (ev.end || ev.start) < now;
       const hasLoc = ev.loc && ev.loc.trim() !== "" && ev.loc.toLowerCase() !== "tba";
       const hasTime = ev.startTime && ev.startTime.trim() !== "" && ev.startTime.toLowerCase() !== "tba";
 
-      // Date Display Logic
-      let dateString = ev.date.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
-      if (ev.endDate) {
-        const endStr = ev.endDate.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
-        // If same month/year, simplify
-        if (ev.date.getMonth() === ev.endDate.getMonth() && ev.date.getFullYear() === ev.endDate.getFullYear()) {
-            dateString = `${ev.date.toLocaleString('en-US', { month: 'long' })} ${ev.date.getDate()} - ${ev.endDate.getDate()}, ${ev.date.getFullYear()}`;
+      let dateString = ev.start.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+      if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
+        const sameMonth = ev.start.getMonth() === ev.end.getMonth();
+        const sameYear = ev.start.getFullYear() === ev.end.getFullYear();
+        if (sameMonth && sameYear) {
+            dateString = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
         } else {
-            dateString = `${ev.date.toLocaleDateString('en-US', { month:'short', day:'numeric' })} - ${endStr}`;
+            dateString = `${ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
         }
       }
 
@@ -214,7 +203,6 @@
     
     if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No events found.</p>';
   }
-
   loadTimeline();
 </script>
 </body>
