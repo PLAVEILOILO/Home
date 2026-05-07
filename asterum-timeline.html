@@ -27,19 +27,18 @@
 
   /* Filter Section */
   .filter-container {
-    width: min(900px, 100%); background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px); padding: 25px; border-radius: 24px;
-    border: 1px solid var(--border); margin-bottom: 40px;
-    display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start;
+    width: min(900px, 100%); background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
+    padding: 25px; border-radius: 24px; border: 1px solid var(--border);
+    margin-bottom: 40px; display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: flex-start;
   }
   .filter-section { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 250px; }
-  .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--theme-purple); text-align: center; }
+  .filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--theme-purple); opacity: 0.8; text-align: center; }
   .filter-group { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .filter-chip { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .filter-chip { padding: 8px 16px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.2s ease; }
   .filter-chip.active { background: var(--theme-purple); color: white; border-color: var(--theme-purple); box-shadow: 0 4px 12px rgba(168, 127, 232, 0.2); }
   .divider { width: 1px; background: var(--border); align-self: stretch; }
 
-  /* Timeline Cards */
+  /* Timeline Styles */
   .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 20px; }
   .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
   .event-card { background: var(--surface); border-radius: 24px; display: grid; grid-template-columns: 180px 1fr; border: 1px solid var(--border); overflow: hidden; transition: transform 0.2s; }
@@ -47,18 +46,19 @@
   .event-img { width: 100%; height: 100%; object-fit: cover; }
   .event-info { padding: 24px; display: flex; flex-direction: column; min-width: 0; }
   .category-tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-  .details-list { display: flex; flex-direction: column; gap: 6px; font-size: 13px; opacity: 0.8; margin-bottom: 10px; }
-  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); min-height: 35px; }
   .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
 
   /* Back to Top Button */
   #backToTop {
-    position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
-    background: var(--theme-purple); color: white; border: none; border-radius: 50%;
-    cursor: pointer; font-size: 20px; display: none; align-items: center; justify-content: center;
-    box-shadow: 0 4px 15px rgba(168, 127, 232, 0.4); z-index: 100; transition: transform 0.2s;
+    position: fixed; bottom: 30px; right: 30px; 
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--accent); color: white; border: none;
+    cursor: pointer; display: none; z-index: 1000;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+    font-size: 20px; transition: transform 0.2s;
   }
   #backToTop:hover { transform: scale(1.1); }
 
@@ -77,7 +77,7 @@
   <div class="orb orb-2"></div>
 </div>
 
-<header id="top">
+<header>
   <h1>Asterum <em>Timeline</em></h1>
 </header>
 
@@ -117,11 +117,11 @@
   };
   const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
 
-  // Scroll to Top Logic
+  // Back to Top Logic
   window.onscroll = function() {
     const btn = document.getElementById("backToTop");
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-      btn.style.display = "flex";
+      btn.style.display = "block";
     } else {
       btn.style.display = "none";
     }
@@ -150,7 +150,8 @@
       cats.forEach(c => {
         const btn = document.createElement('button');
         btn.className = 'filter-chip';
-        btn.textContent = c; btn.dataset.value = c;
+        btn.textContent = c;
+        btn.dataset.value = c;
         btn.onclick = () => setCatFilter(btn);
         document.getElementById('catFilters').appendChild(btn);
       });
@@ -187,9 +188,11 @@
     container.innerHTML = filtered.map(ev => {
       const isPast = ev.date < now;
       const colors = catColors[ev.cat] || defaultColor;
-      const hasLoc = ev.loc && ev.loc.toLowerCase() !== "tba";
-      const displayTime = ev.startTime && ev.startTime.trim() !== "" ? ev.startTime : "TBA";
+      const hasLoc = ev.loc && ev.loc.toLowerCase() !== "tba" && ev.loc.trim() !== "";
       
+      // Clean Time Logic: If startTime is empty/TBA, hide the row
+      const hasTime = ev.startTime && ev.startTime.toLowerCase() !== "tba" && ev.startTime.trim() !== "";
+
       const card = `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" onerror="this.style.display='none'">
@@ -201,7 +204,7 @@
               ${hasLoc ? `<div>📍 ${ev.loc}</div>` : ''}
             </div>
             <div class="status-row">
-              <div style="font-size:12px; font-weight:600;">⏰ ${displayTime}</div>
+              <div style="font-size:12px; font-weight:600;">${hasTime ? '⏰ ' + ev.startTime : ''}</div>
               <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
             </div>
           </div>
