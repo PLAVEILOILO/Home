@@ -40,6 +40,9 @@
 
   .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 20px; }
   
+  /* Link wrapper styling */
+  .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
+
   .event-card {
     background: var(--surface); 
     border-radius: 24px; 
@@ -49,6 +52,7 @@
     box-shadow: 0 10px 30px rgba(168,127,232,0.05); 
     transition: transform 0.2s;
     overflow: hidden;
+    cursor: pointer;
   }
   .event-card:hover { transform: translateY(-3px); }
 
@@ -72,15 +76,14 @@
   
   .event-title { font-size: clamp(18px, 5vw, 22px); font-weight: 600; margin: 0 0 10px 0; line-height: 1.2; }
   
-  /* Container for Date, Loc, Dress for uniform spacing */
   .details-list { 
     display: flex; 
     flex-direction: column; 
-    gap: 8px; /* Uniform distance between each row */
+    gap: 8px; 
     font-size: 13px; 
     opacity: 0.8; 
     line-height: 1.4;
-    margin-bottom: 4px; /* Reduced space after the list */
+    margin-bottom: 4px;
   }
 
   .loc-link { color: inherit; text-decoration: none; }
@@ -95,13 +98,12 @@
     border: 1px solid rgba(168, 127, 232, 0.1);
   }
 
-  /* Status Row - Moved up by reducing padding/margin */
   .status-row { 
     display: flex; 
     justify-content: space-between; 
     align-items: flex-end; 
     margin-top: auto; 
-    padding-top: 10px; /* Reduced from 15px */
+    padding-top: 10px; 
     border-top: 1px dashed var(--border); 
   }
   .meta-group { display: flex; flex-direction: column; gap: 2px; }
@@ -159,7 +161,8 @@
         startTime: row[4] || "", endTime: row[5] || "",
         loc: row[6] || "TBA", img: row[7] || "", cat: row[8] || "Event",
         minP: row[9] || "0", maxP: row[10] || "0", dress: row[11] || "",
-        locLink: row[12] || ""
+        locLink: row[12] || "",
+        id: row[13] || "" // Column N
       })).sort((a, b) => a.date - b.date);
 
       const cats = [...new Set(allEvents.map(e => e.cat))];
@@ -194,11 +197,13 @@
       let countdownText = (diffDays === 0) ? "Happening Today!" : (diffDays === 1) ? "Tomorrow!" : (diffDays > 1) ? `In ${diffDays} days` : "";
 
       const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
+      
+      // Stop link propagation if user clicks the Google Maps link specifically
       const locationDisplay = ev.locLink 
-        ? `<a href="${ev.locLink}" target="_blank" class="loc-link">📍 ${ev.loc}</a>` 
+        ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` 
         : `📍 ${ev.loc}`;
 
-      return `
+      const cardHtml = `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
@@ -223,6 +228,12 @@
             </div>
           </div>
         </div>`;
+
+      // If ID exists, wrap in link, otherwise return just the card
+      return ev.id 
+        ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` 
+        : cardHtml;
+
     }).join('');
 
     if(filtered.length === 0) {
