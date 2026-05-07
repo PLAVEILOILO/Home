@@ -13,10 +13,8 @@
   body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
   .container { width: min(1000px, 100%); background: var(--surface); padding: 40px; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); box-sizing: border-box; }
   
-  /* Header Layout */
   .header-flex { display: flex; align-items: center; gap: 25px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .header-flex.centered { flex-direction: column; text-align: center; justify-content: center; }
-  .header-flex.centered .quick-meta, .header-flex.centered .dress-container { justify-content: center; }
   
   .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); flex-shrink: 0; }
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 42px); margin: 5px 0; }
@@ -26,56 +24,44 @@
   
   .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-bottom: 15px; }
 
-  /* Dress Code Chips in Header */
   .dress-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .dress-chip { background: #f0f0f0; color: #666; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid var(--border); }
 
-  /* Adaptive Content Layout */
   .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
   .main-content.centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
   .centered .description { text-align: center; }
 
-  /* Gallery */
+  /* Cinematic Gallery */
   .gallery-section { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
- /* Professional Mosaic Grid */
-/* Cinematic Landscape Gallery */
-.gallery-grid { 
-  display: grid; 
-  /* Maintains 2 columns on most screens, 1 on very small mobile */
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-  gap: 20px; 
-  margin-top: 20px; 
-}
+  .gallery-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 20px; 
+    margin-top: 20px; 
+  }
+  .gallery-grid img { 
+    width: 100%; 
+    aspect-ratio: 3 / 2; 
+    object-fit: cover;
+    border-radius: 16px; 
+    border: 1px solid var(--border); 
+    transition: transform 0.3s ease;
+  }
+  .gallery-grid img:only-child { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
 
-.gallery-grid img { 
-  width: 100%; 
-  /* This creates a nice landscape rectangle */
-  aspect-ratio: 3 / 2; 
-  object-fit: cover;
-  border-radius: 16px; 
-  border: 1px solid var(--border); 
-  transition: transform 0.3s ease, box-shadow 0.3s ease; 
-  cursor: zoom-in; /* Hints to the user that they can look closer */
-}
+  .view-more-btn {
+    margin-top: 20px; background: none; border: 1px solid var(--theme-purple); 
+    color: var(--theme-purple); padding: 12px; border-radius: 12px; 
+    cursor: pointer; font-weight: 600; width: 100%; transition: all 0.2s;
+  }
+  .view-more-btn:hover { background: #f3edff; }
 
-.gallery-grid img:hover { 
-  transform: scale(1.02); 
-  box-shadow: 0 12px 24px rgba(168, 127, 232, 0.12); 
-}
-
-/* If there is only one highlight, make it stand out as a hero image */
-.gallery-grid img:only-child {
-  grid-column: 1 / -1;
-  aspect-ratio: 16 / 7; /* Extra wide for single featured images */
-}
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
   
-  /* Sidebar */
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
   .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; }
   .rsvp-btn:hover { transform: scale(1.02); }
 
-  /* Video */
   .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 24px; margin-top: 40px; border: 1px solid var(--border); }
   .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
@@ -108,6 +94,12 @@
     return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
+  function showAllImages() {
+    document.querySelectorAll('.extra-img').forEach(img => img.style.display = 'block');
+    const btn = document.getElementById('view-more-btn');
+    if (btn) btn.style.display = 'none';
+  }
+
   async function init() {
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('id');
@@ -125,7 +117,7 @@
 
       const title = tData[3], timelineImg = tData[7], dress = tData[11];
       const rsvp = dData ? dData[2] : "";
-      const hasSidebar = !!rsvp; // Only has sidebar if RSVP link exists
+      const hasSidebar = !!rsvp;
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
@@ -138,8 +130,8 @@
                 <h1>${title}</h1>
                 <div class="quick-meta">
                     <span>📅 ${tData[0]} ${new Date(2000, tData[1]-1).toLocaleString('default', {month:'long'})} ${tData[2]}</span>
-                    <span>⏰ ${tData[4]}</span>
-                    <span>📍 ${tData[6]}</span>
+                    ${tData[4] ? `<span>⏰ ${tData[4]}</span>` : ''}
+                    ${(tData[6] && tData[6].toLowerCase() !== 'tba') ? `<span>📍 ${tData[6]}</span>` : ''}
                     <span>🎟️ ${formatPrice(tData[9], tData[10])}</span>
                 </div>
                 ${dress ? `
@@ -153,13 +145,18 @@
             <div class="content-body">
               ${dData && dData[1] ? `<div class="description">${dData[1]}</div>` : ''}
               
-              ${dData && dData[3] ? `
-                <div class="gallery-section">
-                  <h3 style="font-size:12px; text-transform:uppercase; color:var(--theme-purple); letter-spacing:1px;">Event Highlights</h3>
-                  <div class="gallery-grid">
-                    ${dData[3].split(',').map(img => `<img src="${img.trim()}" alt="Gallery highlight">`).join('')}
-                  </div>
-                </div>` : ''}
+              ${dData && dData[3] ? (() => {
+                  const images = dData[3].split(',').map(img => img.trim());
+                  const hasMore = images.length > 4;
+                  return `
+                    <div class="gallery-section">
+                      <h3 style="font-size:12px; text-transform:uppercase; color:var(--theme-purple); letter-spacing:1px;">Event Highlights</h3>
+                      <div class="gallery-grid">
+                        ${images.map((img, i) => `<img src="${img}" class="${i >= 4 ? 'extra-img' : ''}" style="${i >= 4 ? 'display:none;' : ''}" alt="Highlight">`).join('')}
+                      </div>
+                      ${hasMore ? `<button id="view-more-btn" class="view-more-btn" onclick="showAllImages()">View More (+${images.length - 4})</button>` : ''}
+                    </div>`;
+              })() : ''}
 
               ${dData && dData[4] ? `<div class="video-container"><iframe src="${dData[4]}" allowfullscreen></iframe></div>` : ''}
             </div>
