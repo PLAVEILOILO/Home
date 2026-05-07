@@ -53,10 +53,6 @@
     text-transform: uppercase;
   }
 
-  /* The Original Info Look */
-  .info-list { display: flex; flex-direction: column; gap: 6px; font-size: 13px; opacity: 0.8; margin-bottom: 10px; }
-  .info-item { display: flex; align-items: center; gap: 8px; }
-
   .status-row { 
     display: flex; justify-content: space-between; align-items: flex-end; 
     margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); 
@@ -64,6 +60,12 @@
   .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
+
+  #backToTop {
+    position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; 
+    border-radius: 50%; background: var(--accent); color: white; border: none;
+    cursor: pointer; display: none; z-index: 1000; font-size: 18px;
+  }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
@@ -100,17 +102,26 @@
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
 
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
+  // Color Mapping System
   const catColors = {
     'Fan Gathering': { bg: '#e0f2ff', text: '#3182ce' },
     'Birthday': { bg: '#fff5f5', text: '#e53e3e' },
     'Cafe': { bg: '#fefcbf', text: '#b7791f' },
     'Default': { bg: '#f3edff', text: '#a87fe8' }
   };
+
+  window.onscroll = function() {
+    const btn = document.getElementById("backToTop");
+    if (document.documentElement.scrollTop > 400) btn.style.display = "block";
+    else btn.style.display = "none";
+  };
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
   async function loadTimeline() {
     try {
@@ -165,12 +176,18 @@
 
     container.innerHTML = filtered.map(ev => {
       const isPast = (ev.end || ev.start) < now;
-      
-      let dateStr = ev.start.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+      const hasLoc = ev.loc && ev.loc.toLowerCase() !== "tba";
+      const hasTime = ev.startTime && ev.startTime.toLowerCase() !== "tba";
+
+      let dateString = ev.start.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
       if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
         const sameMonth = ev.start.getMonth() === ev.end.getMonth();
-        if (sameMonth) dateStr = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
-        else dateStr = `${ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
+        const sameYear = ev.start.getFullYear() === ev.end.getFullYear();
+        if (sameMonth && sameYear) {
+            dateString = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
+        } else {
+            dateString = `${ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
+        }
       }
 
       const card = `
@@ -183,24 +200,25 @@
                 return `<span class="category-tag" style="background:${style.bg}; color:${style.text}">${c}</span>`;
               }).join('')}
             </div>
-            <h2 style="margin:0 0 12px 0; font-size:20px; line-height:1.2;">${ev.title}</h2>
-            
-            <div class="info-list">
-              <div class="info-item">📅 ${dateStr}</div>
-              <div class="info-item">📍 ${ev.loc || 'TBA'}</div>
-              <div class="info-item">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              ${ev.dress ? `<div class="info-item">👗 ${ev.dress}</div>` : ''}
+            <h2 style="margin:0 0 10px 0; font-size:20px; line-height:1.2;">${ev.title}</h2>
+            <div style="font-size:13px; opacity:0.8; display:flex; flex-direction:column; gap:6px;">
+              <div>📅 ${dateString}</div>
+              ${hasLoc ? `<div>📍 ${ev.loc}</div>` : ''}
+              <div>🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
+              ${ev.dress ? `<div>👗 ${ev.dress}</div>` : ''}
             </div>
-
             <div class="status-row">
-              <div style="font-size:11px; font-weight:600; opacity:0.7;">${ev.startTime ? '⏰ ' + ev.startTime : ''}</div>
+              <div style="font-size:12px; font-weight:600;">${hasTime ? '⏰ ' + ev.startTime : ''}</div>
               <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
             </div>
           </div>
         </div>`;
       return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${card}</a>` : card;
     }).join('');
+    
+    if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No events found.</p>';
   }
+
   loadTimeline();
 </script>
 </body>
