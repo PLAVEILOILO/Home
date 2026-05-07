@@ -20,7 +20,7 @@
     font-family: 'Outfit', sans-serif;
     background: var(--bg);
     color: var(--text);
-    margin: 0; padding: 40px 20px;
+    margin: 0; padding: 20px;
     display: flex; flex-direction: column; align-items: center;
   }
 
@@ -29,8 +29,8 @@
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  header { text-align: center; margin-bottom: 30px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: 38px; margin: 0; }
+  header { text-align: center; margin: 20px 0 30px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 8vw, 38px); margin: 0; }
 
   .controls { width: min(800px, 100%); display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; justify-content: center; }
   select {
@@ -43,70 +43,57 @@
   .event-card {
     background: var(--surface); 
     border-radius: 24px; 
-    padding: 0; /* Padding moved to info area for flush image */
-    display: flex; 
-    gap: 0; 
+    display: grid;
+    grid-template-columns: 180px 1fr; /* Fixed image width, flexible content */
     border: 1px solid var(--border);
     box-shadow: 0 10px 30px rgba(168,127,232,0.05); 
     transition: transform 0.2s;
     overflow: hidden;
-    min-height: 180px;
   }
   .event-card:hover { transform: translateY(-3px); }
 
   .event-img { 
-    width: 200px; 
-    height: auto; 
+    width: 100%; 
+    height: 100%; 
     object-fit: cover; 
-    flex-shrink: 0; 
+    display: block;
   }
   
   .event-info { 
-    flex-grow: 1; 
     display: flex; 
     flex-direction: column; 
-    padding: 24px;
-    justify-content: space-between;
+    padding: 20px;
+    min-width: 0; /* Prevents text overflow */
   }
-
-  .event-header { display: flex; justify-content: space-between; align-items: flex-start; }
-  
-  .tag-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 
   .category-tag { 
     display: inline-block; padding: 4px 12px; border-radius: 8px;
     background: #f3edff; color: var(--theme-purple);
     font-size: 10px; text-transform: uppercase; letter-spacing: 1px; 
-    font-weight: 700;
-  }
-
-  .dress-tag {
-    display: inline-block; padding: 4px 12px; border-radius: 8px;
-    background: #fff0f6; color: var(--theme-pink);
-    font-size: 10px; text-transform: uppercase; letter-spacing: 1px; 
-    font-weight: 700;
-    border: 1px solid rgba(232, 123, 181, 0.1);
+    font-weight: 700; margin-bottom: 8px;
   }
   
-  .event-title { font-size: 22px; font-weight: 600; margin: 0 0 10px 0; line-height: 1.2; }
+  .event-title { font-size: clamp(18px, 5vw, 22px); font-weight: 600; margin: 0 0 10px 0; line-height: 1.2; }
   
-  .details { font-size: 13px; opacity: 0.7; margin-bottom: 15px; line-height: 1.6; }
+  .details { font-size: 13px; opacity: 0.8; line-height: 1.6; margin-bottom: 12px; }
 
-  .status-area { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; }
-  .badge { padding: 4px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; margin-bottom: 8px; }
+  /* Dress Code Chips */
+  .dress-container { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .dress-chip {
+    padding: 2px 8px; border-radius: 6px;
+    background: #eee; font-size: 11px; font-weight: 500;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .status-area { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
+  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
-  .countdown { font-size: 11px; font-weight: 600; color: var(--accent); }
-
-  .meta-footer {
-    display: flex; gap: 15px; font-size: 13px; font-weight: 600; margin-top: auto; padding-top: 10px;
-    border-top: 1px dashed var(--border);
-  }
+  .meta { font-size: 12px; font-weight: 600; display: flex; gap: 12px; flex-wrap: wrap; }
 
   @media (max-width: 600px) {
-    .event-card { flex-direction: column; }
-    .event-img { width: 100%; height: 180px; }
-    .status-area { align-items: flex-start; margin-top: 15px; text-align: left; }
+    .event-card { grid-template-columns: 1fr; }
+    .event-img { height: 180px; }
   }
 </style>
 </head>
@@ -127,10 +114,7 @@
     <option value="past">Past Events</option>
     <option value="all">All Time</option>
   </select>
-  
-  <select id="catFilter" onchange="filterEvents()">
-    <option value="all">All Categories</option>
-  </select>
+  <select id="catFilter" onchange="filterEvents()"><option value="all">All Categories</option></select>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
@@ -143,114 +127,62 @@
     try {
       const response = await fetch(sheetUrl);
       const csv = await response.text();
-      
       const rows = csv.split(/\r?\n/)
         .map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/"/g, '').trim()))
         .filter(row => row.length > 3 && row[0] !== "Year");
 
-      allEvents = rows.map(row => {
-        return {
-          date: new Date(row[0], row[1] - 1, row[2]),
-          title: row[3] || "Untitled Event",
-          startTime: row[4] || "",
-          endTime: row[5] || "",
-          loc: row[6] || "TBA",
-          img: row[7] || "",
-          cat: row[8] || "Event",
-          minP: row[9] || "0",
-          maxP: row[10] || "0",
-          dress: row[11] || "" 
-        };
-      }).sort((a, b) => a.date - b.date);
+      allEvents = rows.map(row => ({
+        date: new Date(row[0], row[1] - 1, row[2]),
+        title: row[3] || "Untitled",
+        startTime: row[4] || "", endTime: row[5] || "",
+        loc: row[6] || "TBA", img: row[7] || "", cat: row[8] || "Event",
+        minP: row[9] || "0", maxP: row[10] || "0", dress: row[11] || ""
+      })).sort((a, b) => a.date - b.date);
 
       const cats = [...new Set(allEvents.map(e => e.cat))];
-      const catSelect = document.getElementById('catFilter');
-      cats.forEach(c => {
-        if(c) catSelect.innerHTML += `<option value="${c}">${c}</option>`;
-      });
-
+      cats.forEach(c => { if(c) document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; });
       filterEvents();
-    } catch (e) {
-      console.error("Error loading Sheet:", e);
-      document.getElementById('timelineContainer').innerHTML = "Error connecting to Asterum.";
-    }
-  }
-
-  function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
-    if (min === max) return `₱${Number(min).toLocaleString()}`;
-    return `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
-  }
-
-  function formatTime(start, end) {
-    if (!start) return "Time TBA";
-    if (!end) return start;
-    return `${start} – ${end}`;
+    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
   }
 
   function filterEvents() {
     const timeVal = document.getElementById('timeFilter').value;
     const catVal = document.getElementById('catFilter').value;
     const container = document.getElementById('timelineContainer');
-    const now = new Date();
-    now.setHours(0,0,0,0);
+    const now = new Date(); now.setHours(0,0,0,0);
 
     const filtered = allEvents.filter(ev => {
       const isPast = ev.date < now;
-      const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      const catMatch = (catVal === 'all') || (ev.cat.trim() === catVal.trim());
-      return timeMatch && catMatch;
+      return ((timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast)) &&
+             ((catVal === 'all') || (ev.cat.trim() === catVal.trim()));
     });
 
     container.innerHTML = filtered.map(ev => {
-      const diffDays = Math.ceil((ev.date - now) / (1000 * 60 * 60 * 24));
-      const isPast = diffDays < 0;
-
-      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
-      let countdownText = "";
-      if (diffDays === 0) countdownText = "Happening Today!";
-      else if (diffDays === 1) countdownText = "Tomorrow!";
-      else if (diffDays > 1) countdownText = `In ${diffDays} days`;
-
-      let dressHtml = ev.dress ? `<div class="dress-tag">👗 ${ev.dress}</div>` : '';
-
+      const isPast = ev.date < now;
+      const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
+      
       return `
         <div class="event-card">
-          <img src="${ev.img}" class="event-img" onerror="this.src='https://via.placeholder.com/200x200?text=PLAVE'">
+          <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
-            <div class="event-header">
-              <div style="flex:1;">
-                <div class="tag-container">
-                    <div class="category-tag">${ev.cat}</div>
-                    ${dressHtml}
-                </div>
-                <h2 class="event-title">${ev.title}</h2>
-              </div>
-              <div class="status-area">
-                ${statusBadge}
-                <div class="countdown">${isPast ? '' : countdownText}</div>
-              </div>
-            </div>
-            
+            <div class="category-tag">${ev.cat}</div>
+            <h2 class="event-title">${ev.title}</h2>
             <div class="details">
               📅 ${ev.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}<br>
               📍 ${ev.loc}
+              ${ev.dress ? `<div class="dress-container">👚 ${dressChips}</div>` : ''}
             </div>
-
-            <div class="meta-footer">
-              <span style="color:var(--theme-purple);">⏰ ${formatTime(ev.startTime, ev.endTime)}</span>
-              <span style="color:var(--theme-pink);">🎟️ ${formatPrice(ev.minP, ev.maxP)}</span>
+            <div class="status-area">
+              <div class="meta">
+                <span style="color:var(--theme-purple);">⏰ ${ev.startTime}</span>
+                <span style="color:var(--theme-pink);">🎟️ ${ev.minP === "0" ? "Free" : "₱" + ev.minP}</span>
+              </div>
+              ${isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">UPCOMING</span>'}
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
-
-    if(filtered.length === 0) {
-      container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found for this filter.</p>';
-    }
   }
-
   loadTimeline();
 </script>
 </body>
