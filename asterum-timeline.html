@@ -136,9 +136,12 @@
   <select id="timeFilter" onchange="filterEvents()">
     <option value="upcoming">Upcoming</option>
     <option value="past">Past Events</option>
+    <!-- Just add 'selected' here -->
     <option value="all" selected>All Time</option>
   </select>
-  <select id="catFilter" onchange="filterEvents()"><option value="all">All Categories</option></select>
+  <select id="catFilter" onchange="filterEvents()">
+    <option value="all">All Categories</option>
+  </select>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
