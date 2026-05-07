@@ -47,19 +47,32 @@
   .event-img { width: 100%; height: 100%; object-fit: cover; }
   .event-info { padding: 24px; display: flex; flex-direction: column; min-width: 0; }
   
-  .tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
   .category-tag { 
-    padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; 
-    text-transform: uppercase;
+    display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; 
+    font-weight: 700; text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  .event-title { margin: 0 0 10px 0; font-size: 20px; line-height: 1.2; }
+  .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; }
+  .loc-link { text-decoration: none; color: inherit; font-weight: 500; }
+  .loc-link:hover { color: var(--theme-purple); text-decoration: underline; }
+
+  .dress-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .dress-chip { 
+    background: #f0f0f0; color: #666; padding: 2px 8px; border-radius: 100px; 
+    font-size: 10px; font-weight: 600; text-transform: uppercase; border: 1px solid var(--border);
   }
 
   .status-row { 
     display: flex; justify-content: space-between; align-items: flex-end; 
-    margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); 
+    margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); 
   }
-  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+  .meta-item { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .badge-group { text-align: right; }
+  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; display: inline-block; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
+  .countdown { font-size: 11px; font-weight: 500; color: var(--theme-purple); display: block; margin-top: 4px; }
 
   #backToTop {
     position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; 
@@ -108,13 +121,13 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  // Color Mapping System
   const catColors = {
-    'Fan Gathering': { bg: '#e0f2ff', text: '#3182ce' },
-    'Birthday': { bg: '#fff5f5', text: '#e53e3e' },
-    'Cafe': { bg: '#fefcbf', text: '#b7791f' },
-    'Default': { bg: '#f3edff', text: '#a87fe8' }
+    "Anniversary": { bg: "#fff0f6", text: "#d63384" },
+    "Birthdays": { bg: "#fff9db", text: "#f59f00" },
+    "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
+    "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
   };
+  const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
 
   window.onscroll = function() {
     const btn = document.getElementById("backToTop");
@@ -128,28 +141,32 @@
       const response = await fetch(sheetUrl);
       const csv = await response.text();
       const rows = csv.split(/\r?\n/)
-        .map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()))
+        .map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/"/g, '').trim()))
         .filter(row => row.length > 5 && row[0] !== "Start Date");
 
-      allEvents = rows.map(row => ({
-          start: new Date(row[0]),
-          end: row[1] ? new Date(row[1]) : null,
+      allEvents = rows.map(row => {
+        const start = new Date(row[0]);
+        const end = row[1] ? new Date(row[1]) : null;
+        return {
+          start: start,
+          end: end,
           title: row[2] || "Untitled",
-          startTime: row[3],
-          loc: row[5],
-          img: row[6],
-          categories: row[7] ? row[7].split(',').map(c => c.trim()) : [],
-          minP: row[8],
-          maxP: row[9],
-          dress: row[10],
-          id: row[12]
-      })).sort((a, b) => a.start - b.start);
+          startTime: row[3] || "", 
+          endTime: row[4] || "",
+          loc: row[5] || "TBA", 
+          img: row[6] || "", 
+          cat: row[7] || "Event",
+          minP: row[8] || "0", 
+          maxP: row[9] || "0", 
+          dress: row[10] || "",
+          locLink: row[11] || "",
+          id: row[12] || ""
+        };
+      }).sort((a, b) => a.start - b.start);
 
-      const uniqueCats = [...new Set(allEvents.flatMap(e => e.categories))].filter(Boolean);
-      uniqueCats.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = opt.textContent = c;
-        document.getElementById('catFilter').appendChild(opt);
+      const uniqueCats = [...new Set(allEvents.map(e => e.cat))].filter(Boolean);
+      uniqueCats.forEach(c => { 
+        document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; 
       });
 
       filterEvents();
@@ -157,8 +174,9 @@
   }
 
   function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
-    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
+    if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
+    if (min === max) return `₱${Number(min).toLocaleString()}`;
+    return `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
@@ -170,55 +188,64 @@
     const filtered = allEvents.filter(ev => {
       const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      const catMatch = (catVal === 'all') || (ev.categories.includes(catVal));
+      const catMatch = (catVal === 'all') || (ev.cat.trim() === catVal.trim());
       return timeMatch && catMatch;
     });
 
     container.innerHTML = filtered.map(ev => {
+      const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const isPast = (ev.end || ev.start) < now;
-      const hasLoc = ev.loc && ev.loc.toLowerCase() !== "tba";
-      const hasTime = ev.startTime && ev.startTime.toLowerCase() !== "tba";
+      
+      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
+      let countdownText = (diffDays === 0) ? "Happening Today!" : (diffDays === 1) ? "Tomorrow!" : (diffDays > 1) ? `In ${diffDays} days` : "";
 
-      let dateString = ev.start.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+      let dateString = ev.start.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
         const sameMonth = ev.start.getMonth() === ev.end.getMonth();
-        const sameYear = ev.start.getFullYear() === ev.end.getFullYear();
-        if (sameMonth && sameYear) {
-            dateString = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
+        if (sameMonth) {
+          dateString = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
         } else {
-            dateString = `${ev.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}`;
+          dateString = `${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
         }
       }
 
-      const card = `
+      const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
+      const locationDisplay = ev.locLink ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` : `📍 ${ev.loc}`;
+      const colors = catColors[ev.cat] || defaultColor;
+
+      const cardHtml = `
         <div class="event-card">
-          <img src="${ev.img}" class="event-img" onerror="this.style.display='none'">
+          <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
-            <div class="tag-container">
-              ${ev.categories.map(c => {
-                const style = catColors[c] || catColors['Default'];
-                return `<span class="category-tag" style="background:${style.bg}; color:${style.text}">${c}</span>`;
-              }).join('')}
+            <div class="tag-row">
+              <div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">
+                ${ev.cat}
+              </div>
             </div>
-            <h2 style="margin:0 0 10px 0; font-size:20px; line-height:1.2;">${ev.title}</h2>
-            <div style="font-size:13px; opacity:0.8; display:flex; flex-direction:column; gap:6px;">
+            <h2 class="event-title">${ev.title}</h2>
+            <div class="details-list">
               <div>📅 ${dateString}</div>
-              ${hasLoc ? `<div>📍 ${ev.loc}</div>` : ''}
-              <div>🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              ${ev.dress ? `<div>👗 ${ev.dress}</div>` : ''}
+              <div>${locationDisplay}</div>
+              ${ev.dress ? `<div class="dress-row">👚 ${dressChips}</div>` : ''}
             </div>
             <div class="status-row">
-              <div style="font-size:12px; font-weight:600;">${hasTime ? '⏰ ' + ev.startTime : ''}</div>
-              <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+              <div class="meta-group">
+                ${ev.startTime ? `<div class="meta-item" style="color: #2E2E2E;">⏰ ${ev.startTime}${ev.endTime ? ' – ' + ev.endTime : ''}</div>` : ''}
+                <div class="meta-item" style="color: #963252;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
+              </div>
+              <div class="badge-group">
+                ${statusBadge}
+                <span class="countdown">${isPast ? '' : countdownText}</span>
+              </div>
             </div>
           </div>
         </div>`;
-      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${card}</a>` : card;
-    }).join('');
-    
-    if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No events found.</p>';
-  }
 
+      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` : cardHtml;
+    }).join('');
+
+    if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found.</p>';
+  }
   loadTimeline();
 </script>
 </body>
