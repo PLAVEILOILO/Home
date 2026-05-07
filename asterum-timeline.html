@@ -47,9 +47,10 @@
   .event-img { width: 100%; height: 100%; object-fit: cover; }
   .event-info { padding: 24px; display: flex; flex-direction: column; min-width: 0; }
   
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .category-tag { 
-    display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 10px; 
-    font-weight: 700; text-transform: uppercase; margin-bottom: 8px;
+    padding: 4px 10px; border-radius: 6px; font-size: 10px; 
+    font-weight: 700; text-transform: uppercase;
   }
 
   .event-title { margin: 0 0 10px 0; font-size: 20px; line-height: 1.2; }
@@ -57,7 +58,7 @@
   .loc-link { text-decoration: none; color: inherit; font-weight: 500; }
   .loc-link:hover { color: var(--theme-purple); text-decoration: underline; }
 
-  .dress-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .dress-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
   .dress-chip { 
     background: #f0f0f0; color: #666; padding: 2px 8px; border-radius: 100px; 
     font-size: 10px; font-weight: 600; text-transform: uppercase; border: 1px solid var(--border);
@@ -164,7 +165,9 @@
         };
       }).sort((a, b) => a.start - b.start);
 
-      const uniqueCats = [...new Set(allEvents.map(e => e.cat))].filter(Boolean);
+      // Populate Categories Dropdown (Splitting combined strings for unique list)
+      const allCats = allEvents.flatMap(e => e.cat.split(',').map(c => c.trim()));
+      const uniqueCats = [...new Set(allCats)].filter(Boolean);
       uniqueCats.forEach(c => { 
         document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; 
       });
@@ -188,7 +191,10 @@
     const filtered = allEvents.filter(ev => {
       const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      const catMatch = (catVal === 'all') || (ev.cat.trim() === catVal.trim());
+      
+      const evCats = ev.cat.split(',').map(c => c.trim());
+      const catMatch = (catVal === 'all') || (evCats.includes(catVal));
+      
       return timeMatch && catMatch;
     });
 
@@ -209,18 +215,22 @@
         }
       }
 
+      // Logic to split multiple categories into separate Chips
+      const categories = ev.cat.split(',').map(c => c.trim()).filter(Boolean);
+      const categoryChips = categories.map(cat => {
+          const colors = catColors[cat] || defaultColor;
+          return `<div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">${cat}</div>`;
+      }).join('');
+
       const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
       const locationDisplay = ev.locLink ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` : `📍 ${ev.loc}`;
-      const colors = catColors[ev.cat] || defaultColor;
 
       const cardHtml = `
         <div class="event-card">
           <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
             <div class="tag-row">
-              <div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">
-                ${ev.cat}
-              </div>
+              ${categoryChips}
             </div>
             <h2 class="event-title">${ev.title}</h2>
             <div class="details-list">
