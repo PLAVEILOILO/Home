@@ -8,12 +8,13 @@
 <style>
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
-    --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7; --price-red: #ff4d4d;
+    --text: #1e1530; --theme-purple: #7a4ed9; --accent: #6c5ce7; --price-red: #ff4d4d;
   }
 
   body {
     font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text);
     margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
+    -webkit-font-smoothing: antialiased;
   }
 
   .bg-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
@@ -22,56 +23,66 @@
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
   header { text-align: center; margin: 20px 0 30px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 48px); margin: 0; }
-  header p { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-top: 5px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 48px); margin: 0; font-weight: 700; }
+  header p { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-top: 5px; font-weight: 500; }
 
   .filter-bar { 
     width: min(900px, 100%); display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 15px; margin-bottom: 30px; padding: 10px;
   }
-  .filter-group { display: flex; flex-direction: column; gap: 5px; background: white; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-  .filter-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); opacity: 0.5; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; background: white; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+  .filter-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); opacity: 0.7; }
 
-  select { border: none; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--text); outline: none; cursor: pointer; background: transparent; }
+  select { border: none; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); outline: none; cursor: pointer; background: transparent; }
 
   .timeline { width: min(900px, 100%); display: flex; flex-direction: column; gap: 20px; }
   
+  /* Removed Underlines from Link */
+  .event-link { text-decoration: none; color: inherit; display: block; }
+
   .event-card {
     background: var(--surface); border-radius: 24px; display: grid;
-    grid-template-columns: 240px 1fr; border: 2.5px solid transparent;
-    overflow: hidden; transition: all 0.2s; position: relative;
+    grid-template-columns: 260px 1fr; border: 2.5px solid transparent;
+    overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
     box-shadow: 0 4px 20px rgba(168, 127, 232, 0.08);
   }
-  .event-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(168, 127, 232, 0.15); }
+  .event-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(168, 127, 232, 0.15); }
 
-  .img-container { position: relative; width: 240px; height: 100%; overflow: hidden; background: #eee; flex-shrink: 0; }
-  .event-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.6s ease-in-out; opacity: 0; }
+  .img-container { position: relative; width: 260px; height: 100%; overflow: hidden; background: #f0f0f0; flex-shrink: 0; }
+  .event-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.8s ease-in-out; opacity: 0; }
   .event-img.active { opacity: 1; }
 
-  .event-info { padding: 25px; display: flex; flex-direction: column; min-width: 0; }
+  .event-info { padding: 30px; display: flex; flex-direction: column; min-width: 0; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .cat-tag { background: #f3edff; color: var(--theme-purple); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-  .member-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.05); }
-
-  .title-group { margin-bottom: 12px; }
-  .event-title { margin: 0 0 4px 0; font-size: 22px; line-height: 1.2; font-family: 'Playfair Display', serif; }
-  .title-divider { height: 1px; background: var(--border); margin: 8px 0; border: none; width: 50px; }
-
-  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
   
-  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
-  .price-val { color: var(--price-red); font-weight: 700; font-size: 15px; }
+  /* Distinct Category Colors */
+  .cat-tag { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cat-birthday { background: #e0f7fa; color: #00838f; } /* Teal */
+  .cat-anniversary { background: #fff8e1; color: #ff8f00; } /* Amber */
+  .cat-event { background: #e8eaf6; color: #283593; } /* Indigo */
+  .cat-default { background: #f3edff; color: var(--theme-purple); }
+
+  .member-tag { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
+
+  .title-group { margin-bottom: 15px; }
+  .event-title { margin: 0 0 4px 0; font-size: 24px; line-height: 1.2; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text); }
+  .title-divider { height: 1px; background: var(--border); margin: 10px 0; border: none; width: 40px; }
+
+  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-weight: 400; }
+  
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 18px; border-top: 1.5px dashed var(--border); }
+  .price-val { color: var(--price-red); font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
 
   .countdown-box { text-align: right; }
-  .timer-text { display: block; font-size: 11px; font-weight: 600; color: var(--theme-purple); margin-bottom: 4px; text-transform: uppercase; }
-  .badge { padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
-  .badge-soon { background: #eef5ff; color: #4b92ff; }
-  .badge-ended { background: #f5f5f5; color: #999; }
+  .timer-text { display: block; font-size: 11px; font-weight: 700; color: var(--theme-purple); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge { padding: 5px 14px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; }
+  .badge-soon { background: #6c5ce7; color: white; }
+  .badge-ended { background: #eeeeee; color: #999; }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     .event-card { grid-template-columns: 1fr; }
-    .img-container { width: 100%; height: 220px; }
+    .img-container { width: 100%; height: 250px; }
     .filter-bar { grid-template-columns: 1fr; }
   }
 </style>
@@ -116,12 +127,20 @@
 
   const memberStyles = {
     "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" },
+    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" }, // Deep Amethyst
     "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
     "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
     "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { border: "#a87fe8", bg: "#f3edff", text: "#a87fe8" }
+    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" } // Asterum Purple
   };
+
+  function getCatClass(cat) {
+    const c = cat.toLowerCase();
+    if (c.includes('birthday')) return 'cat-birthday';
+    if (c.includes('anniversary')) return 'cat-anniversary';
+    if (c.includes('event')) return 'cat-event';
+    return 'cat-default';
+  }
 
   function formatPrice(min, max) {
     if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
@@ -186,37 +205,39 @@
       const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
 
       return `
-        <a href="details.html?id=${ev.id}" class="event-card" style="border-color: ${mStyle.border}; border-width: 2.5px;">
-          <div class="img-container">
-            ${ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" id="img-${ev.id}-${i}">`).join('')}
-          </div>
-          <div class="event-info">
-            <div class="tag-row">
-              ${ev.cat.split(',').map(c => `<div class="cat-tag">${c.trim()}</div>`).join('')}
-              ${ev.members.map(m => {
-                const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
-                return `<div class="member-tag" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</div>`;
-              }).join('')}
+        <a href="details.html?id=${ev.id}" class="event-link">
+          <div class="event-card" style="border-color: ${mStyle.border};">
+            <div class="img-container">
+              ${ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" id="img-${ev.id}-${i}">`).join('')}
             </div>
-            <div class="title-group">
-              ${ev.titles.map((t, i) => `<h2 class="event-title">${t.trim()}</h2>${i < ev.titles.length - 1 ? '<hr class="title-divider">' : ''}`).join('')}
-            </div>
-            <div class="details-list">
-              <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
-              <div>📍 ${ev.loc}</div>
-            </div>
-            <div class="status-row">
-              <div class="price-val">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              <div class="countdown-box">
-                ${!isPast ? `<span class="timer-text">${getCountdown(ev.start)}</span>` : ''}
-                <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+            <div class="event-info">
+              <div class="tag-row">
+                ${ev.cat.split(',').map(c => `<div class="cat-tag ${getCatClass(c)}">${c.trim()}</div>`).join('')}
+                ${ev.members.map(m => {
+                  const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
+                  return `<div class="member-tag" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</div>`;
+                }).join('')}
+              </div>
+              <div class="title-group">
+                ${ev.titles.map((t, i) => `<h2 class="event-title">${t.trim()}</h2>${i < ev.titles.length - 1 ? '<hr class="title-divider">' : ''}`).join('')}
+              </div>
+              <div class="details-list">
+                <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
+                <div>📍 ${ev.loc}</div>
+              </div>
+              <div class="status-row">
+                <div class="price-val">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
+                <div class="countdown-box">
+                  ${!isPast ? `<span class="timer-text">${getCountdown(ev.start)}</span>` : ''}
+                  <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+                </div>
               </div>
             </div>
           </div>
         </a>`;
     }).join('');
 
-    // Start Swiper for these filtered cards
+    // Swiper logic
     filtered.forEach(ev => {
       if (ev.imgs.length > 1) {
         let cur = 0;
@@ -226,7 +247,7 @@
           cur = (cur + 1) % ev.imgs.length;
           const nImg = document.getElementById(`img-${ev.id}-${cur}`);
           if (nImg) nImg.classList.add('active');
-        }, 3000);
+        }, 4000);
       }
     });
   }
