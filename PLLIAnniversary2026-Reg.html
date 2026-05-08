@@ -3,92 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLLI Anniversary Pass ✨</title>
+    <title>PLLIcnic Anniversary ✨</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Montserrat:wght@800&family=Poppins:wght@400;600&display=swap');
 
+        * { box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
-            margin: 0; min-height: 100vh;
-            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            margin: 0; padding: 20px; overflow-x: hidden;
             background: linear-gradient(175deg, #fffbe6 0%, #fff8f0 55%, #fff0f5 100%);
-            overflow-x: hidden;
         }
 
-        #daisy-canvas { position: fixed; inset: 0; pointer-events: none; opacity: 0.5; z-index: 0; }
+        #daisy-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.6; }
 
-        /* --- Registration Card --- */
+        /* --- Glassmorphism Card --- */
         .card {
-            background: rgba(255,255,255,0.92);
+            background: rgba(255,255,255,0.85);
             padding: 40px; border-radius: 40px;
-            box-shadow: 0 10px 40px rgba(255,210,80,0.15);
-            width: 90%; max-width: 400px; text-align: center;
-            position: relative; z-index: 10; backdrop-filter: blur(8px);
-            border: 2px solid #fde68a;
+            box-shadow: 0 15px 50px rgba(255,210,80,0.2);
+            width: 100%; max-width: 420px; text-align: center;
+            border: 2px solid rgba(255,224,120,0.5);
+            position: relative; z-index: 10; backdrop-filter: blur(12px);
         }
+
+        .logo-text { font-family: 'Fredoka', sans-serif; font-size: 42px; color: #e8822a; margin: 0; }
+        .sub-text { font-size: 11px; color: #c96a1a; font-weight: 600; letter-spacing: 3px; margin-bottom: 30px; }
 
         input {
-            width: 100%; padding: 14px; margin: 10px 0;
-            border: 2px solid #fde68a; border-radius: 15px;
-            font-family: 'Fredoka'; font-size: 16px; outline: none;
+            width: 100%; padding: 16px; margin: 8px 0;
+            border: 2px solid #fde68a; border-radius: 20px;
+            font-family: 'Fredoka'; font-size: 16px; outline: none; background: white;
         }
 
         .btn {
-            width: 100%; padding: 16px; margin-top: 15px;
+            width: 100%; padding: 18px; margin-top: 15px;
             background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
-            color: white; border: none; border-radius: 20px;
+            color: white; border: none; border-radius: 25px;
             font-family: 'Fredoka'; font-weight: 600; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(244,143,177,0.3);
         }
 
-        /* --- Ticket Styles --- */
-        #ticket-container { display: none; width: 90%; max-width: 450px; z-index: 10; }
+        /* --- Ticket Container --- */
+        #ticket-container { display: none; width: 100%; max-width: 450px; z-index: 10; animation: fadeIn 0.8s; }
         
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .success-msg {
-            background: #f0fdf4; color: #166534; padding: 12px;
-            border-radius: 15px; margin-bottom: 15px; font-size: 14px;
-            font-weight: 600; text-align: center; border: 1px solid #bbf7d0;
+            background: #f0fdf4; color: #166534; padding: 12px; border-radius: 15px;
+            margin-bottom: 20px; font-size: 14px; font-weight: 600; text-align: center; border: 1px solid #bbf7d0;
         }
 
-        #capture-area { border-radius: 30px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        #capture-area { border-radius: 35px; overflow: hidden; position: relative; }
 
         .ticket {
-            width: 100%; height: 600px; position: relative;
+            width: 100%; min-height: 620px; position: relative;
             background: var(--m-bg); display: flex; flex-direction: column;
         }
 
         .member-img {
             position: absolute; inset: 0;
-            background-size: cover; background-position: center 10%;
+            background-size: cover; background-position: center 15%; z-index: 1;
         }
 
         .badge-sticker {
-            position: absolute; top: 25px; right: 25px;
-            width: 80px; height: 80px; background: #72c95e; color: white;
+            position: absolute; top: 30px; right: 30px;
+            width: 90px; height: 90px; background: #72c95e; color: white;
             border-radius: 50%; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            font-family: 'Fredoka'; font-weight: 600; font-size: 10px;
-            border: 3px dashed rgba(255,255,255,0.5);
-            transform: rotate(15deg) scale(0); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10;
+            font-family: 'Fredoka'; font-weight: 600; font-size: 11px;
+            border: 4px dashed rgba(255,255,255,0.4);
+            transform: rotate(15deg) scale(0); transition: 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .badge-sticker.pop { transform: rotate(15deg) scale(1); }
 
         .fade-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 35%, transparent 70%);
+            position: absolute; inset: 0; z-index: 2;
+            background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 40%, transparent 80%);
         }
 
-        .ticket-content { position: relative; z-index: 5; margin-top: auto; padding: 35px; }
+        .ticket-content { position: relative; z-index: 5; margin-top: auto; padding: 40px; }
 
-        .detail-label { font-size: 10px; text-transform: uppercase; color: #d4860f; letter-spacing: 1px; }
-        .detail-value { font-size: 15px; font-weight: 600; color: #7a4020; margin-bottom: 10px; }
-        #display-name { font-size: 32px; font-weight: 800; font-family: 'Fredoka'; color: #7a4020; margin: 0; }
+        .member-badge {
+            background: rgba(255,255,255,0.8); padding: 5px 15px; border-radius: 50px;
+            font-size: 12px; font-weight: 600; color: var(--m-color);
+            display: inline-block; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .detail-label { font-size: 10px; text-transform: uppercase; color: #d4860f; letter-spacing: 1.5px; font-weight: 600; }
+        .detail-value { font-size: 15px; font-weight: 600; color: #7a4020; margin-bottom: 15px; }
+        #display-name { font-size: 38px; font-weight: 800; font-family: 'Fredoka'; color: #7a4020; margin: 0; line-height: 1; }
 
         .dl-btn {
-            width: 100%; padding: 18px; background: #e8822a; color: white;
-            border: none; border-radius: 20px; font-family: 'Fredoka';
-            font-weight: 600; margin-top: 20px; cursor: pointer;
+            width: 100%; padding: 20px; background: #e8822a; color: white;
+            border: none; border-radius: 25px; font-family: 'Fredoka';
+            font-weight: 600; margin-top: 25px; cursor: pointer; font-size: 16px;
         }
     </style>
 </head>
@@ -96,16 +107,14 @@
 
 <canvas id="daisy-canvas"></canvas>
 
-<!-- FORM SECTION -->
 <div id="form-container" class="card">
-    <h2 style="font-family: 'Fredoka'; color: #e8822a; margin: 0;">PLLIcnic 🧺</h2>
-    <p style="font-size: 12px; color: #c96a1a; letter-spacing: 2px;">ANNIVERSARY EVENT</p>
+    <div class="logo-text">PLLIcnic 🧺</div>
+    <div class="sub-text">ANNIVERSARY EVENT</div>
     <input type="text" id="firstName" placeholder="First Name">
     <input type="text" id="lastName" placeholder="Last Name">
-    <button class="btn" onclick="register()">Get My Ticket 🎟️</button>
+    <button class="btn" id="regBtn" onclick="register()">Join the Picnic 🎟️</button>
 </div>
 
-<!-- TICKET SECTION -->
 <div id="ticket-container">
     <div class="success-msg">✨ Registration Confirmed! ✨</div>
     <div id="capture-area">
@@ -114,55 +123,53 @@
             <div id="member-photo" class="member-img"></div>
             <div class="fade-overlay"></div>
             <div class="ticket-content">
-                <div id="member-tag" style="background: white; padding: 4px 12px; border-radius: 20px; display: inline-block; font-size: 11px; font-weight: 600; margin-bottom: 10px;">✦ MEMBER</div>
-                <div style="font-family: 'Montserrat'; font-size: 22px; color: #7a4020; margin-bottom: 15px;">PICNIC PASS</div>
-                <div style="display: flex; gap: 40px;">
+                <div id="member-tag" class="member-badge">✦ MEMBER</div>
+                <div style="font-family: 'Montserrat'; font-size: 24px; color: #7a4020; margin-bottom: 20px; font-weight: 800;">PICNIC PASS</div>
+                <div style="display: flex; gap: 50px;">
                     <div><div class="detail-label">Pass ID</div><div id="ticket-id" class="detail-value">---</div></div>
                     <div><div class="detail-label">Date</div><div class="detail-value">June 20, 2026</div></div>
                 </div>
-                <div style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                <div style="border-top: 2px solid rgba(249,168,37,0.2); padding-top: 20px;">
                     <div class="detail-label">Authorized PLLI</div>
                     <h1 id="display-name">---</h1>
                 </div>
             </div>
         </div>
     </div>
-    <button class="dl-btn" onclick="downloadTicket()">Download Pass 📸</button>
+    <button class="dl-btn" onclick="downloadTicket()">Download High-Res Pass 📸</button>
 </div>
 
 <script>
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec';
 
+    // Member visuals - using high quality placeholders (replace with your real hosted URLs)
     const memberData = {
-        "Yejun": { bg: "#c2e0f9", color: "#1f618d", img: "https://i.postimg.cc/kX4pLqRj/yejun.png" },
-        "Noah":  { bg: "#e6cef7", color: "#6c3483", img: "https://i.postimg.cc/mD8XyZzG/noah.png" },
-        "Bamby": { bg: "#ffdde6", color: "#b02c61", img: "https://i.postimg.cc/7Z9Y3q7p/bamby.png" },
-        "Eunho": { bg: "#ffdad6", color: "#b72a27", img: "https://i.postimg.cc/G29x9v6t/eunho.png" },
-        "Hamin": { bg: "#d9f2d1", color: "#236026", img: "https://i.postimg.cc/3Rz0Xw8V/hamin.png" },
-        "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://i.postimg.cc/mD8XyZzG/noah.png" }
+        "Yejun": { bg: "#c2e0f9", color: "#1f618d", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000" },
+        "Noah":  { bg: "#e6cef7", color: "#6c3483", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000" },
+        "Bamby": { bg: "#ffdde6", color: "#b02c61", img: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000" },
+        "Eunho": { bg: "#ffdad6", color: "#b72a27", img: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1000" },
+        "Hamin": { bg: "#d9f2d1", color: "#236026", img: "https://images.unsplash.com/photo-1508615039623-a25605d2b022?q=80&w=1000" },
+        "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://images.unsplash.com/photo-1557683311-eac922347aa1?q=80&w=1000" }
     };
 
     async function register() {
         const first = document.getElementById('firstName').value.trim();
         const last = document.getElementById('lastName').value.trim();
-        if(!first || !last) return alert("Please enter your name!");
+        if(!first || !last) return alert("Please enter both names! ♡");
 
-        const btn = document.querySelector('.btn');
-        btn.innerText = "Processing..."; btn.disabled = true;
+        const btn = document.getElementById('regBtn');
+        btn.innerText = "Checking List... 🌼"; btn.disabled = true;
 
         try {
-            // Using 'cors' mode to ensure we get the data back. 
-            // Note: If you get a CORS error, your Apps Script Deployment "Who has access" isn't set to "Anyone".
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({ first, last })
             });
             const result = await response.json();
-            
             showTicket(first, result.member, result.passId);
         } catch (e) {
             console.error(e);
-            // Fallback for testing
+            alert("Taking a bit long... showing preview pass!");
             showTicket(first, "PLAVE (Group)", "PLLI-LOCAL");
         }
     }
@@ -181,31 +188,52 @@
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('ticket-container').style.display = 'block';
 
-        setTimeout(() => {
-            document.getElementById('badge').classList.add('pop');
-        }, 500);
+        setTimeout(() => { document.getElementById('badge').classList.add('pop'); }, 600);
     }
 
     function downloadTicket() {
-        html2canvas(document.querySelector("#capture-area"), { useCORS: true }).then(canvas => {
+        html2canvas(document.querySelector("#capture-area"), { 
+            useCORS: true, 
+            scale: 2,
+            backgroundColor: null 
+        }).then(canvas => {
             const link = document.createElement('a');
-            link.download = 'PLLIcnic_Pass.png';
-            link.href = canvas.toDataURL();
+            link.download = `PLLIcnic_Pass_${document.getElementById('firstName').value}.png`;
+            link.href = canvas.toDataURL("image/png");
             link.click();
         });
     }
 
-    // Daisy animation code... (keeping it simple)
+    // --- Daisy Animation ---
     const canvas = document.getElementById('daisy-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "white";
-        ctx.beginPath(); ctx.arc(100, 100, 5, 0, Math.PI*2); ctx.fill(); // Demo dot
-        requestAnimationFrame(draw);
+    let daisies = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Daisy {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = 5 + Math.random() * 8;
+            this.speed = 0.5 + Math.random();
+        }
+        update() {
+            this.y += this.speed;
+            if (this.y > canvas.height) { this.y = -20; this.x = Math.random() * canvas.width; }
+        }
+        draw() {
+            ctx.fillStyle = "white";
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size/2, 0, Math.PI*2); ctx.fill();
+        }
     }
-    draw();
+    for(let i=0; i<30; i++) daisies.push(new Daisy());
+    function animate() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        daisies.forEach(d => { d.update(); d.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
 </script>
 </body>
 </html>
