@@ -46,20 +46,25 @@
 
   .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 20px; }
   .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
+  
+  /* Container Border logic applied via JS */
   .event-card {
     background: var(--surface); border-radius: 24px; display: grid;
-    grid-template-columns: 180px 1fr; border: 1px solid var(--border);
-    overflow: hidden; transition: transform 0.2s;
+    grid-template-columns: 180px 1fr; border: 1.5px solid var(--border);
+    overflow: hidden; transition: all 0.2s;
   }
-  .event-card:hover { transform: translateY(-3px); }
+  .event-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
   .event-img { width: 100%; height: 100%; object-fit: cover; }
   .event-info { padding: 24px; display: flex; flex-direction: column; min-width: 0; }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .category-tag { 
+  .category-tag, .member-tag { 
     padding: 4px 10px; border-radius: 6px; font-size: 10px; 
     font-weight: 700; text-transform: uppercase;
   }
+  
+  /* Member Tag Styles */
+  .member-tag { background: #eee; color: #333; letter-spacing: 0.5px; }
 
   .event-title { margin: 0 0 10px 0; font-size: 20px; line-height: 1.2; }
   .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; }
@@ -92,7 +97,6 @@
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
     .event-img { height: 160px; }
-    .filter-group { max-width: 100%; }
   }
 </style>
 </head>
@@ -144,6 +148,17 @@
     "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
     "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
   };
+
+  // Color Mapping for Members (used for container border and member tag)
+  const memberStyles = {
+    "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
+    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" },
+    "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
+    "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
+    "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
+    "PLAVE": { border: "#a87fe8", bg: "#f3edff", text: "#a87fe8" }
+  };
+
   const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
 
   window.onscroll = function() {
@@ -162,11 +177,9 @@
         .filter(row => row.length > 5 && row[0] !== "Start Date");
 
       allEvents = rows.map(row => {
-        const start = new Date(row[0]);
-        const end = row[1] ? new Date(row[1]) : null;
         return {
-          start: start,
-          end: end,
+          start: new Date(row[0]),
+          end: row[1] ? new Date(row[1]) : null,
           title: row[2] || "Untitled",
           startTime: row[3] || "", 
           endTime: row[4] || "",
@@ -177,11 +190,11 @@
           maxP: row[9] || "0", 
           dress: row[10] || "",
           locLink: row[11] || "",
-          id: row[12] || ""
+          id: row[12] || "",
+          member: row[13] || "" // Added Column 14 (Index 13)
         };
       });
 
-      // Populate Categories Dropdown
       const allCats = allEvents.flatMap(e => e.cat.split(',').map(c => c.trim()));
       const uniqueCats = [...new Set(allCats)].filter(Boolean);
       const catSelect = document.getElementById('catFilter');
@@ -209,39 +222,34 @@
     const container = document.getElementById('timelineContainer');
     const now = new Date(); now.setHours(0,0,0,0);
 
-    // 1. Filter Logic
     let filtered = allEvents.filter(ev => {
       const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      
       const evCats = ev.cat.split(',').map(c => c.trim());
       const catMatch = (catVal === 'all') || (evCats.includes(catVal));
-      
       return timeMatch && catMatch;
     });
 
-    // 2. Sort Logic
-    filtered.sort((a, b) => {
-        return sortVal === 'asc' ? a.start - b.start : b.start - a.start;
-    });
+    filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
 
-    // 3. Render HTML
     container.innerHTML = filtered.map(ev => {
       const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const isPast = (ev.end || ev.start) < now;
-      
       let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
       let countdownText = (diffDays === 0) ? "Happening Today!" : (diffDays === 1) ? "Tomorrow!" : (diffDays > 1) ? `In ${diffDays} days` : "";
 
       let dateString = ev.start.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
         const sameMonth = ev.start.getMonth() === ev.end.getMonth();
-        if (sameMonth) {
-          dateString = `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}`;
-        } else {
-          dateString = `${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-        }
+        dateString = sameMonth ? 
+          `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}` : 
+          `${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
       }
+
+      // Member styling logic
+      const mStyle = memberStyles[ev.member] || null;
+      const containerStyle = mStyle ? `style="border-color: ${mStyle.border}; border-width: 2px;"` : "";
+      const memberTagHtml = mStyle ? `<div class="member-tag" style="background: ${mStyle.bg}; color: ${mStyle.text};">✦ ${ev.member}</div>` : "";
 
       const categories = ev.cat.split(',').map(c => c.trim()).filter(Boolean);
       const categoryChips = categories.map(cat => {
@@ -253,11 +261,12 @@
       const locationDisplay = ev.locLink ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` : `📍 ${ev.loc}`;
 
       const cardHtml = `
-        <div class="event-card">
+        <div class="event-card" ${containerStyle}>
           <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
           <div class="event-info">
             <div class="tag-row">
               ${categoryChips}
+              ${memberTagHtml}
             </div>
             <h2 class="event-title">${ev.title}</h2>
             <div class="details-list">
