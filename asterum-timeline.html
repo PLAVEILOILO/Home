@@ -14,30 +14,23 @@
   body {
     font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text);
     margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
-    -webkit-font-smoothing: antialiased;
   }
 
-  /* Background Elements */
   .bg-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
   .orb { position: absolute; border-radius: 50%; filter: blur(90px); width: 400px; height: 400px; opacity: 0.3; }
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  /* Restored Header Style */
+  /* Header Layout Restored */
   header { text-align: center; margin: 20px 0 30px; }
   header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 42px); margin: 0; font-weight: 700; }
   header h1 em { font-weight: 400; font-style: italic; opacity: 0.5; }
 
-  /* Compact Filter Bar for Mobile */
+  /* Filter Bar - Mobile Optimized */
   .filter-bar { 
-    width: min(850px, 100%); 
-    display: flex; 
-    justify-content: center; 
-    gap: 12px; 
-    margin-bottom: 25px; 
-    padding: 5px;
+    width: min(850px, 100%); display: flex; justify-content: center; 
+    gap: 12px; margin-bottom: 25px; padding: 5px;
   }
-
   .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; max-width: 200px; }
   .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); padding-left: 5px; }
 
@@ -49,82 +42,55 @@
     background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 14px; padding-right: 30px;
   }
 
-  /* Timeline Grid */
-  .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 16px; }
+  /* Timeline Cards */
+  .timeline { width: min(850px, 100%); display: flex; flex-direction: column; gap: 16px; }
   .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
 
   .event-card {
     background: var(--surface); border-radius: 20px; display: grid;
-    grid-template-columns: 200px 1fr; border: 1px solid var(--border);
-    overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    grid-template-columns: 220px 1fr; border: 1px solid var(--border);
+    overflow: hidden; transition: transform 0.2s;
     box-shadow: 0 4px 15px rgba(0,0,0,0.02);
   }
   .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 127, 232, 0.1); }
 
-  .img-container { width: 100%; height: 100%; background: #f0f0f0; overflow: hidden; }
-  .event-img { width: 100%; height: 100%; object-fit: cover; }
+  .img-container { width: 220px; height: 100%; background: #f0f0f0; overflow: hidden; position: relative; }
+  .event-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .event-info { padding: 20px 24px; display: flex; flex-direction: column; min-width: 0; }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .category-tag { 
-    padding: 4px 10px; border-radius: 6px; font-size: 9px; 
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-  }
+  .category-tag { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
 
-  /* One-Line Title with Auto-Adjust */
+  /* Title: Fix for long multi-event names */
   .event-title { 
-    margin: 0 0 12px 0; font-size: 22px; line-height: 1.2; 
+    margin: 0 0 12px 0; font-size: 22px; line-height: 1.3; 
     font-family: 'Playfair Display', serif; font-weight: 700;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; text-overflow: ellipsis;
   }
 
-  .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; font-weight: 400; }
-
-  .status-row { 
-    display: flex; justify-content: space-between; align-items: flex-end; 
-    margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); 
-  }
-  .meta-item { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
-  
-  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; display: inline-block; }
+  .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
+  .meta-item { font-size: 12px; font-weight: 600; }
+  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
-  .countdown { font-size: 11px; font-weight: 600; color: var(--theme-purple); display: block; margin-top: 4px; text-align: right; }
 
-  /* Mobile Adjustments */
   @media (max-width: 600px) {
-    body { padding: 15px; }
-    header { margin-bottom: 20px; }
-    
-    /* Scrollable horizontal filters on mobile to save vertical space */
-    .filter-bar { 
-      justify-content: flex-start; 
-      overflow-x: auto; 
-      padding-bottom: 10px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .filter-group { min-width: 130px; flex: 0 0 auto; }
-
+    body { padding: 10px; }
+    .filter-bar { justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; gap: 8px; }
+    .filter-group { min-width: 120px; flex: 0 0 auto; }
     .event-card { grid-template-columns: 1fr; border-radius: 16px; }
-    .img-container { height: 180px; }
+    .img-container { width: 100%; height: 180px; }
     .event-info { padding: 16px; }
     .event-title { font-size: 19px; }
-  }
-
-  #backToTop {
-    position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; 
-    border-radius: 50%; background: var(--accent); color: white; border: none;
-    cursor: pointer; display: none; z-index: 1000; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-</div>
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 
 <header>
   <h1>Asterum <em>Timeline</em></h1>
@@ -155,7 +121,6 @@
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
-<button id="backToTop" onclick="scrollToTop()">↑</button>
 
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
@@ -168,12 +133,6 @@
     "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
   };
   const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
-
-  window.onscroll = function() {
-    const btn = document.getElementById("backToTop");
-    btn.style.display = (document.documentElement.scrollTop > 400) ? "block" : "none";
-  };
-  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
   async function loadTimeline() {
     try {
@@ -188,13 +147,11 @@
         end: row[1] ? new Date(row[1]) : null,
         titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
         startTime: row[3] || "", 
-        endTime: row[4] || "",
         loc: row[5] || "TBA", 
         img: row[6] || "", 
         cat: row[7] || "Event",
-        minP: row[8] || "0", maxP: row[9] || "0", 
+        minP: row[8] || "0", 
         dress: row[10] || "",
-        locLink: row[11] || "",
         id: row[12] || ""
       }));
 
@@ -207,11 +164,6 @@
 
       filterEvents();
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
-  }
-
-  function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
-    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
@@ -232,43 +184,35 @@
 
     container.innerHTML = filtered.map(ev => {
       const isPast = (ev.end || ev.start) < now;
-      const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const combinedTitle = ev.titles.join(' • ');
-      
-      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
-      let countdownText = !isPast ? (diffDays === 0 ? "Today" : diffDays === 1 ? "Tomorrow" : `In ${diffDays} days`) : "";
-
       const categoryChips = ev.cat.split(',').map(c => {
           const colors = catColors[c.trim()] || defaultColor;
           return `<div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">${c.trim()}</div>`;
       }).join('');
 
-      const cardHtml = `
-        <div class="event-card">
-          <div class="img-container">
-            <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.parentElement.style.display='none'">
-          </div>
-          <div class="event-info">
-            <div class="tag-row">${categoryChips}</div>
-            <h2 class="event-title" title="${combinedTitle}">${combinedTitle}</h2>
-            <div class="details-list">
-              <div>📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-              <div>📍 ${ev.loc}</div>
-              ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
+      return `
+        <a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">
+          <div class="event-card">
+            <div class="img-container">
+              <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.opacity='0'">
             </div>
-            <div class="status-row">
-              <div class="meta-group">
-                <div class="meta-item" style="color: #963252;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
+            <div class="event-info">
+              <div class="tag-row">${categoryChips}</div>
+              <h2 class="event-title">${combinedTitle}</h2>
+              <div class="details-list">
+                <div>📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                <div>📍 ${ev.loc}</div>
+                ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
               </div>
-              <div class="badge-group">
-                ${statusBadge}
-                <span class="countdown">${countdownText}</span>
+              <div class="status-row">
+                <div class="meta-item" style="color: #963252;">🎟️ ${ev.minP === "0" ? "Free" : "₱" + Number(ev.minP).toLocaleString()}</div>
+                <div class="badge-group">
+                  <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>`;
-
-      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` : cardHtml;
+        </a>`;
     }).join('');
   }
   loadTimeline();
