@@ -51,7 +51,6 @@
     object-fit: cover; opacity: 0; transition: opacity 1s ease-in-out; 
   }
   .event-img.active { opacity: 1; }
-  .event-img.loaded { /* placeholder for loaded state if needed */ }
 
   .event-info { padding: 24px; display: flex; flex-direction: column; }
   .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; width: 100%; }
@@ -165,12 +164,13 @@
         if (images.length <= 1) return;
 
         let activeIdx = Array.from(images).findIndex(img => img.classList.contains('active'));
-        images[activeIdx].classList.remove('active');
+        if (activeIdx === -1) return;
         
+        images[activeIdx].classList.remove('active');
         let nextIdx = (activeIdx + 1) % images.length;
         images[nextIdx].classList.add('active');
       });
-    }, 4000); // Transitions every 4 seconds
+    }, 4000);
   }
 
   function updateAllCountdowns() {
@@ -211,11 +211,13 @@
         : ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
 
       const timeStr = ev.startTime && ev.endTime ? `${ev.startTime} — ${ev.endTime}` : ev.startTime;
+      
       const cats = ev.cat.split(',').map(c => {
         const s = categoryPalette[c.trim()] || {bg:"#f1f3f5", text:"#495057"};
         return `<div class="tag-cat" style="background:${s.bg}; color:${s.text}">${c.trim()}</div>`;
       }).join('');
       
+      // RESTORED MEMBER COLORS LOGIC
       const mems = ev.members.map(m => {
         const s = memberPalette[m] || {bg:"#eee", text:"#666"};
         return `<div class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">${m}</div>`;
@@ -223,7 +225,6 @@
 
       const price = (!ev.minP || ev.minP === "0") ? "Free Access" : (ev.minP === ev.maxP ? `₱${Number(ev.minP).toLocaleString()}` : `₱${Number(ev.minP).toLocaleString()} - ₱${Number(ev.maxP).toLocaleString()}`);
 
-      // Parse multiple images
       const imgUrls = ev.img.split(',').map(url => url.trim()).filter(url => url !== "");
       const imgHtml = imgUrls.length > 0 
         ? imgUrls.map((url, i) => `<img src="${url}" class="event-img ${i === 0 ? 'active' : ''}" onerror="this.src='https://placehold.co/400x400/eeeaf5/a87fe8?text=Asterum'">`).join('')
