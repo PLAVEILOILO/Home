@@ -10,6 +10,7 @@
     --bg: #faf7ff; --surface: #ffffff; --text: #1e1530; 
     --theme-purple: #7a4ed9; --accent: #6c5ce7; 
     --border: rgba(180,160,220,0.2); 
+    --price-red: #ff4d4d;
   }
   
   body { 
@@ -17,7 +18,7 @@
     margin: 0; padding: 20px; min-height: 100vh;
   }
   
-  /* Fix: Changed from flex-centering on body to auto-margin on container */
+  /* Container Centering Fix */
   .container { 
     width: min(1000px, 100%); 
     background: var(--surface); 
@@ -25,22 +26,23 @@
     border-radius: 32px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.05); 
     box-sizing: border-box; 
-    margin: 20px auto; /* Keeps container centered regardless of content */
+    margin: 20px auto; 
+    position: relative;
   }
   
   .header-flex { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .header-flex.is-centered { flex-direction: column; text-align: center; justify-content: center; }
   
   .logo-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-  .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); }
+  .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); background: #eee; }
   
-  .header-text { flex: 1; }
-  .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); margin: 5px 0; line-height: 1.2; }
+  .header-text { flex: 1; min-width: 0; }
+  .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 42px); margin: 5px 0; line-height: 1.1; font-weight: 700; }
   
-  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
   .header-flex.is-centered .tag-container { justify-content: center; }
   
-  /* SYNCED TAG COLORS FROM TIMELINE */
+  /* Synced Colors from Timeline */
   .cat-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
   .cat-birthday { background: #e0f7fa; color: #00838f; }
   .cat-anniversary { background: #fff8e1; color: #ff8f00; }
@@ -49,13 +51,13 @@
 
   .member-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
 
-  .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-top: 15px; }
+  .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; font-weight: 400; color: #555; }
   .header-flex.is-centered .quick-meta { justify-content: center; }
 
   .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
   .main-content.is-centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; text-align: center; }
 
-  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
+  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; }
   
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
   .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
@@ -63,15 +65,15 @@
   .more-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
 
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: opacity 0.2s; }
-  .rsvp-btn:hover { opacity: 0.9; }
-  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
+  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); }
+  .rsvp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3); }
+  
+  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 5px; }
 
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr !important; }
     .header-flex { flex-direction: column; text-align: center; }
     .tag-container, .quick-meta { justify-content: center; }
-    .header-flex.is-centered .logo-group { flex-direction: row; }
   }
 </style>
 </head>
@@ -129,6 +131,11 @@
       const members = (tData[13] || "").split(',').filter(Boolean);
       const images = tData[6].split(',').filter(Boolean);
       const highlights = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
+      
+      // Time Logic: Start Time is index 3, End Time is index 4
+      const startTime = tData[3];
+      const endTime = tData[4]; 
+      const timeDisplay = (startTime && endTime) ? `${startTime} – ${endTime}` : (startTime || "TBA");
 
       const catHtml = categories.map(c => `<span class="cat-badge ${getCatClass(c)}">${c.trim()}</span>`).join('');
       const memHtml = members.map(m => {
@@ -147,9 +154,9 @@
               ${tData[2].split(',').map(t => `<h1>${t.trim()}</h1>`).join('')}
               <div class="quick-meta">
                 <span>📅 ${new Date(tData[0]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</span>
-                ${tData[3] ? `<span>⏰ ${tData[3]}</span>` : ''}
+                ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
                 ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
-                <span>🎟️ ${formatPrice(tData[8], tData[9])}</span>
+                <span style="color:var(--price-red); font-weight:600;">🎟️ ${formatPrice(tData[8], tData[9])}</span>
               </div>
             </div>
           </div>
@@ -160,9 +167,9 @@
               
               ${tData[10] ? `
                 <div style="margin-bottom:30px;">
-                  <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:8px; opacity:0.6;">Dress Code</h4>
+                  <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; opacity:0.6; letter-spacing:1px;">Dress Code</h4>
                   <div style="display:flex; gap:8px; flex-wrap:wrap; ${!hasSidebar ? 'justify-content:center;' : ''}">
-                    ${tData[10].split(',').map(d => `<span style="background:#f0f0f0; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600;">👗 ${d.trim()}</span>`).join('')}
+                    ${tData[10].split(',').map(d => `<span style="background:#f0f0f0; padding:6px 14px; border-radius:100px; font-size:12px; font-weight:600;">👗 ${d.trim()}</span>`).join('')}
                   </div>
                 </div>` : ''}
 
@@ -179,13 +186,13 @@
             ${hasSidebar ? `
               <div class="sidebar">
                 <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
-                ${tData[11] ? `<a href="${tData[11]}" target="_blank" style="text-align:center; font-size:12px; color:var(--theme-purple); text-decoration:none;">Google Maps ↗</a>` : ''}
+                ${tData[11] ? `<a href="${tData[11]}" target="_blank" style="text-align:center; font-size:13px; color:var(--theme-purple); text-decoration:none; font-weight:500;">View Location on Maps ↗</a>` : ''}
               </div>` : ''}
           </div>
         </div>
       `;
     } catch (err) {
-      document.getElementById('details-root').innerHTML = "Error loading event details.";
+      document.getElementById('details-root').innerHTML = "<div class='container' style='text-align:center;'>Error loading event details.</div>";
     }
   }
   init();
