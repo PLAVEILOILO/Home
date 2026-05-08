@@ -13,26 +13,26 @@
   body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
   .container { width: min(1000px, 100%); background: var(--surface); padding: 40px; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); box-sizing: border-box; }
   
-  /* Updated Header Layout */
-  .header-flex { display: flex; align-items: flex-start; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
+  /* Header Layout Fixes */
+  .header-flex { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .header-flex.centered { flex-direction: column; text-align: center; align-items: center; }
   
-  .event-logo { width: 120px; height: 120px; border-radius: 24px; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
+  .logo-group { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; max-width: 300px; }
+  .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); background: #eee; }
   
+  .header-text { flex-grow: 1; }
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); margin: 10px 0; line-height: 1.2; }
   .title-divider { border: 0; height: 1px; background: var(--border); margin: 8px 0; width: 100%; }
   
-  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
+  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; transition: opacity 0.2s; }
+  .back-btn:hover { opacity: 0.7; }
   
   .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-top: 15px; }
   
-  /* Updated Tags */
-  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 5px; }
-  .cat-badge { background:#f3edff; color:var(--theme-purple); padding:4px 12px; border-radius:6px; font-size:10px; font-weight:700; text-transform:uppercase; }
-  .member-badge { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-
-  .dress-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-  .dress-chip { background: #f0f0f0; color: #666; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); }
+  /* Tags & Badges */
+  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .cat-badge { background:#f3edff; color:var(--theme-purple); padding:4px 12px; border-radius:6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .member-badge { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.05); }
 
   .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
   .main-content.centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
@@ -43,14 +43,13 @@
 
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; }
-
-  .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 24px; margin-top: 40px; }
-  .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; }
+  .rsvp-btn:hover { transform: translateY(-2px); }
 
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr !important; }
     .header-flex { flex-direction: column; text-align: center; align-items: center; }
+    .logo-group { justify-content: center; }
     .header-flex .quick-meta, .header-flex .tag-container { justify-content: center; }
   }
 </style>
@@ -63,15 +62,15 @@
   const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
   const TIMELINE_GID = '1296117535';
   const DETAILS_GID = '1063823403'; 
-  const BACK_LINK = 'index.html'; // Update to your timeline filename
+  const BACK_LINK = 'index.html'; 
 
   const memberStyles = {
-    "Yejun": { bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { bg: "#f5f0ff", text: "#A076FF" },
-    "Bamby": { bg: "#fff0f6", text: "#FF7EB3" },
-    "Eunho": { bg: "#fff0f0", text: "#FF4D4D" },
-    "Hamin": { bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { bg: "#f3edff", text: "#a87fe8" }
+    "Yejun": { bg: "#eef5ff", text: "#4B92FF", border: "#4B92FF" },
+    "Noah": { bg: "#f5f0ff", text: "#A076FF", border: "#A076FF" },
+    "Bamby": { bg: "#fff0f6", text: "#FF7EB3", border: "#FF7EB3" },
+    "Eunho": { bg: "#fff0f0", text: "#FF4D4D", border: "#FF4D4D" },
+    "Hamin": { bg: "#e9f9ee", text: "#2ECC71", border: "#2ECC71" },
+    "PLAVE": { bg: "#7a4ed9", text: "#ffffff", border: "#7a4ed9" }
   };
 
   async function fetchCSV(gid) {
@@ -91,22 +90,17 @@
       const dData = detailRows.find(r => r[0] === eventId);
 
       if (!tData) {
-        document.body.innerHTML = "<div style='text-align:center; padding:50px;'>Event not found.</div>";
+        document.getElementById('details-root').innerHTML = "<div style='text-align:center; padding:50px;'>Event not found.</div>";
         return;
       }
 
-      // Handle multi-values from sheet
       const titles = tData[2].split(',');
-      const images = tData[6].split(',');
+      const images = tData[6].split(',').filter(Boolean);
       const members = (tData[13] || "").split(',').filter(Boolean);
       const categories = tData[7].split(',').filter(Boolean);
+      const primaryMember = members[0]?.trim();
+      const themeColor = memberStyles[primaryMember]?.border || "#a87fe8";
 
-      const startDate = new Date(tData[0]);
-      const loc = tData[5];
-      const rsvp = dData ? dData[2] : "";
-      const hasSidebar = !!rsvp;
-
-      // HTML generation
       const titleHtml = titles.map(t => `<h1>${t.trim()}</h1>`).join('<hr class="title-divider">');
       
       const memberBadges = members.map(m => {
@@ -116,27 +110,39 @@
 
       const catBadges = categories.map(c => `<span class="cat-badge">${c.trim()}</span>`).join('');
 
+      // Header Image setup
+      const logoHtml = images.map(img => `<img src="${img.trim()}" class="event-logo" style="border-color: ${themeColor}">`).join('');
+
       document.getElementById('details-root').innerHTML = `
         <div class="container">
           <a href="${BACK_LINK}" class="back-btn">← Back to Timeline</a>
           
-          <div class="header-flex ${!hasSidebar ? 'centered' : ''}">
-            <img src="${images[0].trim()}" class="event-logo">
+          <div class="header-flex ${!dData || !dData[2] ? 'centered' : ''}">
+            <div class="logo-group">${logoHtml}</div>
             <div class="header-text">
                 <div class="tag-container">${catBadges} ${memberBadges}</div>
                 ${titleHtml}
                 <div class="quick-meta">
-                    <span>📅 ${startDate.toDateString()}</span>
+                    <span>📅 ${new Date(tData[0]).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})}</span>
                     ${tData[3] ? `<span>⏰ ${tData[3]}</span>` : ''}
-                    ${(loc && loc.toLowerCase() !== 'tba') ? `<span>📍 ${loc}</span>` : ''}
+                    ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
                     <span>🎟️ ₱${tData[8]}</span>
                 </div>
             </div>
           </div>
 
-          <div class="main-content ${!hasSidebar ? 'centered' : ''}">
+          <div class="main-content ${!dData || !dData[2] ? 'centered' : ''}">
             <div class="content-body">
               ${dData && dData[1] ? `<div class="description">${dData[1]}</div>` : ''}
+              
+              ${tData[10] ? `
+                <div style="margin-top:20px;">
+                  <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:8px; opacity:0.6;">Dress Code</h4>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    ${tData[10].split(',').map(d => `<span style="background:#f0f0f0; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600;">👗 ${d.trim()}</span>`).join('')}
+                  </div>
+                </div>` : ''}
+
               ${dData && dData[3] ? `
                 <div class="gallery-section">
                   <h3 style="font-size:12px; text-transform:uppercase; color:var(--theme-purple);">Highlights</h3>
@@ -145,16 +151,17 @@
                   </div>
                 </div>` : ''}
             </div>
-            ${hasSidebar ? `
+            ${dData && dData[2] ? `
               <div class="sidebar">
-                <a href="${rsvp}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
+                <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
                 ${tData[11] ? `<a href="${tData[11]}" target="_blank" style="text-align:center; font-size:12px; color:var(--theme-purple); text-decoration:none;">Google Maps ↗</a>` : ''}
               </div>` : ''}
           </div>
         </div>
       `;
     } catch (err) {
-      document.getElementById('details-root').innerHTML = "Error loading event details.";
+      console.error(err);
+      document.getElementById('details-root').innerHTML = "<div style='text-align:center; padding:50px;'>Error loading event details.</div>";
     }
   }
   init();
