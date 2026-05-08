@@ -56,7 +56,6 @@
   
   .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
   
-  /* Member Tag Styles Fix */
   .tag-member { 
     padding: 4px 12px; 
     border-radius: 20px; 
@@ -170,10 +169,8 @@
       containers.forEach(container => {
         const images = container.querySelectorAll('.event-img');
         if (images.length <= 1) return;
-
         let activeIdx = Array.from(images).findIndex(img => img.classList.contains('active'));
         images[activeIdx].classList.remove('active');
-        
         let nextIdx = (activeIdx + 1) % images.length;
         images[nextIdx].classList.add('active');
       });
@@ -225,8 +222,11 @@
       }).join('');
       
       const mems = ev.members.map(m => {
-        const s = memberPalette[m] || {bg:"#eee", text:"#666"};
-        return `<div class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}40">${m}</div>`;
+        // Clean name for lookup (removes extra symbols if they exist in sheet)
+        const cleanName = m.replace('✦', '').trim();
+        const s = memberPalette[cleanName] || {bg:"#eee", text:"#666"};
+        // We add the ✦ here for the "cute" display
+        return `<div class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦${cleanName}</div>`;
       }).join('');
 
       const price = (!ev.minP || ev.minP === "0") ? "Free Access" : (ev.minP === ev.maxP ? `₱${Number(ev.minP).toLocaleString()}` : `₱${Number(ev.minP).toLocaleString()} - ₱${Number(ev.maxP).toLocaleString()}`);
