@@ -25,13 +25,8 @@
   header h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 8vw, 38px); margin: 0; }
 
   .filter-bar { 
-    width: min(850px, 100%); 
-    display: flex; 
-    justify-content: center; 
-    gap: 12px; 
-    margin-bottom: 30px; 
-    padding: 10px; 
-    flex-wrap: wrap;
+    width: min(850px, 100%); display: flex; justify-content: center; 
+    gap: 12px; margin-bottom: 30px; padding: 10px; flex-wrap: wrap;
   }
   .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; max-width: 200px; }
   .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); padding-left: 5px; }
@@ -45,94 +40,55 @@
   }
 
   .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 20px; }
-  .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
   
-  /* Container Border logic applied via JS */
+  /* --- Event Card & Image Swiper --- */
   .event-card {
     background: var(--surface); border-radius: 24px; display: grid;
     grid-template-columns: 180px 1fr; border: 1.5px solid var(--border);
-    overflow: hidden; transition: all 0.2s;
+    overflow: hidden; transition: all 0.2s; position: relative;
   }
   .event-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-  .event-img { width: 100%; height: 100%; object-fit: cover; }
+
+  .img-container { position: relative; width: 180px; height: 100%; overflow: hidden; background: #eee; }
+  .event-img { 
+    position: absolute; width: 100%; height: 100%; object-fit: cover; 
+    transition: opacity 0.8s ease-in-out; opacity: 0;
+  }
+  .event-img.active { opacity: 1; position: relative; } /* Relative keeps the container height */
+
   .event-info { padding: 24px; display: flex; flex-direction: column; min-width: 0; }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .category-tag, .member-tag { 
-    padding: 4px 10px; border-radius: 6px; font-size: 10px; 
-    font-weight: 700; text-transform: uppercase;
-  }
-  
-  /* Member Tag Styles */
+  .category-tag, .member-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
   .member-tag { background: #eee; color: #333; letter-spacing: 0.5px; }
 
-  .event-title { margin: 0 0 10px 0; font-size: 20px; line-height: 1.2; }
+  .event-title { margin: 0 0 10px 0; font-size: 18px; line-height: 1.3; }
+  .title-divider { height: 1px; background: var(--border); margin: 5px 0; border: none; }
+
   .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; }
-  .loc-link { text-decoration: none; color: inherit; font-weight: 500; }
-  .loc-link:hover { color: var(--theme-purple); text-decoration: underline; }
-
-  .dress-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
-  .dress-chip { 
-    background: #f0f0f0; color: #666; padding: 2px 8px; border-radius: 100px; 
-    font-size: 10px; font-weight: 600; text-transform: uppercase; border: 1px solid var(--border);
-  }
-
-  .status-row { 
-    display: flex; justify-content: space-between; align-items: flex-end; 
-    margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); 
-  }
-  .meta-item { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
-  .badge-group { text-align: right; }
-  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; display: inline-block; }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
+  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
-  .countdown { font-size: 11px; font-weight: 500; color: var(--theme-purple); display: block; margin-top: 4px; }
 
-  #backToTop {
-    position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; 
-    border-radius: 50%; background: var(--accent); color: white; border: none;
-    cursor: pointer; display: none; z-index: 1000; font-size: 18px;
-  }
+  #backToTop { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; border: none; cursor: pointer; display: none; z-index: 1000; }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
-    .event-img { height: 160px; }
+    .img-container { width: 100%; height: 200px; }
+    .event-img.active { position: absolute; }
   }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-</div>
-
-<header>
-  <h1>Asterum <em>Timeline</em></h1>
-</header>
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<header><h1>Asterum <em>Timeline</em></h1></header>
 
 <div class="filter-bar">
-  <div class="filter-group">
-    <label class="filter-label">Timeline</label>
-    <select id="timeFilter" onchange="filterEvents()">
-      <option value="all">All Events</option>
-      <option value="upcoming">Upcoming</option>
-      <option value="past">Past</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <label class="filter-label">Category</label>
-    <select id="catFilter" onchange="filterEvents()">
-      <option value="all">All Categories</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <label class="filter-label">Sorting</label>
-    <select id="sortOrder" onchange="filterEvents()">
-      <option value="asc">Earliest</option>
-      <option value="desc">Latest</option>
-    </select>
-  </div>
+  <div class="filter-group"><label class="filter-label">Timeline</label><select id="timeFilter" onchange="filterEvents()"><option value="all">All Events</option><option value="upcoming">Upcoming</option><option value="past">Past</option></select></div>
+  <div class="filter-group"><label class="filter-label">Category</label><select id="catFilter" onchange="filterEvents()"><option value="all">All Categories</option></select></div>
+  <div class="filter-group"><label class="filter-label">Sorting</label><select id="sortOrder" onchange="filterEvents()"><option value="asc">Earliest</option><option value="desc">Latest</option></select></div>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
@@ -142,14 +98,6 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  const catColors = {
-    "Anniversary": { bg: "#fff0f6", text: "#d63384" },
-    "Birthdays": { bg: "#fff9db", text: "#f59f00" },
-    "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
-    "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
-  };
-
-  // Color Mapping for Members (used for container border and member tag)
   const memberStyles = {
     "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
     "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" },
@@ -159,15 +107,6 @@
     "PLAVE": { border: "#a87fe8", bg: "#f3edff", text: "#a87fe8" }
   };
 
-  const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
-
-  window.onscroll = function() {
-    const btn = document.getElementById("backToTop");
-    if (document.documentElement.scrollTop > 400) btn.style.display = "block";
-    else btn.style.display = "none";
-  };
-  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
   async function loadTimeline() {
     try {
       const response = await fetch(sheetUrl);
@@ -176,43 +115,26 @@
         .map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/"/g, '').trim()))
         .filter(row => row.length > 5 && row[0] !== "Start Date");
 
-      allEvents = rows.map(row => {
-        return {
-          start: new Date(row[0]),
-          end: row[1] ? new Date(row[1]) : null,
-          title: row[2] || "Untitled",
-          startTime: row[3] || "", 
-          endTime: row[4] || "",
-          loc: row[5] || "TBA", 
-          img: row[6] || "", 
-          cat: row[7] || "Event",
-          minP: row[8] || "0", 
-          maxP: row[9] || "0", 
-          dress: row[10] || "",
-          locLink: row[11] || "",
-          id: row[12] || "",
-          member: row[13] || "" // Added Column 14 (Index 13)
-        };
-      });
+      allEvents = rows.map(row => ({
+        start: new Date(row[0]), end: row[1] ? new Date(row[1]) : null,
+        titles: (row[2] || "Untitled").split(','), // Split titles
+        startTime: row[3] || "", endTime: row[4] || "",
+        loc: row[5] || "TBA", 
+        imgs: (row[6] || "").split(','), // Split images
+        cat: row[7] || "Event",
+        minP: row[8] || "0", maxP: row[9] || "0", 
+        dress: row[10] || "", locLink: row[11] || "",
+        id: row[12] || "", 
+        members: (row[13] || "").split(',') // Split members
+      }));
 
-      const allCats = allEvents.flatMap(e => e.cat.split(',').map(c => c.trim()));
-      const uniqueCats = [...new Set(allCats)].filter(Boolean);
+      const allCats = [...new Set(allEvents.flatMap(e => e.cat.split(',').map(c => c.trim())))].filter(Boolean);
       const catSelect = document.getElementById('catFilter');
-      uniqueCats.forEach(c => { 
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        catSelect.appendChild(opt);
-      });
+      allCats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
 
       filterEvents();
+      startImageSwiper(); // Trigger the swiping logic
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
-  }
-
-  function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free";
-    if (min === max) return `₱${Number(min).toLocaleString()}`;
-    return `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
   function filterEvents() {
@@ -225,73 +147,65 @@
     let filtered = allEvents.filter(ev => {
       const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      const evCats = ev.cat.split(',').map(c => c.trim());
-      const catMatch = (catVal === 'all') || (evCats.includes(catVal));
-      return timeMatch && catMatch;
+      return timeMatch && (catVal === 'all' || ev.cat.split(',').includes(catVal));
     });
 
     filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
 
     container.innerHTML = filtered.map(ev => {
-      const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const isPast = (ev.end || ev.start) < now;
-      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
-      let countdownText = (diffDays === 0) ? "Happening Today!" : (diffDays === 1) ? "Tomorrow!" : (diffDays > 1) ? `In ${diffDays} days` : "";
-
-      let dateString = ev.start.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-      if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
-        const sameMonth = ev.start.getMonth() === ev.end.getMonth();
-        dateString = sameMonth ? 
-          `${ev.start.toLocaleString('en-US', { month: 'long' })} ${ev.start.getDate()}–${ev.end.getDate()}, ${ev.start.getFullYear()}` : 
-          `${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${ev.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-      }
-
-      // Member styling logic
-      const mStyle = memberStyles[ev.member] || null;
-      const containerStyle = mStyle ? `style="border-color: ${mStyle.border}; border-width: 2px;"` : "";
-      const memberTagHtml = mStyle ? `<div class="member-tag" style="background: ${mStyle.bg}; color: ${mStyle.text};">✦ ${ev.member}</div>` : "";
-
-      const categories = ev.cat.split(',').map(c => c.trim()).filter(Boolean);
-      const categoryChips = categories.map(cat => {
-          const colors = catColors[cat] || defaultColor;
-          return `<div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">${cat}</div>`;
+      const statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
+      
+      // Handle Multiple Titles
+      const titleHtml = ev.titles.map(t => `<h2 class="event-title">${t.trim()}</h2>`).join('<hr class="title-divider">');
+      
+      // Handle Multiple Images
+      const imgHtml = ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" loading="lazy">`).join('');
+      
+      // Handle Multiple Members (takes first member for border color)
+      const primaryMember = ev.members[0]?.trim();
+      const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
+      const memberTags = ev.members.map(m => {
+        const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
+        return `<div class="member-tag" style="background:${s.bg}; color:${s.text};">✦ ${m.trim()}</div>`;
       }).join('');
 
-      const dressChips = ev.dress ? ev.dress.split(',').map(item => `<span class="dress-chip">${item.trim()}</span>`).join('') : '';
-      const locationDisplay = ev.locLink ? `<a href="${ev.locLink}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${ev.loc}</a>` : `📍 ${ev.loc}`;
-
-      const cardHtml = `
-        <div class="event-card" ${containerStyle}>
-          <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.display='none'">
+      return `
+        <div class="event-card" style="border-color: ${mStyle.border}; border-width: 2px;">
+          <div class="img-container">${imgHtml}</div>
           <div class="event-info">
-            <div class="tag-row">
-              ${categoryChips}
-              ${memberTagHtml}
-            </div>
-            <h2 class="event-title">${ev.title}</h2>
+            <div class="tag-row">${memberTags}</div>
+            ${titleHtml}
             <div class="details-list">
-              <div>📅 ${dateString}</div>
-              <div>${locationDisplay}</div>
-              ${ev.dress ? `<div class="dress-row">👚 ${dressChips}</div>` : ''}
+              <div>📅 ${ev.start.toDateString()}</div>
+              <div>📍 ${ev.loc}</div>
             </div>
             <div class="status-row">
-              <div class="meta-group">
-                ${ev.startTime ? `<div class="meta-item" style="color: #2E2E2E;">⏰ ${ev.startTime}${ev.endTime ? ' – ' + ev.endTime : ''}</div>` : ''}
-                <div class="meta-item" style="color: #963252;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              </div>
-              <div class="badge-group">
-                ${statusBadge}
-                <span class="countdown">${isPast ? '' : countdownText}</span>
-              </div>
+              <div class="meta-item">🎟️ ₱${ev.minP}</div>
+              ${statusBadge}
             </div>
           </div>
         </div>`;
-
-      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` : cardHtml;
     }).join('');
-
-    if(filtered.length === 0) container.innerHTML = '<p style="text-align:center; opacity:0.5; margin-top:40px;">No cosmic events found.</p>';
   }
+
+  // Swiper Logic: Rotates images every 3 seconds if there's more than one
+  function startImageSwiper() {
+    setInterval(() => {
+      const containers = document.querySelectorAll('.img-container');
+      containers.forEach(container => {
+        const imgs = container.querySelectorAll('.event-img');
+        if (imgs.length <= 1) return;
+
+        let currentIndex = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+        imgs[currentIndex].classList.remove('active');
+        let nextIndex = (currentIndex + 1) % imgs.length;
+        imgs[nextIndex].classList.add('active');
+      });
+    }, 3000); // Swaps every 3 seconds
+  }
+
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
   loadTimeline();
 </script>
 </body>
