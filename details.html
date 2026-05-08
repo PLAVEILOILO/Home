@@ -28,59 +28,50 @@
     margin: 20px auto; 
   }
   
-  .header-flex { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
-  .header-flex.is-centered { flex-direction: column; text-align: center; justify-content: center; }
+  .header-flex { 
+    display: flex; flex-direction: column; text-align: center; justify-content: center;
+    gap: 20px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; 
+  }
   
   .logo-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); background: #eee; }
   
-  .header-text { flex: 1; min-width: 0; }
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 42px); margin: 5px 0; line-height: 1.1; font-weight: 700; }
   
-  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
-  .header-flex.is-centered .tag-container { justify-content: center; }
+  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: center; }
   
-  /* MATCHED TAG STYLES */
-  .tag-cat { 
-    padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; 
-    text-transform: uppercase; border: 1px solid rgba(0,0,0,0.1); 
-  }
+  /* MATCHED TAG STYLES FROM TIMELINE */
+  .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.1); }
+  .tag-member { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; }
+
+  .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; color: #555; justify-content: center; }
+
+  .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
+
+  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: left; }
   
-  .tag-member { 
-    padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; 
-    text-transform: uppercase; border: 1.5px solid transparent; 
+  /* RSVP Section */
+  .action-area { margin: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+  .rsvp-btn { 
+    display: inline-block; width: min(400px, 100%); text-align: center; 
+    background: var(--accent); color: white; padding: 18px; border-radius: 16px; 
+    text-decoration: none; font-weight: 700; transition: transform 0.2s;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); 
   }
-
-  .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; color: #555; }
-  .header-flex.is-centered .quick-meta { justify-content: center; }
-
-  .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
-  .main-content.is-centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; text-align: center; }
-
-  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; }
+  .rsvp-btn:hover { transform: translateY(-2px); }
   
-  /* Dress Code Tags */
-  .dress-pill { 
-    background: #f8f9fa; padding: 4px 12px; border-radius: 6px; 
-    border: 1px solid #e9ecef; font-weight: 600; font-size: 12px; color: #666;
-  }
+  .maps-link { font-size: 13px; color: var(--theme-purple); text-decoration: none; font-weight: 500; }
 
-  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+  .dress-pill { background: #f8f9fa; padding: 4px 12px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: 600; font-size: 12px; color: #666; }
+
+  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 40px; }
   .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
   .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 
-  .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .rsvp-btn { 
-    display: block; text-align: center; background: var(--accent); color: white; 
-    padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; 
-    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); 
-  }
-  
   .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 25px; display: inline-flex; align-items: center; }
 
-  @media (max-width: 768px) {
-    .main-content { grid-template-columns: 1fr !important; }
-    .header-flex { flex-direction: column; text-align: center; }
+  @media (max-width: 600px) {
+    .gallery-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -93,7 +84,6 @@
   const TIMELINE_GID = '1296117535';
   const DETAILS_GID = '1063823403';
 
-  // Synced Member Palette
   const memberPalette = {
     "Yejun": { bg: "#0055fb15", text: "#0055fb" },
     "Noah": { bg: "#ac7dfa15", text: "#ac7dfa" },
@@ -102,7 +92,6 @@
     "Hamin": { bg: "#2be24f15", text: "#1fa138" }
   };
 
-  // Synced Category Palette
   const categoryPalette = {
     "Anniversary": { bg: "#e9ecef", text: "#495057" },
     "Birthdays": { bg: "#fff9db", text: "#f59f00" },
@@ -127,13 +116,11 @@
       const dData = dRows.find(r => r[0] === eventId);
       if (!tData) return;
 
-      const hasSidebar = !!(dData && dData[2]);
       const categories = tData[7].split(',').filter(Boolean);
       const members = (tData[13] || "").split(',').filter(Boolean);
       const images = tData[6].split(',').filter(Boolean);
       const highlights = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
 
-      // Generate HTML for Tags using Timeline logic
       const catHtml = categories.map(c => {
         const s = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057" };
         return `<span class="tag-cat" style="background:${s.bg}; color:${s.text}">${c.trim()}</span>`;
@@ -153,7 +140,7 @@
         <div class="container">
           <a href="asterum-timeline.html" class="back-btn">← Back to Timeline</a>
           
-          <div class="header-flex ${!hasSidebar ? 'is-centered' : ''}">
+          <div class="header-flex">
             <div class="logo-group">${images.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
             <div class="header-text">
               <div class="tag-container">${catHtml} ${memHtml}</div>
@@ -167,16 +154,23 @@
             </div>
           </div>
 
-          <div class="main-content ${!hasSidebar ? 'is-centered' : ''}">
+          <div class="main-content">
             <div class="content-body">
               ${dData && dData[1] ? `<div class="description">${dData[1]}</div>` : ''}
               
               ${tData[10] ? `
                 <div style="margin-bottom:30px;">
                   <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; opacity:0.6;">Dress Code</h4>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; ${!hasSidebar ? 'justify-content:center;' : ''}">
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
                     ${tData[10].split(',').map(d => `<span class="dress-pill">👗 ${d.trim()}</span>`).join('')}
                   </div>
+                </div>` : ''}
+
+              <!-- RSVP Section Centered Below Description -->
+              ${dData && dData[2] ? `
+                <div class="action-area">
+                  <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER NOW</a>
+                  ${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}
                 </div>` : ''}
 
               ${highlights.length ? `
@@ -184,11 +178,6 @@
                   ${highlights.map(img => `<div class="gallery-item"><img src="${img.trim()}"></div>`).join('')}
                 </div>` : ''}
             </div>
-            ${hasSidebar ? `
-              <div class="sidebar">
-                <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
-                ${tData[11] ? `<a href="${tData[11]}" target="_blank" style="text-align:center; font-size:13px; color:var(--theme-purple); text-decoration:none;">View Maps ↗</a>` : ''}
-              </div>` : ''}
           </div>
         </div>
       `;
