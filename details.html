@@ -13,53 +13,27 @@
     --price-red: #963252;
   }
   
-  body { 
-    font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); 
-    margin: 0; padding: 20px; min-height: 100vh;
-  }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
+  .container { width: min(1000px, 100%); background: var(--surface); padding: 40px; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); box-sizing: border-box; margin: 20px auto; }
   
-  .container { 
-    width: min(1000px, 100%); 
-    background: var(--surface); 
-    padding: 40px; 
-    border-radius: 32px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05); 
-    box-sizing: border-box; 
-    margin: 20px auto; 
-  }
-  
-  .header-flex { 
-    display: flex; flex-direction: column; text-align: center; justify-content: center;
-    gap: 20px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; 
-  }
-  
+  .header-flex { display: flex; flex-direction: column; text-align: center; justify-content: center; gap: 20px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .logo-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); background: #eee; }
-  
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 42px); margin: 5px 0; line-height: 1.1; font-weight: 700; }
   
   .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; justify-content: center; }
-  
-  /* MATCHED TAG STYLES FROM TIMELINE */
   .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.1); }
   .tag-member { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; }
 
   .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; color: #555; justify-content: center; }
-
   .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
 
+  /* FIXED: Description is now centered */
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: center; }
   
-  /* RSVP Section */
   .action-area { margin: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-  .rsvp-btn { 
-    display: inline-block; width: min(400px, 100%); text-align: center; 
-    background: var(--accent); color: white; padding: 18px; border-radius: 16px; 
-    text-decoration: none; font-weight: 700; transition: transform 0.2s;
-    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); 
-  }
+  .rsvp-btn { display: inline-block; width: min(400px, 100%); text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); }
   .rsvp-btn:hover { transform: translateY(-2px); }
-  
   .maps-link { font-size: 13px; color: var(--theme-purple); text-decoration: none; font-weight: 500; }
 
   .dress-pill { background: #f8f9fa; padding: 4px 12px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: 600; font-size: 12px; color: #666; }
@@ -70,9 +44,7 @@
 
   .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 25px; display: inline-flex; align-items: center; }
 
-  @media (max-width: 600px) {
-    .gallery-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 600px) { .gallery-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -121,6 +93,9 @@
       const images = tData[6].split(',').filter(Boolean);
       const highlights = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
 
+      // IMAGE LIMIT LOGIC: Only show first 4 images from highlights
+      const displayHighlights = highlights.slice(0, 4);
+
       const catHtml = categories.map(c => {
         const s = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057" };
         return `<span class="tag-cat" style="background:${s.bg}; color:${s.text}">${c.trim()}</span>`;
@@ -132,14 +107,12 @@
       }).join('');
 
       const startTime = tData[3];
-      const endTime = tData[4]; 
-      const timeDisplay = (startTime && endTime) ? `${startTime} – ${endTime}` : (startTime || "TBA");
+      const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
           <a href="asterum-timeline.html" class="back-btn">← Back to Timeline</a>
-          
           <div class="header-flex">
             <div class="logo-group">${images.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
             <div class="header-text">
@@ -166,16 +139,15 @@
                   </div>
                 </div>` : ''}
 
-              <!-- RSVP Section Centered Below Description -->
               ${dData && dData[2] ? `
                 <div class="action-area">
                   <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER NOW</a>
                   ${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}
                 </div>` : ''}
 
-              ${highlights.length ? `
+              ${displayHighlights.length ? `
                 <div class="gallery-grid">
-                  ${highlights.map(img => `<div class="gallery-item"><img src="${img.trim()}"></div>`).join('')}
+                  ${displayHighlights.map(img => `<div class="gallery-item"><img src="${img.trim()}"></div>`).join('')}
                 </div>` : ''}
             </div>
           </div>
