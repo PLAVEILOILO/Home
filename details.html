@@ -30,21 +30,18 @@
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: center; }
   
   .video-section { margin: 40px auto; display: flex; flex-direction: column; gap: 20px; align-items: center; }
-  /* Updated for better Shorts handling - allows vertical scaling */
   .video-wrapper { 
     width: 100%;
-    max-width: 315px; /* Perfect width for vertical shorts */
+    max-width: 315px; 
     position: relative; 
-    padding-bottom: 177.77%; /* 9:16 aspect ratio for Shorts */
+    padding-bottom: 177.77%; 
     height: 0; 
     overflow: hidden; 
     border-radius: 24px; 
     background: #000; 
     box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
   }
-  /* Fallback for regular landscape videos if you use them */
   .video-wrapper.landscape { max-width: 600px; padding-bottom: 56.25%; }
-
   .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
   .action-area { margin: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
@@ -105,14 +102,13 @@
     return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
   }
 
-  // UPDATED: Handles Shorts, feature=share, and standard links
   function getYoutubeEmbed(url) {
+    if (!url || url.trim() === "") return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
     const match = url.match(regExp);
     const videoId = (match && match[2].length === 11) ? match[2] : null;
     
     if (videoId) {
-      // If it's a short, we return a special object to help with styling
       return {
         url: `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=0`,
         isShort: url.includes('shorts')
@@ -122,11 +118,12 @@
   }
 
   function generateGallery(images) {
-    if (!images.length) return '';
+    if (!images || images.length === 0) return '';
     const limit = 4;
     const remaining = images.length - limit;
     let html = '<div class="gallery-grid" id="eventGallery">';
     images.forEach((img, index) => {
+      if (!img.trim()) return;
       const isHidden = index >= limit;
       const isTrigger = (index === limit - 1 && remaining > 0);
       html += `
@@ -168,8 +165,8 @@
       
       const description = dData ? dData[1] : '';
       const rsvpLink = dData ? dData[2] : '';
-      const galleryImages = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
-      const videoLinks = dData && dData[4] ? dData[4].split(',').filter(Boolean) : [];
+      const galleryImages = dData && dData[3] ? dData[3].split(',').filter(s => s.trim() !== "") : [];
+      const videoLinks = dData && dData[4] ? dData[4].split(',').filter(s => s.trim() !== "") : [];
 
       const catHtml = categories.map(c => {
         const s = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057" };
@@ -202,11 +199,10 @@
       const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
 
-      // MODIFIED: Intelligent video rendering
+      // Fixed video logic to skip empty inputs properly
       const videoHtml = videoLinks.map(link => {
         const videoObj = getYoutubeEmbed(link.trim());
         if (!videoObj) return '';
-        // Apply "landscape" class if it's NOT a short
         const wrapperClass = videoObj.isShort ? 'video-wrapper' : 'video-wrapper landscape';
         return `
           <div class="${wrapperClass}">
@@ -259,6 +255,7 @@
           </div>
         </div>`;
     } catch (err) {
+      console.error(err);
       document.getElementById('details-root').innerHTML = "Error loading event details.";
     }
   }
