@@ -29,7 +29,7 @@
   .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: center; }
   
-  .video-section { margin: 40px auto; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+  .video-section { margin: 40px auto; display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%; }
   .video-wrapper { 
     width: 100%;
     max-width: 315px; 
@@ -103,27 +103,30 @@
   }
 
   function getYoutubeEmbed(url) {
-    if (!url || url.trim() === "") return null;
+    if (!url || typeof url !== 'string' || url.trim() === "") return null;
+    const cleanUrl = url.trim();
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
-    const match = url.match(regExp);
+    const match = cleanUrl.match(regExp);
     const videoId = (match && match[2].length === 11) ? match[2] : null;
     
     if (videoId) {
       return {
-        url: `https://www.youtube.com/embed/${videoId}?rel=0&autoplay=0`,
-        isShort: url.includes('shorts')
+        url: `https://www.youtube.com/embed/${videoId}?rel=0`,
+        isShort: cleanUrl.toLowerCase().includes('shorts')
       };
     }
     return null;
   }
 
   function generateGallery(images) {
-    if (!images || images.length === 0) return '';
+    const validImages = images.filter(img => img && img.trim() !== "");
+    if (validImages.length === 0) return '';
+    
     const limit = 4;
-    const remaining = images.length - limit;
+    const remaining = validImages.length - limit;
     let html = '<div class="gallery-grid" id="eventGallery">';
-    images.forEach((img, index) => {
-      if (!img.trim()) return;
+    
+    validImages.forEach((img, index) => {
       const isHidden = index >= limit;
       const isTrigger = (index === limit - 1 && remaining > 0);
       html += `
@@ -157,16 +160,20 @@
       const [tRows, dRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
       const tData = tRows.find(r => r[12] === eventId);
       const dData = dRows.find(r => r[0] === eventId);
-      if (!tData) return;
+      
+      if (!tData) {
+        document.getElementById('details-root').innerHTML = "Event not found.";
+        return;
+      }
 
-      const categories = tData[7].split(',').filter(Boolean);
+      const categories = (tData[7] || "").split(',').filter(Boolean);
       const members = (tData[13] || "").split(',').filter(Boolean);
-      const headerLogos = tData[6].split(',').filter(Boolean);
+      const headerLogos = (tData[6] || "").split(',').filter(Boolean);
       
       const description = dData ? dData[1] : '';
       const rsvpLink = dData ? dData[2] : '';
-      const galleryImages = dData && dData[3] ? dData[3].split(',').filter(s => s.trim() !== "") : [];
-      const videoLinks = dData && dData[4] ? dData[4].split(',').filter(s => s.trim() !== "") : [];
+      const galleryImages = (dData && dData[3]) ? dData[3].split(',') : [];
+      const videoLinks = (dData && dData[4]) ? dData[4].split(',') : [];
 
       const catHtml = categories.map(c => {
         const s = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057" };
@@ -178,41 +185,25 @@
         return `<span class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦ ${m.trim()}</span>`;
       }).join('');
 
-      const startDateRaw = tData[0];
-      const endDateRaw = tData[1];
-      let dateDisplay = "";
-      const opt = { month: 'short', day: 'numeric', year: 'numeric' };
-      const d1 = new Date(startDateRaw);
-      const d2 = endDateRaw ? new Date(endDateRaw) : null;
-
-      if (d2 && d2.getTime() !== d1.getTime() && endDateRaw !== "") {
-          if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
-              dateDisplay = `${d1.toLocaleDateString('en-US', {month:'short', day:'numeric'})} – ${d2.getDate()}, ${d1.getFullYear()}`;
-          } else {
-              dateDisplay = `${d1.toLocaleDateString('en-US', opt)} – ${d2.toLocaleDateString('en-US', opt)}`;
-          }
-      } else {
-          dateDisplay = d1.toLocaleDateString('en-US', opt);
+      const d1 = new Date(tData[0]);
+      const d2 = tData[1] ? new Date(tData[1]) : null;
+      let dateDisplay = d1.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      if (d2 && tData[1] !== "" && d2.getTime() !== d1.getTime()) {
+         dateDisplay += ` – ${d2.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
       }
 
-      const startTime = tData[3];
       const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
 
-      // Fixed video logic to skip empty inputs properly
-      const videoHtml = videoLinks.map(link => {
-        const videoObj = getYoutubeEmbed(link.trim());
-        if (!videoObj) return '';
-        const wrapperClass = videoObj.isShort ? 'video-wrapper' : 'video-wrapper landscape';
-        return `
-          <div class="${wrapperClass}">
-            <iframe 
-              src="${videoObj.url}" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen>
-            </iframe>
-          </div>`;
-      }).join('');
+      // Final fix for Video HTML rendering
+      let videoHtml = "";
+      const validVideos = videoLinks.map(link => getYoutubeEmbed(link)).filter(v => v !== null);
+      if (validVideos.length > 0) {
+        videoHtml = `<div class="video-section">` + validVideos.map(v => `
+          <div class="video-wrapper ${v.isShort ? '' : 'landscape'}">
+            <iframe src="${v.url}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>
+          </div>`).join('') + `</div>`;
+      }
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
@@ -221,11 +212,11 @@
             <div class="logo-group">${headerLogos.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
             <div class="header-text">
               <div class="tag-container">${catHtml} ${memHtml}</div>
-              <h1>${tData[2].split(',').join(' • ')}</h1>
+              <h1>${tData[2]}</h1>
               <div class="quick-meta">
                 <span>📅 ${dateDisplay}</span>
-                ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
-                ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
+                <span>⏰ ${timeDisplay}</span>
+                ${tData[5] ? `<span>📍 ${tData[5]}</span>` : ''}
                 <span style="color:var(--price-red); font-weight:700;">🎟️ ${price}</span>
               </div>
             </div>
@@ -248,15 +239,15 @@
                   ${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}
                 </div>` : ''}
 
-              ${videoHtml ? `<div class="video-section">${videoHtml}</div>` : ''}
+              ${videoHtml}
               
               ${generateGallery(galleryImages)}
             </div>
           </div>
         </div>`;
     } catch (err) {
-      console.error(err);
-      document.getElementById('details-root').innerHTML = "Error loading event details.";
+      console.error("Initialization error:", err);
+      document.getElementById('details-root').innerHTML = "Something went wrong loading the details.";
     }
   }
   init();
