@@ -9,6 +9,7 @@
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
     --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7;
+    --price-red: #ff5e5e;
   }
 
   body {
@@ -71,6 +72,13 @@
   .dress-tag { font-size: 10px; background: #f8f8f8; color: #777; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); font-weight: 600; }
 
   .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
+  
+  .price-wrapper { display: flex; flex-direction: column; gap: 2px; }
+  .price-label { font-size: 9px; text-transform: uppercase; font-weight: 700; color: var(--price-red); opacity: 0.8; }
+  .price-val { font-weight: 700; font-size: 15px; color: var(--price-red); }
+
+  .countdown-box { display: flex; align-items: center; gap: 8px; }
+  .timer-text { font-size: 11px; font-weight: 600; color: var(--theme-purple); }
   .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #eee; color: #888; }
@@ -101,7 +109,7 @@
 <script>
   const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
   const TIMELINE_GID = '1296117535';
-  const DETAIL_URL = 'details.html'; // Name of your details file
+  const DETAIL_URL = 'details.html'; 
 
   const memberStyles = {
     "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
@@ -109,7 +117,7 @@
     "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
     "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
     "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { border: "#7a4ed9", bg: "#7a4ed9", text: "#ffffff" } // Deeper purple for PLAVE
+    "PLAVE": { border: "#7a4ed9", bg: "#7a4ed9", text: "#ffffff" }
   };
 
   let allEvents = [];
@@ -146,6 +154,17 @@
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
   }
 
+  function getCountdownText(date) {
+    const now = new Date();
+    const diffTime = date - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return "Ended";
+    if (diffDays === 0) return "Today!";
+    if (diffDays === 1) return "In 1 day";
+    return `In ${diffDays} days`;
+  }
+
   function formatPrice(min, max) {
     if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
     return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
@@ -169,6 +188,7 @@
     container.innerHTML = filtered.map(ev => {
       const isPast = (ev.end || ev.start) < now;
       const statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
+      const countdownText = getCountdownText(ev.start);
       
       const titleHtml = ev.titles.map(t => `<h2 class="event-title">${t.trim()}</h2>`).join('<hr class="title-divider">');
       const imgHtml = ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" loading="lazy">`).join('');
@@ -190,13 +210,19 @@
             </div>
             ${titleHtml}
             <div class="details-list">
-              <div>📅 ${ev.start.toDateString()} ${ev.startTime ? ' • ' + ev.startTime : ''}</div>
+              <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
               <div>📍 ${ev.loc}</div>
               ${ev.dress ? `<div class="dress-row">${ev.dress.split(',').map(d => `<span class="dress-tag">👗 ${d.trim()}</span>`).join('')}</div>` : ''}
             </div>
             <div class="status-row">
-              <div class="meta-item" style="font-weight:600; font-size:14px;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              ${statusBadge}
+              <div class="price-wrapper">
+                <span class="price-label">Tickets From</span>
+                <span class="price-val">${formatPrice(ev.minP, ev.maxP)}</span>
+              </div>
+              <div class="countdown-box">
+                ${!isPast ? `<span class="timer-text">${countdownText}</span>` : ''}
+                ${statusBadge}
+              </div>
             </div>
           </div>
         </a>`;
@@ -214,6 +240,7 @@
   }
 
   function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  window.onscroll = function() { document.getElementById("backToTop").style.display = (window.scrollY > 300) ? "block" : "none"; };
   loadTimeline();
 </script>
 </body>
