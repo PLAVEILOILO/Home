@@ -24,8 +24,16 @@
   header { text-align: center; margin: 20px 0 10px; }
   header h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 8vw, 38px); margin: 0; }
 
-  .filter-bar { width: min(800px, 100%); display: flex; justify-content: center; gap: 12px; margin-bottom: 30px; padding: 10px; }
-  .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; max-width: 200px; }
+  .filter-bar { 
+    width: min(850px, 100%); 
+    display: flex; 
+    justify-content: center; 
+    gap: 12px; 
+    margin-bottom: 30px; 
+    padding: 10px; 
+    flex-wrap: wrap;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; max-width: 200px; }
   .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); padding-left: 5px; }
 
   select {
@@ -84,6 +92,7 @@
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
     .event-img { height: 160px; }
+    .filter-group { max-width: 100%; }
   }
 </style>
 </head>
@@ -111,6 +120,13 @@
     <label class="filter-label">Category</label>
     <select id="catFilter" onchange="filterEvents()">
       <option value="all">All Categories</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Order</label>
+    <select id="sortOrder" onchange="filterEvents()">
+      <option value="asc">Oldest First</option>
+      <option value="desc">Newest First</option>
     </select>
   </div>
 </div>
@@ -163,13 +179,17 @@
           locLink: row[11] || "",
           id: row[12] || ""
         };
-      }).sort((a, b) => a.start - b.start);
+      });
 
-      // Populate Categories Dropdown (Splitting combined strings for unique list)
+      // Populate Categories Dropdown
       const allCats = allEvents.flatMap(e => e.cat.split(',').map(c => c.trim()));
       const uniqueCats = [...new Set(allCats)].filter(Boolean);
+      const catSelect = document.getElementById('catFilter');
       uniqueCats.forEach(c => { 
-        document.getElementById('catFilter').innerHTML += `<option value="${c}">${c}</option>`; 
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        catSelect.appendChild(opt);
       });
 
       filterEvents();
@@ -185,10 +205,12 @@
   function filterEvents() {
     const timeVal = document.getElementById('timeFilter').value;
     const catVal = document.getElementById('catFilter').value;
+    const sortVal = document.getElementById('sortOrder').value;
     const container = document.getElementById('timelineContainer');
     const now = new Date(); now.setHours(0,0,0,0);
 
-    const filtered = allEvents.filter(ev => {
+    // 1. Filter Logic
+    let filtered = allEvents.filter(ev => {
       const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
       
@@ -198,6 +220,12 @@
       return timeMatch && catMatch;
     });
 
+    // 2. Sort Logic
+    filtered.sort((a, b) => {
+        return sortVal === 'asc' ? a.start - b.start : b.start - a.start;
+    });
+
+    // 3. Render HTML
     container.innerHTML = filtered.map(ev => {
       const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const isPast = (ev.end || ev.start) < now;
@@ -215,7 +243,6 @@
         }
       }
 
-      // Logic to split multiple categories into separate Chips
       const categories = ev.cat.split(',').map(c => c.trim()).filter(Boolean);
       const categoryChips = categories.map(cat => {
           const colors = catColors[cat] || defaultColor;
