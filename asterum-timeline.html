@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Asterum | Timeline</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Asterum Timeline | PLAVE Iloilo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
-    --text: #1e1530; --theme-purple: #7a4ed9; --accent: #6c5ce7; --price-red: #ff4d4d;
+    --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7;
   }
 
   body {
@@ -17,91 +17,123 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Background Elements */
   .bg-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
   .orb { position: absolute; border-radius: 50%; filter: blur(90px); width: 400px; height: 400px; opacity: 0.3; }
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  /* Restored Original Header Style */
-  header { text-align: center; margin: 30px 0 40px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin: 0; font-weight: 700; }
-  header h1 span { font-family: 'Playfair Display', serif; font-weight: 400; font-style: italic; opacity: 0.4; margin: 0 10px; }
-  header p { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.5; margin-top: 8px; font-weight: 600; }
+  /* Restored Header Style */
+  header { text-align: center; margin: 20px 0 30px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 42px); margin: 0; font-weight: 700; }
+  header h1 em { font-weight: 400; font-style: italic; opacity: 0.5; }
 
+  /* Compact Filter Bar for Mobile */
   .filter-bar { 
-    width: min(900px, 100%); display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 15px; margin-bottom: 30px; padding: 10px;
+    width: min(850px, 100%); 
+    display: flex; 
+    justify-content: center; 
+    gap: 12px; 
+    margin-bottom: 25px; 
+    padding: 5px;
   }
-  .filter-group { display: flex; flex-direction: column; gap: 5px; background: white; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border); }
-  .filter-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); opacity: 0.7; }
 
-  select { border: none; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); outline: none; cursor: pointer; background: transparent; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; max-width: 200px; }
+  .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); padding-left: 5px; }
 
-  .timeline { width: min(900px, 100%); display: flex; flex-direction: column; gap: 20px; }
-  
-  .event-link { text-decoration: none; color: inherit; display: block; }
+  select {
+    padding: 10px 15px; border-radius: 12px; border: 1.5px solid var(--border);
+    background: var(--surface); font-family: inherit; font-size: 13px; color: var(--text);
+    outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a87fe8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 14px; padding-right: 30px;
+  }
+
+  /* Timeline Grid */
+  .timeline { width: min(800px, 100%); display: flex; flex-direction: column; gap: 16px; }
+  .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
 
   .event-card {
-    background: var(--surface); border-radius: 24px; display: grid;
-    grid-template-columns: 260px 1fr; border: 2.5px solid transparent;
-    overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
-    box-shadow: 0 4px 20px rgba(168, 127, 232, 0.08);
+    background: var(--surface); border-radius: 20px; display: grid;
+    grid-template-columns: 200px 1fr; border: 1px solid var(--border);
+    overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
   }
-  .event-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(168, 127, 232, 0.15); }
+  .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 127, 232, 0.1); }
 
-  .img-container { position: relative; width: 260px; height: 100%; overflow: hidden; background: #f0f0f0; flex-shrink: 0; }
-  .event-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.8s ease-in-out; opacity: 0; }
-  .event-img.active { opacity: 1; }
+  .img-container { width: 100%; height: 100%; background: #f0f0f0; overflow: hidden; }
+  .event-img { width: 100%; height: 100%; object-fit: cover; }
 
-  .event-info { padding: 30px; display: flex; flex-direction: column; min-width: 0; }
+  .event-info { padding: 20px 24px; display: flex; flex-direction: column; min-width: 0; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  
-  .cat-tag { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-  .cat-birthday { background: #e0f7fa; color: #00838f; }
-  .cat-anniversary { background: #fff8e1; color: #ff8f00; }
-  .cat-event { background: #e8eaf6; color: #283593; }
-  .cat-default { background: #f3edff; color: var(--theme-purple); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .category-tag { 
+    padding: 4px 10px; border-radius: 6px; font-size: 9px; 
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  }
 
-  .member-tag { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
-
-  .title-wrapper { margin-bottom: 15px; overflow: hidden; }
+  /* One-Line Title with Auto-Adjust */
   .event-title { 
-    margin: 0; font-size: 24px; line-height: 1.2; font-family: 'Playfair Display', serif; 
-    font-weight: 700; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    margin: 0 0 12px 0; font-size: 22px; line-height: 1.2; 
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
-  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-weight: 500; }
+  .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; font-weight: 400; }
+
+  .status-row { 
+    display: flex; justify-content: space-between; align-items: flex-end; 
+    margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); 
+  }
+  .meta-item { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
   
-  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 18px; border-top: 1.5px dashed var(--border); }
-  .price-val { color: var(--price-red); font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+  .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; display: inline-block; }
+  .badge-soon { background: var(--theme-purple); color: white; }
+  .badge-ended { background: #eee; color: #888; }
+  .countdown { font-size: 11px; font-weight: 600; color: var(--theme-purple); display: block; margin-top: 4px; text-align: right; }
 
-  .countdown-box { text-align: right; }
-  .timer-text { display: block; font-size: 11px; font-weight: 700; color: var(--theme-purple); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .badge { padding: 5px 14px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; }
-  .badge-soon { background: #6c5ce7; color: white; }
-  .badge-ended { background: #eeeeee; color: #999; }
+  /* Mobile Adjustments */
+  @media (max-width: 600px) {
+    body { padding: 15px; }
+    header { margin-bottom: 20px; }
+    
+    /* Scrollable horizontal filters on mobile to save vertical space */
+    .filter-bar { 
+      justify-content: flex-start; 
+      overflow-x: auto; 
+      padding-bottom: 10px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .filter-group { min-width: 130px; flex: 0 0 auto; }
 
-  @media (max-width: 768px) {
-    .event-card { grid-template-columns: 1fr; }
-    .img-container { width: 100%; height: 250px; }
-    .filter-bar { grid-template-columns: 1fr; }
+    .event-card { grid-template-columns: 1fr; border-radius: 16px; }
+    .img-container { height: 180px; }
+    .event-info { padding: 16px; }
+    .event-title { font-size: 19px; }
+  }
+
+  #backToTop {
+    position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; 
+    border-radius: 50%; background: var(--accent); color: white; border: none;
+    cursor: pointer; display: none; z-index: 1000; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
 <header>
-  <h1>Asterum <span>|</span> Timeline</h1>
-  <p>PLAVE Iloilo Event Archive</p>
+  <h1>Asterum <em>Timeline</em></h1>
 </header>
 
 <div class="filter-bar">
   <div class="filter-group">
     <label class="filter-label">Timeline</label>
-    <select id="timeFilter" onchange="renderTimeline()">
+    <select id="timeFilter" onchange="filterEvents()">
       <option value="all">All Events</option>
       <option value="upcoming">Upcoming</option>
       <option value="past">Past</option>
@@ -109,54 +141,39 @@
   </div>
   <div class="filter-group">
     <label class="filter-label">Category</label>
-    <select id="catFilter" onchange="renderTimeline()">
+    <select id="catFilter" onchange="filterEvents()">
       <option value="all">All Categories</option>
     </select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Sorting</label>
-    <select id="sortOrder" onchange="renderTimeline()">
-      <option value="desc">Latest Added</option>
-      <option value="asc">Earliest Added</option>
+    <select id="sortOrder" onchange="filterEvents()">
+      <option value="asc">Earliest</option>
+      <option value="desc" selected>Latest</option>
     </select>
   </div>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
 
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  const memberStyles = {
-    "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" }, // Distinct Amethyst
-    "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
-    "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
-    "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" } // Distinct Darker Purple
+  const catColors = {
+    "Anniversary": { bg: "#fff0f6", text: "#d63384" },
+    "Birthdays": { bg: "#fff9db", text: "#f59f00" },
+    "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
+    "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
   };
+  const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
 
-  function getCatClass(cat) {
-    const c = cat.toLowerCase();
-    if (c.includes('birthday')) return 'cat-birthday';
-    if (c.includes('anniversary')) return 'cat-anniversary';
-    if (c.includes('event')) return 'cat-event';
-    return 'cat-default';
-  }
-
-  function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
-    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
-  }
-
-  function getCountdown(date) {
-    const diff = new Date(date) - new Date();
-    if (diff < 0) return "";
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    return days > 0 ? `${days}d ${hours}h left` : `${hours}h left`;
-  }
+  window.onscroll = function() {
+    const btn = document.getElementById("backToTop");
+    btn.style.display = (document.documentElement.scrollTop > 400) ? "block" : "none";
+  };
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
   async function loadTimeline() {
     try {
@@ -168,27 +185,36 @@
 
       allEvents = rows.map(row => ({
         start: new Date(row[0]),
+        end: row[1] ? new Date(row[1]) : null,
         titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
-        startTime: row[3] || "",
+        startTime: row[3] || "", 
+        endTime: row[4] || "",
         loc: row[5] || "TBA", 
-        imgs: (row[6] || "").split(','),
+        img: row[6] || "", 
         cat: row[7] || "Event",
         minP: row[8] || "0", maxP: row[9] || "0", 
         dress: row[10] || "",
-        id: row[12] || "", 
-        members: (row[13] || "").split(',').filter(Boolean)
+        locLink: row[11] || "",
+        id: row[12] || ""
       }));
 
-      const cats = new Set();
-      allEvents.forEach(e => e.cat.split(',').forEach(c => c.trim() && cats.add(c.trim())));
+      const uniqueCats = [...new Set(allEvents.flatMap(e => e.cat.split(',').map(c => c.trim())))].filter(Boolean);
       const catSelect = document.getElementById('catFilter');
-      cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
+      uniqueCats.forEach(c => { 
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c; catSelect.appendChild(opt);
+      });
 
-      renderTimeline();
-    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading timeline."; }
+      filterEvents();
+    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
   }
 
-  function renderTimeline() {
+  function formatPrice(min, max) {
+    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
+    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
+  }
+
+  function filterEvents() {
     const timeVal = document.getElementById('timeFilter').value;
     const catVal = document.getElementById('catFilter').value;
     const sortVal = document.getElementById('sortOrder').value;
@@ -196,69 +222,55 @@
     const now = new Date(); now.setHours(0,0,0,0);
 
     let filtered = allEvents.filter(ev => {
-      const isPast = ev.start < now;
+      const isPast = (ev.end || ev.start) < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      return timeMatch && (catVal === 'all' || ev.cat.includes(catVal));
+      const catMatch = (catVal === 'all') || (ev.cat.split(',').map(c => c.trim()).includes(catVal));
+      return timeMatch && catMatch;
     });
 
     filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
 
     container.innerHTML = filtered.map(ev => {
-      const isPast = ev.start < now;
-      const primaryMember = ev.members[0]?.trim();
-      const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
+      const isPast = (ev.end || ev.start) < now;
+      const diffDays = Math.ceil((ev.start - now) / (1000 * 60 * 60 * 24));
       const combinedTitle = ev.titles.join(' • ');
+      
+      let statusBadge = isPast ? '<span class="badge badge-ended">ENDED</span>' : '<span class="badge badge-soon">SOON</span>';
+      let countdownText = !isPast ? (diffDays === 0 ? "Today" : diffDays === 1 ? "Tomorrow" : `In ${diffDays} days`) : "";
 
-      return `
-        <a href="details.html?id=${ev.id}" class="event-link">
-          <div class="event-card" style="border-color: ${mStyle.border};">
-            <div class="img-container">
-              ${ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" id="img-${ev.id}-${i}">`).join('')}
+      const categoryChips = ev.cat.split(',').map(c => {
+          const colors = catColors[c.trim()] || defaultColor;
+          return `<div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">${c.trim()}</div>`;
+      }).join('');
+
+      const cardHtml = `
+        <div class="event-card">
+          <div class="img-container">
+            <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+          </div>
+          <div class="event-info">
+            <div class="tag-row">${categoryChips}</div>
+            <h2 class="event-title" title="${combinedTitle}">${combinedTitle}</h2>
+            <div class="details-list">
+              <div>📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              <div>📍 ${ev.loc}</div>
+              ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
             </div>
-            <div class="event-info">
-              <div class="tag-row">
-                ${ev.cat.split(',').map(c => `<div class="cat-tag ${getCatClass(c)}">${c.trim()}</div>`).join('')}
-                ${ev.members.map(m => {
-                  const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
-                  return `<div class="member-tag" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</div>`;
-                }).join('')}
+            <div class="status-row">
+              <div class="meta-group">
+                <div class="meta-item" style="color: #963252;">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
               </div>
-              <div class="title-wrapper">
-                <h2 class="event-title" title="${combinedTitle}">${combinedTitle}</h2>
-              </div>
-              <div class="details-list">
-                <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
-                <div>📍 ${ev.loc}</div>
-                ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
-              </div>
-              <div class="status-row">
-                <div class="price-val">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-                <div class="countdown-box">
-                  ${!isPast ? `<span class="timer-text">${getCountdown(ev.start)}</span>` : ''}
-                  <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
-                </div>
+              <div class="badge-group">
+                ${statusBadge}
+                <span class="countdown">${countdownText}</span>
               </div>
             </div>
           </div>
-        </a>`;
+        </div>`;
+
+      return ev.id ? `<a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">${cardHtml}</a>` : cardHtml;
     }).join('');
-
-    // Swiper logic
-    filtered.forEach(ev => {
-      if (ev.imgs.length > 1) {
-        let cur = 0;
-        const intervalId = setInterval(() => {
-          const cImg = document.getElementById(`img-${ev.id}-${cur}`);
-          if (cImg) cImg.classList.remove('active');
-          cur = (cur + 1) % ev.imgs.length;
-          const nImg = document.getElementById(`img-${ev.id}-${cur}`);
-          if (nImg) nImg.classList.add('active');
-          else clearInterval(intervalId); // Cleanup if element is removed
-        }, 4000);
-      }
-    });
   }
-
   loadTimeline();
 </script>
 </body>
