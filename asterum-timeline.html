@@ -15,7 +15,6 @@
   body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
   .timeline-container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
-  /* Card Layout */
   .event-card { 
     background: var(--surface); border-radius: 24px; overflow: hidden; 
     display: flex; text-decoration: none; color: inherit; 
@@ -30,17 +29,17 @@
 
   .event-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
   
-  /* Titles & Tags */
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
   .member-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
   
-  .event-title { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.2; margin: 0; color: var(--text); }
+  /* Titles stacked together */
+  .title-group { margin-bottom: 12px; }
+  .event-title { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.2; margin: 0 0 4px 0; color: var(--text); }
   
   .details-list { font-size: 14px; opacity: 0.8; line-height: 1.6; margin-bottom: 15px; }
   .dress-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .dress-tag { background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 
-  /* Bottom Row Styling */
   .status-row { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; }
   .price-val { color: var(--price-red); font-weight: 700; font-size: 15px; }
   
@@ -58,7 +57,7 @@
 </head>
 <body>
 
-<div class="timeline-container" id="timeline-root">Loading Asterum Events...</div>
+<div class="timeline-container" id="timeline-root"></div>
 
 <script>
   const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
@@ -103,7 +102,6 @@
         const titles = r[2].split(',');
         const images = r[6].split(',');
         const members = (r[13] || "").split(',').filter(Boolean);
-        
         const primaryMember = members[0]?.trim();
         const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
         
@@ -121,7 +119,7 @@
             </div>
             <div class="event-info">
               <div class="tag-row">${memberTags}</div>
-              <div style="margin-bottom: 12px;">${titleHtml}</div>
+              <div class="title-group">${titleHtml}</div>
               <div class="details-list">
                 <div>📅 ${startDate.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${r[3] ? ' • ⏰ ' + r[3] : ''}</div>
                 <div>📍 ${r[5]}</div>
@@ -139,21 +137,23 @@
         `;
       }).join('');
 
-      // Auto-slide images if more than one
       rows.forEach(r => {
         const images = r[6].split(',');
         if (images.length > 1) {
           let currentIdx = 0;
           setInterval(() => {
-            document.getElementById(`img-${r[12]}-${currentIdx}`).classList.remove('active');
+            const currentImg = document.getElementById(`img-${r[12]}-${currentIdx}`);
+            if (currentImg) currentImg.classList.remove('active');
             currentIdx = (currentIdx + 1) % images.length;
-            document.getElementById(`img-${r[12]}-${currentIdx}`).classList.add('active');
+            const nextImg = document.getElementById(`img-${r[12]}-${currentIdx}`);
+            if (nextImg) nextImg.classList.add('active');
           }, 3000);
         }
       });
 
     } catch (err) {
-      document.getElementById('timeline-root').innerHTML = "Error loading timeline.";
+      console.error(err);
+      document.getElementById('timeline-root').innerHTML = "Error loading events.";
     }
   }
   init();
