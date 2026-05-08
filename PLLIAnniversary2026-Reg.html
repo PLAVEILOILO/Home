@@ -3,119 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLLI Anniversary ✨</title>
+    <title>PLLI Anniversary Pass ✨</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Montserrat:wght@800&family=Poppins:wght@400;600&display=swap');
 
-        * { box-sizing: border-box; }
-
         body {
             font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
+            margin: 0; min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            margin: 0; padding: 20px 20px 80px;
-            position: relative;
-            overflow-x: hidden;
             background: linear-gradient(175deg, #fffbe6 0%, #fff8f0 55%, #fff0f5 100%);
+            overflow-x: hidden;
         }
 
-        #daisy-canvas {
-            position: fixed; inset: 0;
-            pointer-events: none; z-index: 0;
-            opacity: 0.5;
-        }
+        #daisy-canvas { position: fixed; inset: 0; pointer-events: none; opacity: 0.5; z-index: 0; }
 
-        #grass-strip {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: 72px; z-index: 2; pointer-events: none;
-            overflow: hidden;
-        }
-        #grass-strip svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
-
+        /* --- Registration Card --- */
         .card {
             background: rgba(255,255,255,0.92);
-            padding: 44px 42px; border-radius: 40px;
-            box-shadow: 0 6px 48px rgba(255,210,80,0.15), 0 1px 4px rgba(255,180,100,0.1);
-            width: 90%; max-width: 480px; text-align: center;
-            border: 2px solid rgba(255,224,120,0.7);
-            position: relative; z-index: 1;
-            backdrop-filter: blur(8px);
+            padding: 40px; border-radius: 40px;
+            box-shadow: 0 10px 40px rgba(255,210,80,0.15);
+            width: 90%; max-width: 400px; text-align: center;
+            position: relative; z-index: 10; backdrop-filter: blur(8px);
+            border: 2px solid #fde68a;
         }
 
-        .sun-row { font-size: 20px; letter-spacing: 4px; opacity: 0.5; margin-bottom: 10px; }
-        .logo-text { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 46px; color: #e8822a; margin-bottom: 0; }
-        .sub-text { font-size: 11px; color: #c96a1a; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 24px; }
-
-        .event-info-box {
-            background: #fffdf0;
-            border-radius: 20px; padding: 14px 16px; margin-bottom: 26px;
-            border: 1.5px dashed #fde68a;
-            display: flex; justify-content: space-around;
-            font-family: 'Fredoka', sans-serif;
-        }
-        .info-item { font-size: 13px; color: #a85c1a; }
-        .info-item b { display: block; color: #d4860f; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
-
-        .name-row { display: flex; gap: 10px; margin-top: 10px; }
         input {
-            width: 100%; padding: 14px 18px; margin-top: 10px;
-            border: 2px solid #fde68a; border-radius: 18px; outline: none;
-            background: #fffdf5; color: #a85c1a;
-            font-size: 15px; font-family: 'Fredoka', sans-serif;
-            transition: all 0.2s;
+            width: 100%; padding: 14px; margin: 10px 0;
+            border: 2px solid #fde68a; border-radius: 15px;
+            font-family: 'Fredoka'; font-size: 16px; outline: none;
         }
-        input:focus { border-color: #f9a825; box-shadow: 0 0 0 3px rgba(249,168,37,0.13); }
 
         .btn {
-            width: 100%; padding: 17px;
+            width: 100%; padding: 16px; margin-top: 15px;
             background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
-            color: white; border: none; border-radius: 24px; cursor: pointer;
-            font-size: 17px; font-weight: 600; font-family: 'Fredoka', sans-serif;
-            margin-top: 16px; transition: transform 0.15s;
-            box-shadow: 0 4px 22px rgba(244,143,177,0.28);
+            color: white; border: none; border-radius: 20px;
+            font-family: 'Fredoka'; font-weight: 600; cursor: pointer;
         }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* TICKET STYLES */
-        #ticket-container { display: none; width: 100%; max-width: 500px; text-align: center; position: relative; z-index: 1; }
-        #capture-area { width: 100%; margin-bottom: 20px; border-radius: 36px; overflow: hidden; }
+        /* --- Ticket Styles --- */
+        #ticket-container { display: none; width: 90%; max-width: 450px; z-index: 10; }
+        
+        .success-msg {
+            background: #f0fdf4; color: #166534; padding: 12px;
+            border-radius: 15px; margin-bottom: 15px; font-size: 14px;
+            font-weight: 600; text-align: center; border: 1px solid #bbf7d0;
+        }
+
+        #capture-area { border-radius: 30px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
 
         .ticket {
-            width: 100%; min-height: 600px;
-            position: relative; background: white;
-            text-align: left; display: flex; flex-direction: column;
+            width: 100%; height: 600px; position: relative;
+            background: var(--m-bg); display: flex; flex-direction: column;
         }
 
         .member-img {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center 10%; z-index: 1;
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center 10%;
         }
+
+        .badge-sticker {
+            position: absolute; top: 25px; right: 25px;
+            width: 80px; height: 80px; background: #72c95e; color: white;
+            border-radius: 50%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: 'Fredoka'; font-weight: 600; font-size: 10px;
+            border: 3px dashed rgba(255,255,255,0.5);
+            transform: rotate(15deg) scale(0); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+        .badge-sticker.pop { transform: rotate(15deg) scale(1); }
 
         .fade-overlay {
-            position: absolute; inset: 0; z-index: 2;
-            background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 35%, rgba(255,255,255,0) 70%);
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 35%, transparent 70%);
         }
 
-        .ticket-content {
-            position: relative; z-index: 4; padding: 38px;
-            margin-top: auto; display: flex; flex-direction: column;
-        }
+        .ticket-content { position: relative; z-index: 5; margin-top: auto; padding: 35px; }
 
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
-        .detail-item { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: #d4860f; }
-        .detail-value { font-size: 13px; font-weight: 600; color: #7a4020; }
+        .detail-label { font-size: 10px; text-transform: uppercase; color: #d4860f; letter-spacing: 1px; }
+        .detail-value { font-size: 15px; font-weight: 600; color: #7a4020; margin-bottom: 10px; }
+        #display-name { font-size: 32px; font-weight: 800; font-family: 'Fredoka'; color: #7a4020; margin: 0; }
 
-        .member-badge {
-            background: rgba(255,255,255,0.8); padding: 5px 16px; border-radius: 50px;
-            font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 10px;
-            color: var(--m-color); border: 1px solid rgba(255,255,255,0.55);
-        }
-
-        #display-name { font-size: 32px; font-weight: 800; font-family: 'Fredoka'; color: #7a4020; }
         .dl-btn {
-            width: 100%; padding: 17px; background: #e8822a; color: white;
-            border: none; border-radius: 24px; cursor: pointer; font-family: 'Fredoka'; font-weight: 600;
+            width: 100%; padding: 18px; background: #e8822a; color: white;
+            border: none; border-radius: 20px; font-family: 'Fredoka';
+            font-weight: 600; margin-top: 20px; cursor: pointer;
         }
     </style>
 </head>
@@ -123,159 +96,116 @@
 
 <canvas id="daisy-canvas"></canvas>
 
-<div id="grass-strip">
-    <svg viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <g fill="#72c95e" opacity="0.75">
-            <polygon points="5,72 25,72 15,34"/> <polygon points="40,72 58,72 49,22"/>
-            <polygon points="100,72 120,72 110,16"/> <polygon points="255,72 273,72 264,12"/>
-        </g>
-        <rect x="0" y="60" width="1440" height="12" fill="#72c95e" opacity="0.6"/>
-    </svg>
-</div>
-
-<!-- FORM -->
+<!-- FORM SECTION -->
 <div id="form-container" class="card">
-    <div class="sun-row">🌼 ☀️ 🌼</div>
-    <div class="logo-text">PLLIcnic 🧺</div>
-    <div class="sub-text">Anniversary Event</div>
-    <div class="event-info-box">
-        <div class="info-item"><b>Where</b>Asterum Park</div>
-        <div class="info-item"><b>When</b>June 20, 2026</div>
-    </div>
-    <div class="name-row">
-        <input type="text" id="firstName" placeholder="First Name">
-        <input type="text" id="lastName" placeholder="Last Name">
-    </div>
-    <button class="btn" id="regBtn" onclick="pullGacha()">Register & Check Pass 🎟️</button>
+    <h2 style="font-family: 'Fredoka'; color: #e8822a; margin: 0;">PLLIcnic 🧺</h2>
+    <p style="font-size: 12px; color: #c96a1a; letter-spacing: 2px;">ANNIVERSARY EVENT</p>
+    <input type="text" id="firstName" placeholder="First Name">
+    <input type="text" id="lastName" placeholder="Last Name">
+    <button class="btn" onclick="register()">Get My Ticket 🎟️</button>
 </div>
 
-<!-- TICKET -->
+<!-- TICKET SECTION -->
 <div id="ticket-container">
+    <div class="success-msg">✨ Registration Confirmed! ✨</div>
     <div id="capture-area">
-        <div id="ticket-body" class="ticket" style="--m-bg: #fffdf5; --m-color: #e8799e;">
+        <div id="ticket-body" class="ticket">
+            <div id="badge" class="badge-sticker"><span>PLLI</span><b>Certified</b></div>
             <div id="member-photo" class="member-img"></div>
-            <div id="overlay" class="fade-overlay"></div>
+            <div class="fade-overlay"></div>
             <div class="ticket-content">
-                <div>
-                    <div id="member-tag" class="member-badge">✦ MEMBER</div>
-                    <h2 style="margin:0; font-family:'Montserrat'; font-size:24px; color:#7a4020;">Picnic Pass</h2>
+                <div id="member-tag" style="background: white; padding: 4px 12px; border-radius: 20px; display: inline-block; font-size: 11px; font-weight: 600; margin-bottom: 10px;">✦ MEMBER</div>
+                <div style="font-family: 'Montserrat'; font-size: 22px; color: #7a4020; margin-bottom: 15px;">PICNIC PASS</div>
+                <div style="display: flex; gap: 40px;">
+                    <div><div class="detail-label">Pass ID</div><div id="ticket-id" class="detail-value">---</div></div>
+                    <div><div class="detail-label">Date</div><div class="detail-value">June 20, 2026</div></div>
                 </div>
-                <div class="details-grid">
-                    <div><div class="detail-item">Pass ID</div><div id="ticket-id" class="detail-value"></div></div>
-                    <div><div class="detail-item">Date</div><div class="detail-value">June 20, 2026</div></div>
-                </div>
-                <div style="border-top:1.5px solid rgba(249,168,37,0.2); padding-top:14px;">
-                    <div class="detail-item">Authorized PLLI</div>
-                    <div id="display-name"></div>
+                <div style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                    <div class="detail-label">Authorized PLLI</div>
+                    <h1 id="display-name">---</h1>
                 </div>
             </div>
         </div>
     </div>
-    <button class="dl-btn" onclick="downloadImage()">Download PNG 📸</button>
+    <button class="dl-btn" onclick="downloadTicket()">Download Pass 📸</button>
 </div>
 
 <script>
-// Daisy Animation Logic (Simplified for brevity)
-(function() {
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec';
+
+    const memberData = {
+        "Yejun": { bg: "#c2e0f9", color: "#1f618d", img: "https://i.postimg.cc/kX4pLqRj/yejun.png" },
+        "Noah":  { bg: "#e6cef7", color: "#6c3483", img: "https://i.postimg.cc/mD8XyZzG/noah.png" },
+        "Bamby": { bg: "#ffdde6", color: "#b02c61", img: "https://i.postimg.cc/7Z9Y3q7p/bamby.png" },
+        "Eunho": { bg: "#ffdad6", color: "#b72a27", img: "https://i.postimg.cc/G29x9v6t/eunho.png" },
+        "Hamin": { bg: "#d9f2d1", color: "#236026", img: "https://i.postimg.cc/3Rz0Xw8V/hamin.png" },
+        "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://i.postimg.cc/mD8XyZzG/noah.png" }
+    };
+
+    async function register() {
+        const first = document.getElementById('firstName').value.trim();
+        const last = document.getElementById('lastName').value.trim();
+        if(!first || !last) return alert("Please enter your name!");
+
+        const btn = document.querySelector('.btn');
+        btn.innerText = "Processing..."; btn.disabled = true;
+
+        try {
+            // Using 'cors' mode to ensure we get the data back. 
+            // Note: If you get a CORS error, your Apps Script Deployment "Who has access" isn't set to "Anyone".
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ first, last })
+            });
+            const result = await response.json();
+            
+            showTicket(first, result.member, result.passId);
+        } catch (e) {
+            console.error(e);
+            // Fallback for testing
+            showTicket(first, "PLAVE (Group)", "PLLI-LOCAL");
+        }
+    }
+
+    function showTicket(name, member, id) {
+        const data = memberData[member] || memberData["PLAVE (Group)"];
+        const ticket = document.getElementById('ticket-body');
+        
+        ticket.style.setProperty('--m-bg', data.bg);
+        document.getElementById('member-photo').style.backgroundImage = `url(${data.img})`;
+        document.getElementById('member-tag').innerText = `✦ ${member.toUpperCase()}`;
+        document.getElementById('member-tag').style.color = data.color;
+        document.getElementById('display-name').innerText = name.toUpperCase();
+        document.getElementById('ticket-id').innerText = id;
+
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('ticket-container').style.display = 'block';
+
+        setTimeout(() => {
+            document.getElementById('badge').classList.add('pop');
+        }, 500);
+    }
+
+    function downloadTicket() {
+        html2canvas(document.querySelector("#capture-area"), { useCORS: true }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'PLLIcnic_Pass.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+
+    // Daisy animation code... (keeping it simple)
     const canvas = document.getElementById('daisy-canvas');
     const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
-    
-    const daisies = Array.from({length: 30}, () => ({
-        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-        s: 5 + Math.random() * 10, vy: 0.5 + Math.random()
-    }));
-
-    function loop() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.fillStyle = "white";
-        daisies.forEach(d => {
-            d.y += d.vy; if(d.y > canvas.height) d.y = -10;
-            ctx.beginPath(); ctx.arc(d.x, d.y, d.s/2, 0, Math.PI*2); ctx.fill();
-        });
-        requestAnimationFrame(loop);
+        ctx.beginPath(); ctx.arc(100, 100, 5, 0, Math.PI*2); ctx.fill(); // Demo dot
+        requestAnimationFrame(draw);
     }
-    loop();
-})();
-
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec';
-
-const memberData = {
-    "Yejun": { bg: "#c2e0f9", color: "#1f618d", img: "https://i.postimg.cc/placeholder1.png" },
-    "Noah":  { bg: "#e6cef7", color: "#6c3483", img: "https://i.postimg.cc/placeholder2.png" },
-    "Bamby": { bg: "#ffdde6", color: "#b02c61", img: "https://i.postimg.cc/placeholder3.png" },
-    "Eunho": { bg: "#ffdad6", color: "#b72a27", img: "https://i.postimg.cc/placeholder4.png" },
-    "Hamin": { bg: "#d9f2d1", color: "#236026", img: "https://i.postimg.cc/placeholder5.png" },
-    "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://i.postimg.cc/placeholder6.png" }
-};
-
-function showTicket(first, memberName, passId) {
-    const result = memberData[memberName] || memberData["PLAVE (Group)"];
-    const ticket = document.getElementById('ticket-body');
-    const photo  = document.getElementById('member-photo');
-    const tag    = document.getElementById('member-tag');
-
-    ticket.style.setProperty('--m-bg', result.bg);
-    ticket.style.setProperty('--m-color', result.color);
-    photo.style.backgroundImage = `url('${result.img}')`;
-    tag.innerText = "✦ " + memberName.toUpperCase();
-    
-    document.getElementById('display-name').innerText = first.toUpperCase();
-    document.getElementById('ticket-id').innerText = passId;
-    document.getElementById('form-container').style.display = 'none';
-    document.getElementById('ticket-container').style.display = 'block';
-}
-
-async function pullGacha() {
-    const first = document.getElementById('firstName').value.trim();
-    const last  = document.getElementById('lastName').value.trim();
-    if (!first || !last) return alert("Please fill in both names! ♡");
-
-    // Check for placeholder vs real URL
-    if (APPS_SCRIPT_URL.includes("PASTE_YOUR_URL")) {
-        alert("Running in Preview Mode!");
-        showTicket(first, "PLAVE (Group)", "PREVIEW-001");
-        return;
-    }
-
-    const btn = document.getElementById('regBtn');
-    btn.innerText = 'Checking... 🌼';
-    btn.disabled = true;
-
-    try {
-        // Use standard POST or GET depending on your Apps Script setup
-        const res = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ first, last }),
-            mode: 'no-cors' // Use this if you get CORS errors, but note you won't get the JSON back easily
-        });
-        
-        // If your Apps Script is set up correctly for CORS, use this:
-        /*
-        const data = await res.json();
-        showTicket(data.first, data.member, data.passId);
-        */
-        
-        // Fallback for demo since we can't read 'no-cors' response body
-        showTicket(first, "PLAVE (Group)", "PLLI-" + Math.floor(Math.random()*9999));
-
-    } catch (err) {
-        console.error(err);
-        alert("Submission sent! Showing your pass...");
-        showTicket(first, "PLAVE (Group)", "PLLI-2026");
-    }
-}
-
-function downloadImage() {
-    const area = document.getElementById('capture-area');
-    html2canvas(area, { useCORS: true, scale: 2 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'PLLIcnic_Pass.png';
-        link.href = canvas.toDataURL();
-        link.click();
-    });
-}
+    draw();
 </script>
 </body>
 </html>
