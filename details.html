@@ -6,51 +6,72 @@
 <title>Asterum | Event Details</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #faf7ff; --surface: #ffffff; --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7; --border: rgba(180,160,220,0.2); }
+  :root { 
+    --bg: #faf7ff; --surface: #ffffff; --text: #1e1530; 
+    --theme-purple: #7a4ed9; --accent: #6c5ce7; 
+    --border: rgba(180,160,220,0.2); 
+  }
   
-  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+  body { 
+    font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); 
+    margin: 0; padding: 20px; min-height: 100vh;
+  }
   
-  .container { width: min(1000px, 100%); background: var(--surface); padding: 40px; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); box-sizing: border-box; align-self: flex-start; }
+  /* Fix: Changed from flex-centering on body to auto-margin on container */
+  .container { 
+    width: min(1000px, 100%); 
+    background: var(--surface); 
+    padding: 40px; 
+    border-radius: 32px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05); 
+    box-sizing: border-box; 
+    margin: 20px auto; /* Keeps container centered regardless of content */
+  }
   
-  /* Header Alignment Fixes */
   .header-flex { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
   .header-flex.is-centered { flex-direction: column; text-align: center; justify-content: center; }
   
   .logo-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
   .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); }
   
-  .header-text { width: 100%; } /* Removed flex-grow to allow centering */
+  .header-text { flex: 1; }
   .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); margin: 5px 0; line-height: 1.2; }
   
   .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
   .header-flex.is-centered .tag-container { justify-content: center; }
   
-  .cat-badge { background:#f3edff; color:var(--theme-purple); padding:4px 12px; border-radius:6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-  .member-badge { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  /* SYNCED TAG COLORS FROM TIMELINE */
+  .cat-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cat-birthday { background: #e0f7fa; color: #00838f; }
+  .cat-anniversary { background: #fff8e1; color: #ff8f00; }
+  .cat-event { background: #e8eaf6; color: #283593; }
+  .cat-default { background: #f3edff; color: var(--theme-purple); }
+
+  .member-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
 
   .quick-meta { display: flex; flex-wrap: wrap; gap: 15px; font-size: 14px; opacity: 0.8; margin-top: 15px; }
   .header-flex.is-centered .quick-meta { justify-content: center; }
 
-  /* Layout Logic */
   .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
   .main-content.is-centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; text-align: center; }
 
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; }
   
-  /* Highlights Restored */
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
   .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
   .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
   .more-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
 
   .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; }
+  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: opacity 0.2s; }
+  .rsvp-btn:hover { opacity: 0.9; }
   .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 20px; display: inline-block; }
 
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr !important; }
     .header-flex { flex-direction: column; text-align: center; }
     .tag-container, .quick-meta { justify-content: center; }
+    .header-flex.is-centered .logo-group { flex-direction: row; }
   }
 </style>
 </head>
@@ -64,13 +85,21 @@
   const DETAILS_GID = '1063823403';
 
   const memberStyles = {
-    "Yejun": { bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { bg: "#f5f0ff", text: "#A076FF" },
-    "Bamby": { bg: "#fff0f6", text: "#FF7EB3" },
-    "Eunho": { bg: "#fff0f0", text: "#FF4D4D" },
-    "Hamin": { bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { bg: "#7a4ed9", text: "#ffffff" }
+    "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
+    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" },
+    "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
+    "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
+    "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
+    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" }
   };
+
+  function getCatClass(cat) {
+    const c = cat.toLowerCase();
+    if (c.includes('birthday')) return 'cat-birthday';
+    if (c.includes('anniversary')) return 'cat-anniversary';
+    if (c.includes('event')) return 'cat-event';
+    return 'cat-default';
+  }
 
   function formatPrice(min, max) {
     if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
@@ -101,15 +130,15 @@
       const images = tData[6].split(',').filter(Boolean);
       const highlights = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
 
-      const catHtml = categories.map(c => `<span class="cat-badge">${c.trim()}</span>`).join('');
+      const catHtml = categories.map(c => `<span class="cat-badge ${getCatClass(c)}">${c.trim()}</span>`).join('');
       const memHtml = members.map(m => {
         const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
-        return `<span class="member-badge" style="background:${s.bg}; color:${s.text}">✦ ${m.trim()}</span>`;
+        return `<span class="member-badge" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</span>`;
       }).join('');
 
       document.getElementById('details-root').innerHTML = `
         <div class="container">
-          <a href="asterum-timeline.html" class="back-btn">← Back to Timeline</a>
+          <a href="timeline.html" class="back-btn">← Back to Timeline</a>
           
           <div class="header-flex ${!hasSidebar ? 'is-centered' : ''}">
             <div class="logo-group">${images.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
@@ -117,7 +146,7 @@
               <div class="tag-container">${catHtml} ${memHtml}</div>
               ${tData[2].split(',').map(t => `<h1>${t.trim()}</h1>`).join('')}
               <div class="quick-meta">
-                <span>📅 ${new Date(tData[0]).toDateString()}</span>
+                <span>📅 ${new Date(tData[0]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</span>
                 ${tData[3] ? `<span>⏰ ${tData[3]}</span>` : ''}
                 ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
                 <span>🎟️ ${formatPrice(tData[8], tData[9])}</span>
