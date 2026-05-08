@@ -56,18 +56,20 @@
 
   .event-info { padding: 20px 24px; display: flex; flex-direction: column; min-width: 0; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
   .tag { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
   .member-tag { font-size: 8px; border: 1px solid var(--border); }
 
   .event-title { 
-    margin: 0 0 12px 0; font-size: 22px; line-height: 1.3; 
+    margin: 0 0 14px 0; font-size: 22px; line-height: 1.3; 
     font-family: 'Playfair Display', serif; font-weight: 700;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     overflow: hidden; text-overflow: ellipsis;
   }
 
-  .details-list { font-size: 13px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; }
+  .details-list { font-size: 13px; opacity: 0.9; display: flex; flex-direction: column; gap: 8px; }
+  .detail-item { display: flex; align-items: center; gap: 8px; }
+  
   .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
   .meta-item { font-size: 12px; font-weight: 600; color: #963252; }
   .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
@@ -78,7 +80,7 @@
     .filter-bar { justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; }
     .event-card { grid-template-columns: 1fr; }
     .img-container { width: 100%; height: 180px; }
-    .event-info { padding: 16px; }
+    .event-info { padding: 18px; }
   }
 </style>
 </head>
@@ -207,9 +209,9 @@
               <div class="tag-row">${categoryTags}${memberTags}</div>
               <h2 class="event-title">${combinedTitle}</h2>
               <div class="details-list">
-                <div>📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ${ev.startTime ? ' • ' + ev.startTime : ''}</div>
-                <div>📍 ${ev.loc}</div>
-                ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
+                <div class="detail-item">📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ${ev.startTime ? ' • ' + ev.startTime : ''}</div>
+                <div class="detail-item">📍 ${ev.loc}</div>
+                ${ev.dress ? `<div class="detail-item">👗 Dress Code: ${ev.dress}</div>` : ''}
               </div>
               <div class="status-row">
                 <div class="meta-item">🎟️ ${priceDisplay}</div>
