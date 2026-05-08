@@ -8,7 +8,7 @@
 <style>
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
-    --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7;
+    --text: #1e1530; --theme-purple: #a87fe8;
   }
 
   body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -24,52 +24,53 @@
   .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
   .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--theme-purple); padding-left: 5px; }
 
-  select {
-    padding: 10px 15px; border-radius: 12px; border: 1.5px solid var(--border);
-    background: var(--surface); font-family: inherit; font-size: 13px; outline: none; cursor: pointer;
-  }
+  select { padding: 10px 15px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); font-family: inherit; font-size: 13px; outline: none; cursor: pointer; }
 
   .timeline { width: min(850px, 100%); display: flex; flex-direction: column; gap: 16px; }
   .event-link { text-decoration: none; color: inherit; display: block; }
 
   .event-card {
-    background: var(--surface); border-radius: 20px; display: grid;
-    grid-template-columns: 220px 1fr; border: 1px solid var(--border);
-    overflow: hidden; transition: transform 0.2s;
+    background: var(--surface); border-radius: 24px; display: grid;
+    grid-template-columns: 240px 1fr; border: 1px solid var(--border);
+    overflow: hidden; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
   }
-  .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 127, 232, 0.1); }
+  .event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(168, 127, 232, 0.12); }
 
-  .img-container { width: 220px; height: 100%; background: #f0f0f0; }
+  .img-container { width: 240px; height: 100%; background: #f0f0f0; }
   .event-img { width: 100%; height: 100%; object-fit: cover; }
 
-  .event-info { padding: 22px; display: flex; flex-direction: column; }
+  .event-info { padding: 24px; display: flex; flex-direction: column; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .tag { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
-  .member-tag { border-radius: 20px; font-size: 8px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+  
+  /* Category Tags: Rectangular */
+  .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
+  
+  /* Member Tags: Rounded Pills */
+  .tag-member { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; }
 
-  .event-title { margin: 0 0 14px 0; font-size: 22px; font-family: 'Playfair Display', serif; line-height: 1.2; }
+  .event-title { margin: 0 0 16px 0; font-size: 24px; font-family: 'Playfair Display', serif; line-height: 1.2; color: #1e1530; }
 
   .details-list { font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
-  .detail-item { display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; }
-  .detail-icon { min-width: 18px; opacity: 0.7; }
+  .detail-item { display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; color: #555; }
+  .detail-icon { min-width: 20px; font-size: 14px; text-align: center; }
   
-  /* Dress Code Specific Pill */
+  /* Dress Code Tags */
+  .dress-container { display: flex; flex-wrap: wrap; gap: 6px; }
   .dress-pill { 
-    display: inline-block; background: rgba(168, 127, 232, 0.08); 
-    padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(168, 127, 232, 0.15);
-    font-weight: 500; font-size: 12px; margin-top: 2px;
+    background: #f8f9fa; padding: 2px 10px; border-radius: 6px; 
+    border: 1px solid #e9ecef; font-weight: 600; font-size: 11px; color: #666;
   }
 
-  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
-  .meta-item { font-size: 13px; font-weight: 600; color: #963252; }
-  .badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 18px; border-top: 1px dashed var(--border); }
+  .meta-item { font-size: 14px; font-weight: 700; color: #963252; letter-spacing: -0.2px; }
+  .badge { padding: 5px 14px; border-radius: 10px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
-  .badge-ended { background: #eee; color: #888; }
+  .badge-ended { background: #f1f3f5; color: #adb5bd; }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
-    .img-container { width: 100%; height: 180px; }
+    .img-container { width: 100%; height: 200px; }
   }
 </style>
 </head>
@@ -88,7 +89,7 @@
     <select id="catFilter" onchange="filterEvents()"><option value="all">All Categories</option></select>
   </div>
   <div class="filter-group">
-    <label class="filter-label">Sorting</label>
+    <label class="filter-label">Sort</label>
     <select id="sortOrder" onchange="filterEvents()"><option value="asc">Earliest</option><option value="desc" selected>Latest</option></select>
   </div>
 </div>
@@ -99,16 +100,20 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  const tagColors = {
-    "Anniversary": { bg: "#f3edff", text: "#6c5ce7" },
+  // Categorization of Colors
+  const memberPalette = {
+    "Yejun": { bg: "#0055fb15", text: "#0055fb" },
+    "Noah": { bg: "#ac7dfa15", text: "#ac7dfa" },
+    "Bamby": { bg: "#ff76a215", text: "#ff76a2" },
+    "Eunho": { bg: "#ff2f2f15", text: "#ff2f2f" },
+    "Hamin": { bg: "#2be24f15", text: "#1fa138" }
+  };
+
+  const categoryPalette = {
+    "Anniversary": { bg: "#e9ecef", text: "#495057" },
     "Birthdays": { bg: "#fff9db", text: "#f59f00" },
-    "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
-    "Fan Gathering": { bg: "#fff0f6", text: "#d63384" },
-    "Yejun": { bg: "#0055fb20", text: "#0055fb" },
-    "Noah": { bg: "#ac7dfa20", text: "#ac7dfa" },
-    "Bamby": { bg: "#ff76a220", text: "#ff76a2" },
-    "Eunho": { bg: "#ff2f2f20", text: "#ff2f2f" },
-    "Hamin": { bg: "#2be24f20", text: "#1fa138" }
+    "Online Viewing": { bg: "#d0ebff", text: "#1971c2" },
+    "Fan Gathering": { bg: "#f3f0ff", text: "#6741d9" }
   };
 
   async function loadTimeline() {
@@ -137,7 +142,7 @@
       uniqueCats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
 
       filterEvents();
-    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum."; }
+    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum data."; }
   }
 
   function filterEvents() {
@@ -148,7 +153,8 @@
     const now = new Date(); now.setHours(0,0,0,0);
 
     let filtered = allEvents.filter(ev => {
-      const isPast = (ev.end || ev.start) < now;
+      const eventEnd = ev.end || ev.start;
+      const isPast = eventEnd < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
       const catMatch = (catVal === 'all') || (ev.cat.split(',').map(c => c.trim()).includes(catVal));
       return timeMatch && catMatch;
@@ -157,21 +163,30 @@
     filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
 
     container.innerHTML = filtered.map(ev => {
-      const isPast = (ev.end || ev.start) < now;
-      const options = { month: 'short', day: 'numeric', year: 'numeric' };
-      const dateDisplay = ev.end && ev.end.getTime() !== ev.start.getTime() 
-                          ? `${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric'})} - ${ev.end.toLocaleDateString('en-US', options)}`
-                          : ev.start.toLocaleDateString('en-US', options);
+      const eventEnd = ev.end || ev.start;
+      const isPast = eventEnd < now;
+      
+      // Date Range Logic
+      const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+      const shortOptions = { month: 'short', day: 'numeric' };
+      let dateDisplay = ev.start.toLocaleDateString('en-US', dateOptions);
+      
+      if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
+          dateDisplay = `${ev.start.toLocaleDateString('en-US', shortOptions)} — ${ev.end.toLocaleDateString('en-US', dateOptions)}`;
+      }
       
       const categoryTags = ev.cat.split(',').map(c => {
-          const colors = tagColors[c.trim()] || { bg: "#f3edff", text: "#a87fe8" };
-          return `<div class="tag" style="background: ${colors.bg}; color: ${colors.text};">${c.trim()}</div>`;
+          const style = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057" };
+          return `<div class="tag-cat" style="background: ${style.bg}; color: ${style.text};">${c.trim()}</div>`;
       }).join('');
 
       const memberTags = ev.members.map(m => {
-          const colors = tagColors[m] || { bg: "#eee", text: "#666" };
-          return `<div class="tag member-tag" style="background: ${colors.bg}; color: ${colors.text}; border: 1px solid ${colors.text}20;">${m}</div>`;
+          const style = memberPalette[m] || { bg: "#eee", text: "#666" };
+          return `<div class="tag-member" style="background: ${style.bg}; color: ${style.text}; border-color: ${style.text}30;">${m}</div>`;
       }).join('');
+
+      // Split Dress Code into separate containers
+      const dressTags = ev.dress ? ev.dress.split(',').map(d => `<span class="dress-pill">${d.trim()}</span>`).join('') : '';
 
       const priceDisplay = (ev.minP === "0" || !ev.minP) ? "Free Access" : 
                            (ev.minP === ev.maxP) ? `₱${Number(ev.minP).toLocaleString()}` : 
@@ -188,7 +203,7 @@
                 <div class="detail-item"><span class="detail-icon">📅</span> <span>${dateDisplay}</span></div>
                 ${ev.startTime ? `<div class="detail-item"><span class="detail-icon">🕒</span> <span>${ev.startTime}</span></div>` : ''}
                 <div class="detail-item"><span class="detail-icon">📍</span> <span>${ev.loc}</span></div>
-                ${ev.dress ? `<div class="detail-item"><span class="detail-icon">👗</span> <span><span class="dress-pill">${ev.dress}</span></span></div>` : ''}
+                ${ev.dress ? `<div class="detail-item"><span class="detail-icon">👗</span> <div class="dress-container">${dressTags}</div></div>` : ''}
               </div>
               <div class="status-row">
                 <div class="meta-item">🎟️ ${priceDisplay}</div>
