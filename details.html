@@ -27,14 +27,21 @@
   .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; color: #555; justify-content: center; }
 
   .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
-  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: center; }
+  
+  /* FIXED: description styling to handle line breaks properly */
+  .description { 
+    line-height: 1.8; 
+    font-size: 17px; 
+    white-space: pre-wrap; /* Allows line breaks from Google Sheets to render */
+    margin-bottom: 30px; 
+    color: #333; 
+    text-align: center; 
+    word-wrap: break-word;
+  }
   
   .video-section { margin: 40px auto; display: flex; flex-direction: column; align-items: center; gap: 20px; }
   .video-wrapper { position: relative; width: 100%; max-width: 600px; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-  
-  /* Styling specifically for Shorts to look better (9:16 ratio) */
   .video-wrapper.is-shorts { max-width: 315px; padding-bottom: 177.77%; margin: 0 auto; }
-  
   .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
   .action-area { margin: 40px 0; display: flex; flex-direction: column; align-items: center; gap: 15px; }
@@ -89,17 +96,53 @@
     "Fan Gathering": { bg: "#f3f0ff", text: "#6741d9" }
   };
 
+  // FIXED: Improved CSV parser to handle line breaks and quoted commas
+  function parseCSV(text) {
+    const rows = [];
+    let currentRow = [];
+    let currentCell = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        let nextChar = text[i + 1];
+
+        if (char === '"' && inQuotes && nextChar === '"') {
+            currentCell += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            currentRow.push(currentCell.trim());
+            currentCell = '';
+        } else if ((char === '\r' || char === '\n') && !inQuotes) {
+            if (currentCell !== '' || currentRow.length > 0) {
+                currentRow.push(currentCell.trim());
+                rows.push(currentRow);
+                currentCell = '';
+                currentRow = [];
+            }
+            if (char === '\r' && nextChar === '\n') i++; 
+        } else {
+            currentCell += char;
+        }
+    }
+    if (currentCell !== '' || currentRow.length > 0) {
+        currentRow.push(currentCell.trim());
+        rows.push(currentRow);
+    }
+    return rows;
+  }
+
   async function fetchCSV(gid) {
     const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`);
-    const csv = await response.text();
-    return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
+    const csvText = await response.text();
+    return parseCSV(csvText);
   }
 
   function getYoutubeEmbed(url) {
-    // Regex covers: watch?v=, .be/, /embed/, and /shorts/
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
     const match = url.match(regExp);
-    
     if (match && match[2].length === 11) {
         const videoId = match[2];
         const isShorts = url.includes('/shorts/');
@@ -148,13 +191,19 @@
 
     try {
       const [tRows, dRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
+      
+      // eventId is typically in index 12 of Timeline and index 0 of Details
       const tData = tRows.find(r => r[12] === eventId);
       const dData = dRows.find(r => r[0] === eventId);
-      if (!tData) return;
+      
+      if (!tData) {
+          document.getElementById('details-root').innerHTML = "Event not found.";
+          return;
+      }
 
-      const categories = tData[7].split(',').filter(Boolean);
+      const categories = tData[7] ? tData[7].split(',').filter(Boolean) : [];
       const members = (tData[13] || "").split(',').filter(Boolean);
-      const headerLogos = tData[6].split(',').filter(Boolean);
+      const headerLogos = tData[6] ? tData[6].split(',').filter(Boolean) : [];
       
       const description = dData ? dData[1] : '';
       const rsvpLink = dData ? dData[2] : '';
@@ -171,6 +220,7 @@
         return `<span class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦ ${m.trim()}</span>`;
       }).join('');
 
+      // Date Formatting
       const startDateRaw = tData[0];
       const endDateRaw = tData[1];
       let dateDisplay = "";
@@ -195,16 +245,9 @@
       const videoHtml = videoLinks.map(link => {
         const videoObj = getYoutubeEmbed(link.trim());
         if(!videoObj) return '';
-        
         return `
           <div class="video-wrapper ${videoObj.isShorts ? 'is-shorts' : ''}">
-            <iframe 
-              src="${videoObj.url}" 
-              title="YouTube video player" 
-              frameborder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowfullscreen>
-            </iframe>
+            <iframe src="${videoObj.url}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
           </div>`;
       }).join('');
 
@@ -215,7 +258,7 @@
             <div class="logo-group">${headerLogos.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
             <div class="header-text">
               <div class="tag-container">${catHtml} ${memHtml}</div>
-              <h1>${tData[2].split(',').join(' • ')}</h1>
+              <h1>${tData[2] ? tData[2].split(',').join(' • ') : 'Unnamed Event'}</h1>
               <div class="quick-meta">
                 <span>📅 ${dateDisplay}</span>
                 ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
@@ -243,12 +286,12 @@
                 </div>` : ''}
 
               ${videoHtml ? `<div class="video-section">${videoHtml}</div>` : ''}
-              
               ${generateGallery(galleryImages)}
             </div>
           </div>
         </div>`;
     } catch (err) {
+      console.error(err);
       document.getElementById('details-root').innerHTML = "Error loading event details.";
     }
   }
