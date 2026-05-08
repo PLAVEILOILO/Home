@@ -45,7 +45,7 @@
   }
   select:focus { border-color: var(--theme-purple); box-shadow: 0 0 0 3px rgba(168,127,232,0.1); }
 
-  /* SMALLER TIMELINE */
+  /* SMALLER TIMELINE CONTAINER */
   .timeline { width: min(700px, 100%); display: flex; flex-direction: column; gap: 14px; }
   .event-link { text-decoration: none; color: inherit; display: block; opacity: 0; animation: fadeInUp 0.5s ease forwards; }
 
@@ -68,7 +68,7 @@
   .event-img.active { opacity: 1; }
 
   .event-info { padding: 18px; display: flex; flex-direction: column; }
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; width: 100%; }
   
   .tag-cat { padding: 3px 8px; border-radius: 4px; font-size: 8px; font-weight: 700; text-transform: uppercase; background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
   .tag-member { padding: 3px 10px; border-radius: 20px; font-size: 8px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; display: inline-flex; align-items: center; gap: 3px; }
@@ -119,16 +119,16 @@
 
 <div class="filter-bar">
   <div class="filter-group">
-    <label class="filter-label">When</label>
-    <select id="timeFilter" onchange="filterEvents()"><option value="all">All</option><option value="upcoming">Soon</option><option value="past">Past</option></select>
+    <label class="filter-label">Timeline</label>
+    <select id="timeFilter" onchange="filterEvents()"><option value="all">All</option><option value="upcoming">Upcoming</option><option value="past">Past</option></select>
   </div>
   <div class="filter-group">
-    <label class="filter-label">Type</label>
+    <label class="filter-label">Category</label>
     <select id="catFilter" onchange="filterEvents()"><option value="all">All</option></select>
   </div>
   <div class="filter-group">
     <label class="filter-label">Sort</label>
-    <select id="sortOrder" onchange="filterEvents()"><option value="asc">Oldest</option><option value="desc" selected>Newest</option></select>
+    <select id="sortOrder" onchange="filterEvents()"><option value="asc">Earliest</option><option value="desc" selected>Latest</option></select>
   </div>
 </div>
 
@@ -248,7 +248,10 @@
         return `<div class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">${m}</div>`;
       }).join('');
 
-      const price = (!ev.minP || ev.minP === "0") ? "Free" : (ev.minP === ev.maxP ? `₱${Number(ev.minP).toLocaleString()}` : `₱${Number(ev.minP).toLocaleString()}+`);
+      /* PRICE LOGIC RESTORED */
+      const price = (!ev.minP || ev.minP === "0") 
+        ? "Free Access" 
+        : (ev.minP === ev.maxP ? `₱${Number(ev.minP).toLocaleString()}` : `₱${Number(ev.minP).toLocaleString()} - ₱${Number(ev.maxP).toLocaleString()}`);
 
       const imgUrls = ev.img.split(',').map(url => url.trim()).filter(url => url !== "");
       const imgHtml = imgUrls.length > 0 
