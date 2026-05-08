@@ -30,7 +30,6 @@
   .timeline { width: min(850px, 100%); display: flex; flex-direction: column; gap: 16px; }
   .event-link { text-decoration: none; color: inherit; display: block; opacity: 0; animation: fadeInUp 0.5s ease forwards; }
 
-  /* Smooth Entrance Animation */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
@@ -44,9 +43,14 @@
   }
   .event-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 30px rgba(168, 127, 232, 0.15); }
 
+  /* UPDATED IMAGE CONTAINER FOR SLIDESHOW */
   .img-container { width: 240px; height: 100%; background: #eeeaf5; overflow: hidden; position: relative; }
-  .event-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; }
-  .event-img.loaded { opacity: 1; }
+  .event-img { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    object-fit: cover; opacity: 0; transition: opacity 1.2s ease-in-out; 
+    z-index: 1;
+  }
+  .event-img.active { opacity: 1; z-index: 2; }
 
   .event-info { padding: 24px; display: flex; flex-direction: column; }
   .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; width: 100%; }
@@ -58,7 +62,6 @@
 
   .details-list { font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
   .detail-item { display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; color: #555; }
-  .detail-icon { min-width: 20px; font-size: 14px; text-align: center; }
   
   .dress-pill { background: #f8f9fa; padding: 2px 10px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: 600; font-size: 11px; color: #666; }
 
@@ -76,7 +79,7 @@
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
-    .img-container { width: 100%; height: 200px; }
+    .img-container { width: 100%; height: 240px; }
   }
 </style>
 </head>
@@ -148,7 +151,23 @@
       uniqueCats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
 
       filterEvents();
+      startImageCycles();
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum data."; }
+  }
+
+  function startImageCycles() {
+    // Cycles images every 4 seconds for cards with multiple images
+    setInterval(() => {
+      document.querySelectorAll('.img-container').forEach(container => {
+        const imgs = container.querySelectorAll('.event-img');
+        if (imgs.length > 1) {
+          let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+          imgs[activeIdx].classList.remove('active');
+          let nextIdx = (activeIdx + 1) % imgs.length;
+          imgs[nextIdx].classList.add('active');
+        }
+      });
+    }, 4000);
   }
 
   function updateAllCountdowns() {
@@ -201,13 +220,25 @@
 
       const price = (!ev.minP || ev.minP === "0") ? "Free Access" : (ev.minP === ev.maxP ? `₱${Number(ev.minP).toLocaleString()}` : `₱${Number(ev.minP).toLocaleString()} - ₱${Number(ev.maxP).toLocaleString()}`);
 
-      // Adding a slight animation delay to each card for a "staggered" effect
+      // SPLIT COMMA-SEPARATED IMAGES
+      const imageList = ev.img.split(',').map(url => url.trim()).filter(url => url !== "");
+      let imgHtml = "";
+      
+      if (imageList.length > 0) {
+        imgHtml = imageList.map((url, i) => `
+          <img src="${url}" 
+               class="event-img ${i === 0 ? 'active' : ''}" 
+               onload="this.classList.add('loaded')" 
+               onerror="this.src='https://placehold.co/400x400/eeeaf5/a87fe8?text=Asterum';this.classList.add('active')">
+        `).join('');
+      } else {
+        imgHtml = `<img src="https://placehold.co/400x400/eeeaf5/a87fe8?text=Asterum" class="event-img active">`;
+      }
+
       return `
         <a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link" style="animation-delay: ${index * 0.05}s">
           <div class="event-card">
-            <div class="img-container">
-                <img src="${ev.img}" class="event-img" onload="this.classList.add('loaded')" onerror="this.src='https://placehold.co/400x400/eeeaf5/a87fe8?text=Asterum';this.classList.add('loaded')">
-            </div>
+            <div class="img-container">${imgHtml}</div>
             <div class="event-info">
               <div class="tag-row">${cats}${mems}${!isPast ? `<span class="countdown-timer" data-start="${ev.start.toISOString()}"></span>` : ''}</div>
               <h2 class="event-title">${ev.titles.join(' • ')}</h2>
