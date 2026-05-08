@@ -41,7 +41,7 @@
 
   .event-info { padding: 24px; display: flex; flex-direction: column; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; width: 100%; }
   .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
   .tag-member { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; }
 
@@ -59,6 +59,12 @@
   .badge { padding: 5px 14px; border-radius: 10px; font-size: 10px; font-weight: 800; }
   .badge-soon { background: var(--theme-purple); color: white; }
   .badge-ended { background: #f1f3f5; color: #adb5bd; }
+
+  .countdown-timer {
+    font-size: 10px; font-weight: 800; color: var(--theme-purple);
+    background: rgba(168, 127, 232, 0.1); padding: 3px 10px;
+    border-radius: 6px; margin-left: auto; letter-spacing: 0.5px;
+  }
 
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
@@ -118,7 +124,7 @@
         end: row[1] ? new Date(row[1]) : null,
         titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
         startTime: row[3] || "",
-        endTime: row[4] || "", // Column E
+        endTime: row[4] || "",
         loc: row[5] || "TBA", 
         img: row[6] || "", 
         cat: row[7] || "Event",
@@ -137,16 +143,40 @@
     } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum data."; }
   }
 
+  function updateAllCountdowns() {
+    const timers = document.querySelectorAll('.countdown-timer');
+    const now = new Date();
+
+    timers.forEach(timer => {
+      const eventDate = new Date(timer.dataset.start);
+      const diff = eventDate - now;
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / (1000 * 60)) % 60);
+        
+        if (days > 0) {
+          timer.textContent = `⏳ IN ${days}D ${hours}H`;
+        } else {
+          timer.textContent = `⏳ IN ${hours}H ${mins}M`;
+        }
+      } else {
+        timer.style.display = 'none';
+      }
+    });
+  }
+
   function filterEvents() {
     const timeVal = document.getElementById('timeFilter').value;
     const catVal = document.getElementById('catFilter').value;
     const sortVal = document.getElementById('sortOrder').value;
     const container = document.getElementById('timelineContainer');
-    const now = new Date(); now.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
 
     let filtered = allEvents.filter(ev => {
       const eventStop = ev.end || ev.start;
-      const isPast = eventStop < now;
+      const isPast = eventStop < today;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
       const catMatch = (catVal === 'all') || (ev.cat.split(',').map(c => c.trim()).includes(catVal));
       return timeMatch && catMatch;
@@ -156,19 +186,16 @@
 
     container.innerHTML = filtered.map(ev => {
       const eventStop = ev.end || ev.start;
-      const isPast = eventStop < now;
+      const isPast = eventStop < today;
       
-      // FIX: Improved Date Range Logic
       const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
       const shortOptions = { month: 'short', day: 'numeric' };
       let dateDisplay = ev.start.toLocaleDateString('en-US', dateOptions);
       
-      // If end date exists and is different from start date
       if (ev.end && ev.end.toDateString() !== ev.start.toDateString()) {
           dateDisplay = `${ev.start.toLocaleDateString('en-US', shortOptions)} — ${ev.end.toLocaleDateString('en-US', dateOptions)}`;
       }
 
-      // FIX: Time Range Logic
       let timeDisplay = ev.startTime;
       if (ev.startTime && ev.endTime) {
           timeDisplay = `${ev.startTime} — ${ev.endTime}`;
@@ -185,6 +212,7 @@
       }).join('');
 
       const dressTags = ev.dress ? ev.dress.split(',').map(d => `<span class="dress-pill">${d.trim()}</span>`).join('') : '';
+      const countdownHtml = !isPast ? `<span class="countdown-timer" data-start="${ev.start.toISOString()}"></span>` : '';
 
       const priceDisplay = (ev.minP === "0" || !ev.minP) ? "Free Access" : 
                            (ev.minP === ev.maxP) ? `₱${Number(ev.minP).toLocaleString()}` : 
@@ -195,7 +223,10 @@
           <div class="event-card">
             <div class="img-container"><img src="${ev.img}" class="event-img" onerror="this.style.opacity='0'"></div>
             <div class="event-info">
-              <div class="tag-row">${categoryTags}${memberTags}</div>
+              <div class="tag-row">
+                ${categoryTags}${memberTags}
+                ${countdownHtml}
+              </div>
               <h2 class="event-title">${ev.titles.join(' • ')}</h2>
               <div class="details-list">
                 <div class="detail-item"><span class="detail-icon">📅</span> <span>${dateDisplay}</span></div>
@@ -211,8 +242,12 @@
           </div>
         </a>`;
     }).join('');
+    
+    updateAllCountdowns();
   }
+
   loadTimeline();
+  setInterval(updateAllCountdowns, 60000);
 </script>
 </body>
 </html>
