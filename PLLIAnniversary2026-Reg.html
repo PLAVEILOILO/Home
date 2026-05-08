@@ -20,15 +20,6 @@
             background: linear-gradient(175deg, #fffbe6 0%, #fff8f0 55%, #fff0f5 100%);
         }
 
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #ff9800; color: white; padding: 12px 24px;
-            border-radius: 50px; font-weight: 600; font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: none; z-index: 1000; animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
-
         #daisy-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
 
         #grass-strip {
@@ -41,15 +32,24 @@
         .card {
             background: rgba(255,255,255,0.92);
             padding: 44px 42px; border-radius: 40px;
-            box-shadow: 0 6px 48px rgba(255,210,80,0.15);
+            box-shadow: 0 6px 48px rgba(255,210,80,0.15), 0 1px 4px rgba(255,180,100,0.1);
             width: 90%; max-width: 480px; text-align: center;
             border: 2px solid rgba(255,224,120,0.7);
             position: relative; z-index: 1;
             backdrop-filter: blur(8px);
         }
 
+        .sun-row { font-size: 20px; letter-spacing: 4px; opacity: 0.5; margin-bottom: 10px; }
         .logo-text { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 46px; color: #e8822a; margin-bottom: 0; }
         .sub-text { font-size: 11px; color: #c96a1a; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 24px; }
+
+        .event-info-box {
+            background: #fffdf0; border-radius: 20px; padding: 14px 16px; margin-bottom: 26px;
+            border: 1.5px dashed #fde68a; display: flex; justify-content: space-around;
+            font-family: 'Fredoka', sans-serif;
+        }
+        .info-item { font-size: 13px; color: #a85c1a; }
+        .info-item b { display: block; color: #d4860f; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
 
         .name-row { display: flex; gap: 10px; margin-top: 10px; }
         input {
@@ -58,7 +58,7 @@
             background: #fffdf5; color: #a85c1a; font-size: 15px; font-family: 'Fredoka', sans-serif;
         }
 
-        .btn, .dl-btn {
+        .btn {
             width: 100%; padding: 17px;
             background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
             color: white; border: none; border-radius: 24px; cursor: pointer;
@@ -67,7 +67,8 @@
         }
 
         #ticket-container { display: none; width: 100%; max-width: 800px; text-align: center; position: relative; z-index: 1; }
-        
+        #capture-area { width: 100%; margin: 0 auto 20px; }
+
         .ticket {
             width: 100%; aspect-ratio: 2/3.5;
             border-radius: 36px; position: relative; overflow: hidden;
@@ -77,23 +78,12 @@
 
         .member-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center 10%; z-index: 1; }
         
-        .fade-overlay { 
-            position: absolute; inset: 0; z-index: 2; 
-            background: linear-gradient(to top, #fffdf5 20%, transparent 70%); 
-        }
+        /* Updated Gradient: Uses fixed color to prevent the white line issue */
+        .fade-overlay { position: absolute; inset: 0; z-index: 2; background: linear-gradient(to top, #fffdf5 10%, #fffdf5 30%, transparent 70%); }
+        
+        .ticket-bloom { position: absolute; top: -80px; right: -80px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,236,120,0.25) 0%, transparent 68%); z-index: 3; }
 
         .ticket-content { position: relative; z-index: 4; padding: 38px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
-        
-        .member-badge { 
-            background: linear-gradient(135deg, #ff9800, #ed6c02); 
-            color: white !important;
-            padding: 6px 18px; border-radius: 50px; 
-            font-size: 11px; font-weight: 600; 
-            display: inline-block; margin-bottom: 12px;
-            box-shadow: 0 4px 10px rgba(237, 108, 2, 0.2);
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-
         .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
 
         @media screen and (min-width: 800px) {
@@ -105,12 +95,17 @@
 
         .detail-item { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: #d4860f; margin-bottom: 2px; }
         .detail-value { font-size: 13px; font-weight: 600; color: #7a4020; }
+        
+        /* Pill styling: White background, dynamic text color */
+        .member-badge { background: rgba(255,255,255,0.9); padding: 5px 16px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 10px; color: var(--m-color); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
         #display-name { font-size: 38px; font-weight: 800; font-family: 'Fredoka'; line-height: 1; color: #7a4020; margin: 0; }
+
+        .dl-btn { width: 100%; padding: 17px; background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 17px; font-weight: 600; font-family: 'Fredoka', sans-serif; }
     </style>
 </head>
 <body>
 
-<div id="toast">Successfully Registered! 🧺✨</div>
 <canvas id="daisy-canvas"></canvas>
 
 <div id="grass-strip">
@@ -121,8 +116,14 @@
 </div>
 
 <div id="form-container" class="card">
+    <div class="sun-row">🌼 ☀️ 🌼</div>
     <div class="logo-text">PLLIcnic 🧺</div>
     <div class="sub-text">Anniversary Event</div>
+    <div class="event-info-box">
+        <div class="info-item"><b>Where</b>Asterum Park</div>
+        <div class="info-item"><b>When</b>June 20, 2026</div>
+        <div class="info-item"><b>Time</b>4:00 PM</div>
+    </div>
     <div class="name-row">
         <input type="text" id="firstName" placeholder="First Name">
         <input type="text" id="lastName" placeholder="Last Name">
@@ -132,15 +133,15 @@
 
 <div id="ticket-container">
     <div id="capture-area">
-        <div id="ticket-body" class="ticket">
+        <div id="ticket-body" class="ticket" style="--m-color: #e8799e;">
             <div id="member-photo" class="member-img"></div>
             <div class="fade-overlay"></div>
+            <div class="ticket-bloom"></div>
             <div class="ticket-content">
                 <div>
                     <div id="member-tag" class="member-badge">✦ MEMBER</div>
                     <h2 style="margin:0; font-family:'Montserrat'; font-size:30px; line-height:1.1; color:#7a4020;">🌼 Picnic Pass</h2>
                 </div>
-                <!-- RESTORED DETAILS BELOW -->
                 <div class="details-grid">
                     <div><div class="detail-item">Location</div><div class="detail-value">Asterum Park</div></div>
                     <div><div class="detail-item">Pass ID</div><div id="ticket-id" class="detail-value"></div></div>
@@ -158,7 +159,6 @@
 </div>
 
 <script>
-// DAISY ANIMATION 
 (function() {
     const canvas = document.getElementById('daisy-canvas');
     const ctx = canvas.getContext('2d');
@@ -201,15 +201,15 @@
     loop();
 })();
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec'; 
+const APPS_SCRIPT_URL = 'PASTE_YOUR_URL_HERE';
 
 const memberData = {
-    "Yejun": "https://lh3.googleusercontent.com/u/0/d/1f_5pCcNu6yWJIZoanqRMGBoVPJY33Cke",
-    "Noah": "https://lh3.googleusercontent.com/u/0/d/136FYbU-u4U0Cw8AJQKYUfzpzNQrMDKhW",
-    "Bamby": "https://lh3.googleusercontent.com/u/0/d/1X9VM3HhF8cYvU6A6k0jXGEEaK6JpGZQ7",
-    "Eunho": "https://lh3.googleusercontent.com/u/0/d/1IcBszLi_zV2Hrw2BxxaGqFn4rjJBulGa",
-    "Hamin": "https://lh3.googleusercontent.com/u/0/d/1K21sm_dz9BgkXesEJEuPZn8MyQ0Tjr9K",
-    "PLAVE (Group)": "https://lh3.googleusercontent.com/u/0/d/1pVg2CfjS-7elfpIfvyCT_oV_QaYPZDy9"
+    "Yejun": { color: "#2980b9", img: "https://lh3.googleusercontent.com/u/0/d/1f_5pCcNu6yWJIZoanqRMGBoVPJY33Cke" },
+    "Noah": { color: "#8e44ad", img: "https://lh3.googleusercontent.com/u/0/d/136FYbU-u4U0Cw8AJQKYUfzpzNQrMDKhW" },
+    "Bamby": { color: "#d63878", img: "https://lh3.googleusercontent.com/u/0/d/1X9VM3HhF8cYvU6A6k0jXGEEaK6JpGZQ7" },
+    "Eunho": { color: "#e53935", img: "https://lh3.googleusercontent.com/u/0/d/1IcBszLi_zV2Hrw2BxxaGqFn4rjJBulGa" },
+    "Hamin": { color: "#2e7d32", img: "https://lh3.googleusercontent.com/u/0/d/1K21sm_dz9BgkXesEJEuPZn8MyQ0Tjr9K" },
+    "PLAVE (Group)": { color: "#d4860f", img: "https://lh3.googleusercontent.com/u/0/d/1pVg2CfjS-7elfpIfvyCT_oV_QaYPZDy9" }
 };
 
 async function pullGacha() {
@@ -222,18 +222,16 @@ async function pullGacha() {
     try {
         const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ first, last }) });
         const data = await res.json();
-        
         const memberName = data.member;
-        const imgUrl = memberData[memberName] || memberData["PLAVE (Group)"];
+        const result = memberData[memberName] || memberData["PLAVE (Group)"];
         
-        document.getElementById('member-photo').style.backgroundImage = `url('${imgUrl}')`;
+        document.getElementById('ticket-body').style.setProperty('--m-color', result.color);
+        document.getElementById('member-photo').style.backgroundImage = `url('${result.img}')`;
         document.getElementById('member-tag').innerText = "✦ " + memberName.toUpperCase();
         document.getElementById('display-name').innerText = first.toUpperCase();
         document.getElementById('ticket-id').innerText = data.passId;
 
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
+        alert("Registered Successfully! 🧺✨"); // Simple confirmation
 
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('ticket-container').style.display = 'block';
@@ -244,9 +242,9 @@ async function pullGacha() {
 }
 
 function downloadImage() {
-    html2canvas(document.getElementById('capture-area'), { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
+    html2canvas(document.getElementById('capture-area'), { useCORS: true, scale: 3 }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `PLLIcnic_Pass_${document.getElementById('firstName').value}.png`;
+        link.download = 'PLLIcnic_Pass.png';
         link.href = canvas.toDataURL();
         link.click();
     });
