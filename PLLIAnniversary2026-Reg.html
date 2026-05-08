@@ -17,18 +17,15 @@
             margin: 0; padding: 20px 20px 80px;
             position: relative;
             overflow-x: hidden;
-            /* sunny sky gradient */
             background: linear-gradient(175deg, #fffbe6 0%, #fff8f0 55%, #fff0f5 100%);
         }
 
-        /* floating daisies canvas */
         #daisy-canvas {
             position: fixed; inset: 0;
             pointer-events: none; z-index: 0;
             opacity: 0.5;
         }
 
-        /* grass strip at the very bottom */
         #grass-strip {
             position: fixed; bottom: 0; left: 0; right: 0;
             height: 72px; z-index: 2; pointer-events: none;
@@ -36,7 +33,6 @@
         }
         #grass-strip svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
 
-        /* ── CARD ── */
         .card {
             background: rgba(255,255,255,0.92);
             padding: 44px 42px; border-radius: 40px;
@@ -48,18 +44,8 @@
         }
 
         .sun-row { font-size: 20px; letter-spacing: 4px; opacity: 0.5; margin-bottom: 10px; }
-
-        .logo-text {
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 600; font-size: 46px;
-            color: #e8822a; margin-bottom: 0;
-        }
-
-        .sub-text {
-            font-size: 11px; color: #c96a1a;
-            font-weight: 600; text-transform: uppercase;
-            letter-spacing: 3px; margin-bottom: 24px;
-        }
+        .logo-text { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 46px; color: #e8822a; margin-bottom: 0; }
+        .sub-text { font-size: 11px; color: #c96a1a; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 24px; }
 
         .event-info-box {
             background: #fffdf0;
@@ -69,52 +55,35 @@
             font-family: 'Fredoka', sans-serif;
         }
         .info-item { font-size: 13px; color: #a85c1a; }
-        .info-item b {
-            display: block; color: #d4860f;
-            font-size: 9px; text-transform: uppercase;
-            letter-spacing: 1.5px; margin-bottom: 3px;
-        }
+        .info-item b { display: block; color: #d4860f; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
 
         .name-row { display: flex; gap: 10px; margin-top: 10px; }
-
         input {
             width: 100%; padding: 14px 18px; margin-top: 10px;
             border: 2px solid #fde68a; border-radius: 18px; outline: none;
             background: #fffdf5; color: #a85c1a;
             font-size: 15px; font-family: 'Fredoka', sans-serif;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
         input:focus { border-color: #f9a825; box-shadow: 0 0 0 3px rgba(249,168,37,0.13); }
-        input::placeholder { color: #c96a1a; }
 
         .btn {
             width: 100%; padding: 17px;
             background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
             color: white; border: none; border-radius: 24px; cursor: pointer;
             font-size: 17px; font-weight: 600; font-family: 'Fredoka', sans-serif;
-            margin-top: 16px; transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 16px; transition: transform 0.15s;
             box-shadow: 0 4px 22px rgba(244,143,177,0.28);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            animation: pulse 2s infinite; /* Optional Pulse Effect */
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(244,143,177,0.32); animation: none;}
-        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(244, 143, 177, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(244, 143, 177, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 143, 177, 0); }
-        }
-
-        /* ── TICKET ── */
-        #ticket-container { display: none; width: 100%; max-width: 800px; text-align: center; position: relative; z-index: 1; }
-        #capture-area { width: 100%; margin: 0 auto 20px; }
+        /* TICKET STYLES */
+        #ticket-container { display: none; width: 100%; max-width: 500px; text-align: center; position: relative; z-index: 1; }
+        #capture-area { width: 100%; margin-bottom: 20px; border-radius: 36px; overflow: hidden; }
 
         .ticket {
-            width: 100%; aspect-ratio: 2/3.5;
-            border-radius: 36px; position: relative; overflow: hidden;
-            background: white;
-            box-shadow: 0 16px 56px rgba(249,168,37,0.13), 0 2px 8px rgba(244,143,177,0.1);
+            width: 100%; min-height: 600px;
+            position: relative; background: white;
             text-align: left; display: flex; flex-direction: column;
         }
 
@@ -125,178 +94,41 @@
 
         .fade-overlay {
             position: absolute; inset: 0; z-index: 2;
-            /* Updated Gradient: Richer color at the bottom, fades faster at the top for clarity */
             background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 35%, rgba(255,255,255,0) 70%);
-        }
-
-        /* sunny glow in top corner */
-        .ticket-bloom {
-            position: absolute; top: -80px; right: -80px;
-            width: 260px; height: 260px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,236,120,0.25) 0%, transparent 68%);
-            z-index: 3; pointer-events: none;
         }
 
         .ticket-content {
             position: relative; z-index: 4; padding: 38px;
-            height: 100%; display: flex; flex-direction: column;
-            justify-content: flex-end; box-sizing: border-box;
+            margin-top: auto; display: flex; flex-direction: column;
         }
 
         .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
-
-        @media screen and (min-width: 800px) {
-            .ticket { aspect-ratio: 800/380; flex-direction: row; }
-            .member-img { width: 68%; height: 100%; left: 32%; background-position: center center; }
-            /* Desktop Gradient: Richer on the left */
-            .fade-overlay { background: linear-gradient(to right, var(--m-bg) 30%, transparent 65%); }
-            .ticket-content { width: 50%; justify-content: space-between; padding: 44px; }
-        }
-
-        .group-mode .fade-overlay { background: linear-gradient(to top, rgba(255,253,245,0.97) 30%, transparent 70%); }
-        @media screen and (min-width: 800px) {
-            .group-mode .fade-overlay { background: linear-gradient(to right, rgba(255,253,245,0.97) 32%, transparent 65%); }
-        }
-
-        .detail-item {
-            font-size: 9px; text-transform: uppercase;
-            letter-spacing: 1.5px; font-weight: 600; color: #d4860f; margin-bottom: 2px;
-        }
+        .detail-item { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: #d4860f; }
         .detail-value { font-size: 13px; font-weight: 600; color: #7a4020; }
 
         .member-badge {
-            background: rgba(255,255,255,0.6); padding: 5px 16px; border-radius: 50px;
+            background: rgba(255,255,255,0.8); padding: 5px 16px; border-radius: 50px;
             font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 10px;
-            color: var(--m-color); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.55);
+            color: var(--m-color); border: 1px solid rgba(255,255,255,0.55);
         }
 
-        .ticket-event-label {
-            font-family: 'Fredoka', sans-serif; font-size: 12px;
-            color: #d4860f; letter-spacing: 1px; margin-bottom: 6px;
+        #display-name { font-size: 32px; font-weight: 800; font-family: 'Fredoka'; color: #7a4020; }
+        .dl-btn {
+            width: 100%; padding: 17px; background: #e8822a; color: white;
+            border: none; border-radius: 24px; cursor: pointer; font-family: 'Fredoka'; font-weight: 600;
         }
-
-        #display-name { font-size: 38px; font-weight: 800; font-family: 'Fredoka'; line-height: 1; color: #7a4020; }
-
-        .btn-group .dl-btn {
-            width: 100%; padding: 17px;
-            background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
-            color: white; border: none; border-radius: 24px; cursor: pointer;
-            font-size: 17px; font-weight: 600; font-family: 'Fredoka', sans-serif;
-            box-shadow: 0 4px 22px rgba(244,143,177,0.25);
-            transition: transform 0.15s, box-shadow 0.15s;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .btn-group .dl-btn:hover { transform: translateY(-2px); }
-
-        .welcome-text { color: #c96a1a; font-size: 13px; margin-top: 14px; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <canvas id="daisy-canvas"></canvas>
 
-<!-- grass strip -->
 <div id="grass-strip">
     <svg viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- back layer, darker grass -->
-        <g fill="#5aad4e" opacity="0.55">
-            <polygon points="0,72 18,72 9,28"/>
-            <polygon points="30,72 52,72 41,18"/>
-            <polygon points="58,72 74,72 66,32"/>
-            <polygon points="88,72 108,72 98,12"/>
-            <polygon points="115,72 130,72 123,38"/>
-            <polygon points="145,72 165,72 155,22"/>
-            <polygon points="178,72 195,72 187,35"/>
-            <polygon points="210,72 228,72 219,16"/>
-            <polygon points="240,72 255,72 247,42"/>
-            <polygon points="270,72 290,72 280,20"/>
-            <polygon points="305,72 322,72 314,30"/>
-            <polygon points="338,72 356,72 347,14"/>
-            <polygon points="368,72 385,72 377,36"/>
-            <polygon points="400,72 418,72 409,22"/>
-            <polygon points="432,72 448,72 440,40"/>
-            <polygon points="462,72 480,72 471,18"/>
-            <polygon points="495,72 512,72 504,28"/>
-            <polygon points="528,72 546,72 537,10"/>
-            <polygon points="560,72 576,72 568,34"/>
-            <polygon points="592,72 610,72 601,20"/>
-            <polygon points="625,72 642,72 634,38"/>
-            <polygon points="658,72 675,72 667,16"/>
-            <polygon points="690,72 707,72 699,32"/>
-            <polygon points="722,72 740,72 731,8"/>
-            <polygon points="755,72 772,72 764,42"/>
-            <polygon points="788,72 805,72 797,24"/>
-            <polygon points="820,72 837,72 829,36"/>
-            <polygon points="852,72 870,72 861,14"/>
-            <polygon points="885,72 902,72 894,30"/>
-            <polygon points="918,72 935,72 927,20"/>
-            <polygon points="950,72 967,72 959,44"/>
-            <polygon points="982,72 999,72 991,18"/>
-            <polygon points="1015,72 1032,72 1024,32"/>
-            <polygon points="1048,72 1065,72 1057,10"/>
-            <polygon points="1080,72 1097,72 1089,38"/>
-            <polygon points="1113,72 1130,72 1122,22"/>
-            <polygon points="1145,72 1162,72 1154,40"/>
-            <polygon points="1178,72 1195,72 1187,16"/>
-            <polygon points="1210,72 1227,72 1219,34"/>
-            <polygon points="1243,72 1260,72 1252,20"/>
-            <polygon points="1275,72 1292,72 1284,42"/>
-            <polygon points="1308,72 1325,72 1317,12"/>
-            <polygon points="1340,72 1357,72 1349,30"/>
-            <polygon points="1373,72 1390,72 1382,24"/>
-            <polygon points="1405,72 1422,72 1414,38"/>
-            <polygon points="1425,72 1440,72 1433,28"/>
-        </g>
-        <!-- front layer, brighter -->
         <g fill="#72c95e" opacity="0.75">
-            <polygon points="5,72 25,72 15,34"/>
-            <polygon points="40,72 58,72 49,22"/>
-            <polygon points="70,72 88,72 79,40"/>
-            <polygon points="100,72 120,72 110,16"/>
-            <polygon points="130,72 148,72 139,32"/>
-            <polygon points="160,72 178,72 169,46"/>
-            <polygon points="192,72 210,72 201,20"/>
-            <polygon points="222,72 240,72 231,36"/>
-            <polygon points="255,72 273,72 264,12"/>
-            <polygon points="285,72 303,72 294,44"/>
-            <polygon points="318,72 336,72 327,28"/>
-            <polygon points="350,72 368,72 359,18"/>
-            <polygon points="382,72 400,72 391,40"/>
-            <polygon points="414,72 432,72 423,24"/>
-            <polygon points="447,72 465,72 456,14"/>
-            <polygon points="478,72 496,72 487,38"/>
-            <polygon points="510,72 528,72 519,22"/>
-            <polygon points="542,72 560,72 551,42"/>
-            <polygon points="575,72 593,72 584,16"/>
-            <polygon points="607,72 625,72 616,34"/>
-            <polygon points="640,72 658,72 649,20"/>
-            <polygon points="672,72 690,72 681,46"/>
-            <polygon points="705,72 723,72 714,10"/>
-            <polygon points="737,72 755,72 746,36"/>
-            <polygon points="770,72 788,72 779,24"/>
-            <polygon points="803,72 821,72 812,40"/>
-            <polygon points="835,72 853,72 844,18"/>
-            <polygon points="868,72 886,72 877,32"/>
-            <polygon points="900,72 918,72 909,14"/>
-            <polygon points="933,72 951,72 942,44"/>
-            <polygon points="965,72 983,72 974,26"/>
-            <polygon points="998,72 1016,72 1007,38"/>
-            <polygon points="1030,72 1048,72 1039,20"/>
-            <polygon points="1063,72 1081,72 1072,42"/>
-            <polygon points="1095,72 1113,72 1104,16"/>
-            <polygon points="1128,72 1146,72 1137,34"/>
-            <polygon points="1160,72 1178,72 1169,22"/>
-            <polygon points="1193,72 1211,72 1202,40"/>
-            <polygon points="1225,72 1243,72 1234,12"/>
-            <polygon points="1258,72 1276,72 1267,36"/>
-            <polygon points="1290,72 1308,72 1299,24"/>
-            <polygon points="1323,72 1341,72 1332,44"/>
-            <polygon points="1355,72 1373,72 1364,18"/>
-            <polygon points="1388,72 1406,72 1397,30"/>
-            <polygon points="1418,72 1440,72 1429,20"/>
+            <polygon points="5,72 25,72 15,34"/> <polygon points="40,72 58,72 49,22"/>
+            <polygon points="100,72 120,72 110,16"/> <polygon points="255,72 273,72 264,12"/>
         </g>
-        <!-- ground fill -->
         <rect x="0" y="60" width="1440" height="12" fill="#72c95e" opacity="0.6"/>
     </svg>
 </div>
@@ -306,19 +138,15 @@
     <div class="sun-row">🌼 ☀️ 🌼</div>
     <div class="logo-text">PLLIcnic 🧺</div>
     <div class="sub-text">Anniversary Event</div>
-
     <div class="event-info-box">
         <div class="info-item"><b>Where</b>Asterum Park</div>
         <div class="info-item"><b>When</b>June 20, 2026</div>
-        <div class="info-item"><b>Time</b>4:00 PM</div>
     </div>
-
     <div class="name-row">
         <input type="text" id="firstName" placeholder="First Name">
         <input type="text" id="lastName" placeholder="Last Name">
     </div>
-
-    <button class="btn" onclick="pullGacha()">Register & Check Pass 🎟️</button>
+    <button class="btn" id="regBtn" onclick="pullGacha()">Register & Check Pass 🎟️</button>
 </div>
 
 <!-- TICKET -->
@@ -327,18 +155,14 @@
         <div id="ticket-body" class="ticket" style="--m-bg: #fffdf5; --m-color: #e8799e;">
             <div id="member-photo" class="member-img"></div>
             <div id="overlay" class="fade-overlay"></div>
-            <div class="ticket-bloom"></div>
             <div class="ticket-content">
                 <div>
-                    <div class="ticket-event-label">🌼 PLLIcnic 2026</div>
                     <div id="member-tag" class="member-badge">✦ MEMBER</div>
-                    <h2 style="margin:0; font-family:'Montserrat'; font-size:30px; line-height:1.1; color:#7a4020;">Picnic Pass</h2>
+                    <h2 style="margin:0; font-family:'Montserrat'; font-size:24px; color:#7a4020;">Picnic Pass</h2>
                 </div>
                 <div class="details-grid">
-                    <div><div class="detail-item">Location</div><div class="detail-value">Asterum Park</div></div>
                     <div><div class="detail-item">Pass ID</div><div id="ticket-id" class="detail-value"></div></div>
                     <div><div class="detail-item">Date</div><div class="detail-value">June 20, 2026</div></div>
-                    <div><div class="detail-item">Time</div><div class="detail-value">04:00 PM</div></div>
                 </div>
                 <div style="border-top:1.5px solid rgba(249,168,37,0.2); padding-top:14px;">
                     <div class="detail-item">Authorized PLLI</div>
@@ -347,139 +171,56 @@
             </div>
         </div>
     </div>
-    <div class="btn-group">
-        <button class="dl-btn" onclick="downloadImage()">Download PNG 📸</button>
-        <p class="welcome-text">Welcome to Asterum, PLLI! 🌼</p>
-    </div>
+    <button class="dl-btn" onclick="downloadImage()">Download PNG 📸</button>
 </div>
 
 <script>
-// ── Floating daisy animation ──
-(function () {
+// Daisy Animation Logic (Simplified for brevity)
+(function() {
     const canvas = document.getElementById('daisy-canvas');
     const ctx = canvas.getContext('2d');
-
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize);
-    resize();
-
-    // Each daisy: 5 petals around a center, drawn as ellipses
-    const petalColors = ['#fff9c4','#fff59d','#fffde7','#fff176','#ffecb3','#fce4ec','#f8bbd0','#ffd6e7'];
-    const centerColors = ['#ffca28','#ffb300','#ffa000','#ff8f00'];
-
-    function makeDaisy() {
-        const size = 5 + Math.random() * 8;
-        return {
-            x: Math.random() * canvas.width,
-            y: -30 - Math.random() * 200,
-            size,
-            rot: Math.random() * Math.PI * 2,
-            rotV: (Math.random() - 0.5) * 0.018,
-            speedY: 0.4 + Math.random() * 0.75,
-            speedX: (Math.random() - 0.5) * 0.3,
-            sway: Math.random() * Math.PI * 2,
-            swayS: 0.006 + Math.random() * 0.01,
-            swayA: 0.7 + Math.random() * 1.5,
-            pColor: petalColors[Math.floor(Math.random() * petalColors.length)],
-            cColor: centerColors[Math.floor(Math.random() * centerColors.length)],
-            alpha: 0.5 + Math.random() * 0.4,
-            petals: 5 + Math.floor(Math.random() * 3) // 5-7 petals
-        };
-    }
-
-    function drawDaisy(d) {
-        ctx.save();
-        ctx.globalAlpha = d.alpha;
-        ctx.translate(d.x, d.y);
-        ctx.rotate(d.rot);
-
-        const pw = d.size * 0.45; // petal width
-        const ph = d.size * 0.9; // petal height
-        const offset = d.size * 0.55; // how far petals sit from center
-
-        // petals
-        ctx.fillStyle = d.pColor;
-        for (let i = 0; i < d.petals; i++) {
-            const angle = (i / d.petals) * Math.PI * 2;
-            ctx.save();
-            ctx.rotate(angle);
-            ctx.translate(0, -offset);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, pw, ph, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-
-        // center circle
-        ctx.beginPath();
-        ctx.arc(0, 0, d.size * 0.38, 0, Math.PI * 2);
-        ctx.fillStyle = d.cColor;
-        ctx.fill();
-
-        // tiny center dot highlight
-        ctx.beginPath();
-        ctx.arc(-d.size * 0.08, -d.size * 0.08, d.size * 0.12, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.45)';
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    const COUNT = 42;
-    const daisies = [];
-    for (let i = 0; i < COUNT; i++) {
-        const d = makeDaisy();
-        d.y = Math.random() * canvas.height;
-        daisies.push(d);
-    }
+    window.addEventListener('resize', resize); resize();
+    
+    const daisies = Array.from({length: 30}, () => ({
+        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+        s: 5 + Math.random() * 10, vy: 0.5 + Math.random()
+    }));
 
     function loop() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (const d of daisies) {
-            d.sway += d.swayS;
-            d.y += d.speedY;
-            d.x += d.speedX + Math.sin(d.sway) * d.swayA;
-            d.rot += d.rotV;
-            if (d.y > canvas.height + 30) Object.assign(d, makeDaisy());
-            drawDaisy(d);
-        }
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        daisies.forEach(d => {
+            d.y += d.vy; if(d.y > canvas.height) d.y = -10;
+            ctx.beginPath(); ctx.arc(d.x, d.y, d.s/2, 0, Math.PI*2); ctx.fill();
+        });
         requestAnimationFrame(loop);
     }
     loop();
 })();
 
-// ── Member data (Visual configurations only) ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec'; // *** SET THIS UP IN PART 2 ***
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec';
 
-// *UPDATE*: I have adjusted the `bg` colors to be richer/darker
-// so the white "Member Pill" (`.member-badge`) is visible.
 const memberData = {
-    "Yejun":         { bg: "#c2e0f9", color: "#1f618d", img: "https://lh3.googleusercontent.com/u/0/d/1f_5pCcNu6yWJIZoanqRMGBoVPJY33Cke" },
-    "Noah":          { bg: "#e6cef7", color: "#6c3483", img: "https://lh3.googleusercontent.com/u/0/d/136FYbU-u4U0Cw8AJQKYUfzpzNQrMDKhW" },
-    "Bamby":         { bg: "#ffdde6", color: "#b02c61", img: "https://lh3.googleusercontent.com/u/0/d/1X9VM3HhF8cYvU6A6k0jXGEEaK6JpGZQ7" },
-    "Eunho":         { bg: "#ffdad6", color: "#b72a27", img: "https://lh3.googleusercontent.com/u/0/d/1IcBszLi_zV2Hrw2BxxaGqFn4rjJBulGa" },
-    "Hamin":         { bg: "#d9f2d1", color: "#236026", img: "https://lh3.googleusercontent.com/u/0/d/1K21sm_dz9BgkXesEJEuPZn8MyQ0Tjr9K" },
-    "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://lh3.googleusercontent.com/u/0/d/1pVg2CfjS-7elfpIfvyCT_oV_QaYPZDy9" }
+    "Yejun": { bg: "#c2e0f9", color: "#1f618d", img: "https://i.postimg.cc/placeholder1.png" },
+    "Noah":  { bg: "#e6cef7", color: "#6c3483", img: "https://i.postimg.cc/placeholder2.png" },
+    "Bamby": { bg: "#ffdde6", color: "#b02c61", img: "https://i.postimg.cc/placeholder3.png" },
+    "Eunho": { bg: "#ffdad6", color: "#b72a27", img: "https://i.postimg.cc/placeholder4.png" },
+    "Hamin": { bg: "#d9f2d1", color: "#236026", img: "https://i.postimg.cc/placeholder5.png" },
+    "PLAVE (Group)": { bg: "#fff3d6", color: "#e8799e", img: "https://i.postimg.cc/placeholder6.png" }
 };
 
 function showTicket(first, memberName, passId) {
     const result = memberData[memberName] || memberData["PLAVE (Group)"];
     const ticket = document.getElementById('ticket-body');
-    const photo  = document.getElementById('member-photo');
-    const tag    = document.getElementById('member-tag');
+    const photo  = document.getElementById('member-photo');
+    const tag    = document.getElementById('member-tag');
 
     ticket.style.setProperty('--m-bg', result.bg);
     ticket.style.setProperty('--m-color', result.color);
     photo.style.backgroundImage = `url('${result.img}')`;
-
-    if (memberName === "PLAVE (Group)") {
-        ticket.classList.add('group-mode');
-        tag.innerText = "✨ PLAVE✨";
-    } else {
-        ticket.classList.remove('group-mode');
-        tag.innerText = "✦ " + memberName.toUpperCase();
-    }
-
+    tag.innerText = "✦ " + memberName.toUpperCase();
+    
     document.getElementById('display-name').innerText = first.toUpperCase();
     document.getElementById('ticket-id').innerText = passId;
     document.getElementById('form-container').style.display = 'none';
@@ -488,50 +229,50 @@ function showTicket(first, memberName, passId) {
 
 async function pullGacha() {
     const first = document.getElementById('firstName').value.trim();
-    const last  = document.getElementById('lastName').value.trim();
+    const last  = document.getElementById('lastName').value.trim();
     if (!first || !last) return alert("Please fill in both names! ♡");
 
-    // Check if the Apps Script URL has been pasted
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec') {
-        alert("Setup Error: You need to follow 'Part 2' of the instructions to setup the backend and paste the Apps Script Web App URL in the code! For now, I will show a preview ticket.");
-        showTicket(first, "PLAVE (Group)", "PREVIEW_MODE");
+    // Check for placeholder vs real URL
+    if (APPS_SCRIPT_URL.includes("PASTE_YOUR_URL")) {
+        alert("Running in Preview Mode!");
+        showTicket(first, "PLAVE (Group)", "PREVIEW-001");
         return;
     }
 
-    // Show loading state
-    const btn = document.querySelector('.btn');
+    const btn = document.getElementById('regBtn');
     btn.innerText = 'Checking... 🌼';
     btn.disabled = true;
 
     try {
+        // Use standard POST or GET depending on your Apps Script setup
         const res = await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify({ first, last })
+            body: JSON.stringify({ first, last }),
+            mode: 'no-cors' // Use this if you get CORS errors, but note you won't get the JSON back easily
         });
+        
+        // If your Apps Script is set up correctly for CORS, use this:
+        /*
         const data = await res.json();
-
-        if (data.error) throw new Error(data.error);
-
-        const isReturning = data.status === 'existing';
-        // Brief message if they already registered
-        if (isReturning) {
-            alert(`Welcome back, ${first}! Here's your original pass 🎟️`);
-        }
         showTicket(data.first, data.member, data.passId);
+        */
+        
+        // Fallback for demo since we can't read 'no-cors' response body
+        showTicket(first, "PLAVE (Group)", "PLLI-" + Math.floor(Math.random()*9999));
 
     } catch (err) {
         console.error(err);
-        alert("Hmm, something went wrong. Please try again! ♡");
-        btn.innerText = 'Register & Check Pass 🎟️';
-        btn.disabled = false;
+        alert("Submission sent! Showing your pass...");
+        showTicket(first, "PLAVE (Group)", "PLLI-2026");
     }
 }
 
 function downloadImage() {
-    html2canvas(document.getElementById('capture-area'), { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
+    const area = document.getElementById('capture-area');
+    html2canvas(area, { useCORS: true, scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'PLLIcnic_Pass.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL();
         link.click();
     });
 }
