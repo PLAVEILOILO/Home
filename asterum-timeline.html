@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Asterum Timeline | PLAVE Iloilo</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Asterum | Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
@@ -22,9 +22,11 @@
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  header { text-align: center; margin: 20px 0 30px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 48px); margin: 0; font-weight: 700; }
-  header p { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-top: 5px; font-weight: 500; }
+  /* Restored Original Header Style */
+  header { text-align: center; margin: 30px 0 40px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin: 0; font-weight: 700; }
+  header h1 span { font-family: 'Playfair Display', serif; font-weight: 400; font-style: italic; opacity: 0.4; margin: 0 10px; }
+  header p { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.5; margin-top: 8px; font-weight: 600; }
 
   .filter-bar { 
     width: min(900px, 100%); display: grid; grid-template-columns: repeat(3, 1fr);
@@ -37,7 +39,6 @@
 
   .timeline { width: min(900px, 100%); display: flex; flex-direction: column; gap: 20px; }
   
-  /* Removed Underlines from Link */
   .event-link { text-decoration: none; color: inherit; display: block; }
 
   .event-card {
@@ -54,22 +55,24 @@
 
   .event-info { padding: 30px; display: flex; flex-direction: column; min-width: 0; }
   
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
   
-  /* Distinct Category Colors */
   .cat-tag { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-  .cat-birthday { background: #e0f7fa; color: #00838f; } /* Teal */
-  .cat-anniversary { background: #fff8e1; color: #ff8f00; } /* Amber */
-  .cat-event { background: #e8eaf6; color: #283593; } /* Indigo */
+  .cat-birthday { background: #e0f7fa; color: #00838f; }
+  .cat-anniversary { background: #fff8e1; color: #ff8f00; }
+  .cat-event { background: #e8eaf6; color: #283593; }
   .cat-default { background: #f3edff; color: var(--theme-purple); }
 
   .member-tag { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
 
-  .title-group { margin-bottom: 15px; }
-  .event-title { margin: 0 0 4px 0; font-size: 24px; line-height: 1.2; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text); }
-  .title-divider { height: 1px; background: var(--border); margin: 10px 0; border: none; width: 40px; }
+  .title-wrapper { margin-bottom: 15px; overflow: hidden; }
+  .event-title { 
+    margin: 0; font-size: 24px; line-height: 1.2; font-family: 'Playfair Display', serif; 
+    font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+  }
 
-  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-weight: 400; }
+  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; font-weight: 500; }
   
   .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 18px; border-top: 1.5px dashed var(--border); }
   .price-val { color: var(--price-red); font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
@@ -91,8 +94,8 @@
 
 <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 <header>
-  <h1>Asterum</h1>
-  <p>Timeline & Event Archive</p>
+  <h1>Asterum <span>|</span> Timeline</h1>
+  <p>PLAVE Iloilo Event Archive</p>
 </header>
 
 <div class="filter-bar">
@@ -127,11 +130,11 @@
 
   const memberStyles = {
     "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" }, // Deep Amethyst
+    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" }, // Distinct Amethyst
     "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
     "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
     "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" } // Asterum Purple
+    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" } // Distinct Darker Purple
   };
 
   function getCatClass(cat) {
@@ -165,12 +168,13 @@
 
       allEvents = rows.map(row => ({
         start: new Date(row[0]),
-        titles: (row[2] || "Untitled").split(','),
+        titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
         startTime: row[3] || "",
         loc: row[5] || "TBA", 
         imgs: (row[6] || "").split(','),
         cat: row[7] || "Event",
         minP: row[8] || "0", maxP: row[9] || "0", 
+        dress: row[10] || "",
         id: row[12] || "", 
         members: (row[13] || "").split(',').filter(Boolean)
       }));
@@ -203,6 +207,7 @@
       const isPast = ev.start < now;
       const primaryMember = ev.members[0]?.trim();
       const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
+      const combinedTitle = ev.titles.join(' • ');
 
       return `
         <a href="details.html?id=${ev.id}" class="event-link">
@@ -218,12 +223,13 @@
                   return `<div class="member-tag" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</div>`;
                 }).join('')}
               </div>
-              <div class="title-group">
-                ${ev.titles.map((t, i) => `<h2 class="event-title">${t.trim()}</h2>${i < ev.titles.length - 1 ? '<hr class="title-divider">' : ''}`).join('')}
+              <div class="title-wrapper">
+                <h2 class="event-title" title="${combinedTitle}">${combinedTitle}</h2>
               </div>
               <div class="details-list">
                 <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
                 <div>📍 ${ev.loc}</div>
+                ${ev.dress ? `<div>👗 Dress Code: ${ev.dress}</div>` : ''}
               </div>
               <div class="status-row">
                 <div class="price-val">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
@@ -241,12 +247,13 @@
     filtered.forEach(ev => {
       if (ev.imgs.length > 1) {
         let cur = 0;
-        setInterval(() => {
+        const intervalId = setInterval(() => {
           const cImg = document.getElementById(`img-${ev.id}-${cur}`);
           if (cImg) cImg.classList.remove('active');
           cur = (cur + 1) % ev.imgs.length;
           const nImg = document.getElementById(`img-${ev.id}-${cur}`);
           if (nImg) nImg.classList.add('active');
+          else clearInterval(intervalId); // Cleanup if element is removed
         }, 4000);
       }
     });
