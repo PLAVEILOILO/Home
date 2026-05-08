@@ -29,8 +29,8 @@
   .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
   .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; text-align: center; }
   
-  /* VIDEO STYLES */
-  .video-section { margin: 30px 0; display: flex; flex-direction: column; gap: 20px; }
+  /* VIDEO STYLES - Centered and capped width for clips */
+  .video-section { margin: 40px auto; display: flex; flex-direction: column; gap: 20px; max-width: 600px; }
   .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
   .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
@@ -92,7 +92,6 @@
     return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
   }
 
-  // Converts standard YouTube URLs to Embed URLs
   function getYoutubeEmbed(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
@@ -144,7 +143,6 @@
       const members = (tData[13] || "").split(',').filter(Boolean);
       const headerLogos = tData[6].split(',').filter(Boolean);
       
-      // Data from Details Sheet
       const description = dData ? dData[1] : '';
       const rsvpLink = dData ? dData[2] : '';
       const galleryImages = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
@@ -160,7 +158,7 @@
         return `<span class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦ ${m.trim()}</span>`;
       }).join('');
 
-      // DATE RANGE LOGIC
+      // DATE LOGIC
       const startDateRaw = tData[0];
       const endDateRaw = tData[1];
       let dateDisplay = "";
@@ -182,7 +180,6 @@
       const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
 
-      // Generate Video HTML
       const videoHtml = videoLinks.map(link => {
         const embedUrl = getYoutubeEmbed(link.trim());
         return embedUrl ? `<div class="video-wrapper"><iframe src="${embedUrl}" allowfullscreen></iframe></div>` : '';
@@ -208,8 +205,6 @@
             <div class="content-body">
               ${description ? `<div class="description">${description}</div>` : ''}
               
-              ${videoHtml ? `<div class="video-section">${videoHtml}</div>` : ''}
-
               ${tData[10] ? `
                 <div style="margin-bottom:30px;">
                   <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; opacity:0.6;">Dress Code</h4>
@@ -223,6 +218,9 @@
                   <a href="${rsvpLink}" class="rsvp-btn" target="_blank">RSVP / REGISTER NOW</a>
                   ${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}
                 </div>` : ''}
+
+              <!-- VIDEOS MOVED BELOW ACTION AREA -->
+              ${videoHtml ? `<div class="video-section">${videoHtml}</div>` : ''}
               
               ${generateGallery(galleryImages)}
             </div>
