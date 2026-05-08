@@ -21,12 +21,10 @@
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  /* Header Layout Restored */
   header { text-align: center; margin: 20px 0 30px; }
   header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 42px); margin: 0; font-weight: 700; }
   header h1 em { font-weight: 400; font-style: italic; opacity: 0.5; }
 
-  /* Filter Bar - Mobile Optimized */
   .filter-bar { 
     width: min(850px, 100%); display: flex; justify-content: center; 
     gap: 12px; margin-bottom: 25px; padding: 5px;
@@ -42,7 +40,6 @@
     background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 14px; padding-right: 30px;
   }
 
-  /* Timeline Cards */
   .timeline { width: min(850px, 100%); display: flex; flex-direction: column; gap: 16px; }
   .event-link { text-decoration: none; color: inherit; display: block; width: 100%; }
 
@@ -54,15 +51,14 @@
   }
   .event-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 127, 232, 0.1); }
 
-  .img-container { width: 220px; height: 100%; background: #f0f0f0; overflow: hidden; position: relative; }
+  .img-container { width: 220px; height: 100%; background: #f0f0f0; overflow: hidden; }
   .event-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   .event-info { padding: 20px 24px; display: flex; flex-direction: column; min-width: 0; }
   
   .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .category-tag { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+  .tag { padding: 4px 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* Title: Fix for long multi-event names */
   .event-title { 
     margin: 0 0 12px 0; font-size: 22px; line-height: 1.3; 
     font-family: 'Playfair Display', serif; font-weight: 700;
@@ -78,12 +74,9 @@
   .badge-ended { background: #eee; color: #888; }
 
   @media (max-width: 600px) {
-    body { padding: 10px; }
-    .filter-bar { justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; gap: 8px; }
-    .filter-group { min-width: 120px; flex: 0 0 auto; }
-    .event-card { grid-template-columns: 1fr; border-radius: 16px; }
+    .filter-bar { justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; }
+    .event-card { grid-template-columns: 1fr; }
     .img-container { width: 100%; height: 180px; }
-    .event-info { padding: 16px; }
     .event-title { font-size: 19px; }
   }
 </style>
@@ -91,10 +84,7 @@
 <body>
 
 <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
-
-<header>
-  <h1>Asterum <em>Timeline</em></h1>
-</header>
+<header><h1>Asterum <em>Timeline</em></h1></header>
 
 <div class="filter-bar">
   <div class="filter-group">
@@ -126,13 +116,17 @@
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
   let allEvents = [];
 
-  const catColors = {
+  const tagColors = {
     "Anniversary": { bg: "#fff0f6", text: "#d63384" },
     "Birthdays": { bg: "#fff9db", text: "#f59f00" },
     "Online Viewing": { bg: "#e7f5ff", text: "#1c7ed6" },
-    "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" }
+    "Fan Gathering": { bg: "#f3edff", text: "#a87fe8" },
+    "Yejun": { bg: "#e7f5ff", text: "#007bff" },
+    "Noah": { bg: "#fff0f6", text: "#ff69b4" },
+    "Bamby": { bg: "#f3edff", text: "#9b59b6" },
+    "Eunho": { bg: "#fff5f5", text: "#e74c3c" },
+    "Hamin": { bg: "#f8f9fa", text: "#343a40" }
   };
-  const defaultColor = { bg: "#f3edff", text: "#a87fe8" };
 
   async function loadTimeline() {
     try {
@@ -146,13 +140,13 @@
         start: new Date(row[0]),
         end: row[1] ? new Date(row[1]) : null,
         titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
-        startTime: row[3] || "", 
         loc: row[5] || "TBA", 
         img: row[6] || "", 
         cat: row[7] || "Event",
         minP: row[8] || "0", 
         dress: row[10] || "",
-        id: row[12] || ""
+        id: row[12] || "",
+        members: row[13] ? row[13].split(',').map(m => m.trim()) : []
       }));
 
       const uniqueCats = [...new Set(allEvents.flatMap(e => e.cat.split(',').map(c => c.trim())))].filter(Boolean);
@@ -185,19 +179,25 @@
     container.innerHTML = filtered.map(ev => {
       const isPast = (ev.end || ev.start) < now;
       const combinedTitle = ev.titles.join(' • ');
-      const categoryChips = ev.cat.split(',').map(c => {
-          const colors = catColors[c.trim()] || defaultColor;
-          return `<div class="category-tag" style="background: ${colors.bg}; color: ${colors.text};">${c.trim()}</div>`;
+      
+      const categoryTags = ev.cat.split(',').map(c => {
+          const colors = tagColors[c.trim()] || { bg: "#f3edff", text: "#a87fe8" };
+          return `<div class="tag" style="background: ${colors.bg}; color: ${colors.text};">${c.trim()}</div>`;
+      }).join('');
+
+      const memberTags = ev.members.map(m => {
+          const colors = tagColors[m] || { bg: "#eee", text: "#666" };
+          return `<div class="tag" style="background: ${colors.bg}; color: ${colors.text};">${m}</div>`;
       }).join('');
 
       return `
         <a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">
           <div class="event-card">
             <div class="img-container">
-              <img src="${ev.img}" class="event-img" loading="lazy" onerror="this.style.opacity='0'">
+              <img src="${ev.img}" class="event-img" onerror="this.style.opacity='0'">
             </div>
             <div class="event-info">
-              <div class="tag-row">${categoryChips}</div>
+              <div class="tag-row">${categoryTags}${memberTags}</div>
               <h2 class="event-title">${combinedTitle}</h2>
               <div class="details-list">
                 <div>📅 ${ev.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
@@ -206,9 +206,7 @@
               </div>
               <div class="status-row">
                 <div class="meta-item" style="color: #963252;">🎟️ ${ev.minP === "0" ? "Free" : "₱" + Number(ev.minP).toLocaleString()}</div>
-                <div class="badge-group">
-                  <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
-                </div>
+                <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
               </div>
             </div>
           </div>
