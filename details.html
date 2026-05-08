@@ -27,17 +27,7 @@
   .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; color: #555; justify-content: center; }
 
   .main-content { max-width: 800px; margin: 0 auto; text-align: center; }
-  
-  /* FIXED: description styling to handle line breaks properly */
-  .description { 
-    line-height: 1.8; 
-    font-size: 17px; 
-    white-space: pre-wrap; /* Allows line breaks from Google Sheets to render */
-    margin-bottom: 30px; 
-    color: #333; 
-    text-align: center; 
-    word-wrap: break-word;
-  }
+  .description { line-height: 1.8; font-size: 17px; white-space: pre-wrap; margin-bottom: 30px; color: #333; text-align: center; word-wrap: break-word; }
   
   .video-section { margin: 40px auto; display: flex; flex-direction: column; align-items: center; gap: 20px; }
   .video-wrapper { position: relative; width: 100%; max-width: 600px; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; background: #000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -50,9 +40,11 @@
   .maps-link { font-size: 13px; color: var(--theme-purple); text-decoration: none; font-weight: 500; }
   .dress-pill { background: #f8f9fa; padding: 4px 12px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: 600; font-size: 12px; color: #666; }
 
+  /* Gallery Styling Updates */
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 40px; }
-  .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); animation: fadeIn 0.6s ease forwards; }
-  .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+  .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); animation: fadeIn 0.6s ease forwards; cursor: zoom-in; }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+  .gallery-item:hover img { transform: scale(1.05); }
   
   .more-overlay {
     position: absolute; inset: 0; background: rgba(30, 21, 48, 0.75);
@@ -61,6 +53,13 @@
     backdrop-filter: blur(4px); transition: background 0.3s; z-index: 2;
   }
   .more-overlay span { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; opacity: 0.8; }
+
+  /* Simple Lightbox Style */
+  #lightbox {
+    display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); justify-content: center; align-items: center; cursor: zoom-out;
+  }
+  #lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
   
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -75,6 +74,7 @@
 <body>
 
 <div id="details-root"></div>
+<div id="lightbox" onclick="this.style.display='none'"><img src="" id="lightbox-img"></div>
 
 <script>
   const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
@@ -96,41 +96,19 @@
     "Fan Gathering": { bg: "#f3f0ff", text: "#6741d9" }
   };
 
-  // FIXED: Improved CSV parser to handle line breaks and quoted commas
   function parseCSV(text) {
-    const rows = [];
-    let currentRow = [];
-    let currentCell = '';
-    let inQuotes = false;
-
+    const rows = []; let currentRow = []; let currentCell = ''; let inQuotes = false;
     for (let i = 0; i < text.length; i++) {
-        let char = text[i];
-        let nextChar = text[i + 1];
-
-        if (char === '"' && inQuotes && nextChar === '"') {
-            currentCell += '"';
-            i++;
-        } else if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            currentRow.push(currentCell.trim());
-            currentCell = '';
-        } else if ((char === '\r' || char === '\n') && !inQuotes) {
-            if (currentCell !== '' || currentRow.length > 0) {
-                currentRow.push(currentCell.trim());
-                rows.push(currentRow);
-                currentCell = '';
-                currentRow = [];
-            }
+        let char = text[i]; let nextChar = text[i + 1];
+        if (char === '"' && inQuotes && nextChar === '"') { currentCell += '"'; i++; }
+        else if (char === '"') { inQuotes = !inQuotes; }
+        else if (char === ',' && !inQuotes) { currentRow.push(currentCell.trim()); currentCell = ''; }
+        else if ((char === '\r' || char === '\n') && !inQuotes) {
+            if (currentCell !== '' || currentRow.length > 0) { currentRow.push(currentCell.trim()); rows.push(currentRow); currentCell = ''; currentRow = []; }
             if (char === '\r' && nextChar === '\n') i++; 
-        } else {
-            currentCell += char;
-        }
+        } else { currentCell += char; }
     }
-    if (currentCell !== '' || currentRow.length > 0) {
-        currentRow.push(currentCell.trim());
-        rows.push(currentRow);
-    }
+    if (currentCell !== '' || currentRow.length > 0) { currentRow.push(currentCell.trim()); rows.push(currentRow); }
     return rows;
   }
 
@@ -144,15 +122,18 @@
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
     const match = url.match(regExp);
     if (match && match[2].length === 11) {
-        const videoId = match[2];
-        const isShorts = url.includes('/shorts/');
-        return {
-            url: `https://www.youtube.com/embed/${videoId}?rel=0`,
-            isShorts: isShorts
-        };
+        return { url: `https://www.youtube.com/embed/${match[2]}?rel=0`, isShorts: url.includes('/shorts/') };
     }
     return null;
   }
+
+  // Open Full Picture
+  window.openFullImg = function(src) {
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    lbImg.src = src;
+    lb.style.display = 'flex';
+  };
 
   function generateGallery(images) {
     if (!images.length) return '';
@@ -160,13 +141,14 @@
     const remaining = images.length - limit;
     let html = '<div class="gallery-grid" id="eventGallery">';
     images.forEach((img, index) => {
+      const src = img.trim();
       const isHidden = index >= limit;
       const isTrigger = (index === limit - 1 && remaining > 0);
       html += `
-        <div class="gallery-item" ${isHidden ? 'style="display:none"' : ''}>
-          <img src="${img.trim()}" loading="lazy">
+        <div class="gallery-item" ${isHidden ? 'style="display:none"' : ''} onclick="openFullImg('${src}')">
+          <img src="${src}" loading="lazy">
           ${isTrigger ? `
-            <div class="more-overlay" id="galleryTrigger" onclick="expandGallery()">
+            <div class="more-overlay" id="galleryTrigger" onclick="event.stopPropagation(); expandGallery()">
               +${remaining}
               <span>View All</span>
             </div>` : ''}
@@ -191,20 +173,13 @@
 
     try {
       const [tRows, dRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
-      
-      // eventId is typically in index 12 of Timeline and index 0 of Details
       const tData = tRows.find(r => r[12] === eventId);
       const dData = dRows.find(r => r[0] === eventId);
-      
-      if (!tData) {
-          document.getElementById('details-root').innerHTML = "Event not found.";
-          return;
-      }
+      if (!tData) return;
 
       const categories = tData[7] ? tData[7].split(',').filter(Boolean) : [];
       const members = (tData[13] || "").split(',').filter(Boolean);
       const headerLogos = tData[6] ? tData[6].split(',').filter(Boolean) : [];
-      
       const description = dData ? dData[1] : '';
       const rsvpLink = dData ? dData[2] : '';
       const galleryImages = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
@@ -220,35 +195,21 @@
         return `<span class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦ ${m.trim()}</span>`;
       }).join('');
 
-      // Date Formatting
-      const startDateRaw = tData[0];
-      const endDateRaw = tData[1];
-      let dateDisplay = "";
-      const opt = { month: 'short', day: 'numeric', year: 'numeric' };
-      const d1 = new Date(startDateRaw);
-      const d2 = endDateRaw ? new Date(endDateRaw) : null;
-
-      if (d2 && d2.getTime() !== d1.getTime() && endDateRaw !== "") {
-          if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
-              dateDisplay = `${d1.toLocaleDateString('en-US', {month:'short', day:'numeric'})} – ${d2.getDate()}, ${d1.getFullYear()}`;
-          } else {
-              dateDisplay = `${d1.toLocaleDateString('en-US', opt)} – ${d2.toLocaleDateString('en-US', opt)}`;
-          }
-      } else {
-          dateDisplay = d1.toLocaleDateString('en-US', opt);
+      const d1 = new Date(tData[0]);
+      const d2 = tData[1] ? new Date(tData[1]) : null;
+      let dateDisplay = d1.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      if (d2 && d2.getTime() !== d1.getTime() && tData[1] !== "") {
+          dateDisplay = (d1.getMonth() === d2.getMonth()) 
+            ? `${d1.toLocaleDateString('en-US', {month:'short', day:'numeric'})} – ${d2.getDate()}, ${d1.getFullYear()}`
+            : `${dateDisplay} – ${d2.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}`;
       }
 
-      const startTime = tData[3];
       const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
 
       const videoHtml = videoLinks.map(link => {
-        const videoObj = getYoutubeEmbed(link.trim());
-        if(!videoObj) return '';
-        return `
-          <div class="video-wrapper ${videoObj.isShorts ? 'is-shorts' : ''}">
-            <iframe src="${videoObj.url}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-          </div>`;
+        const v = getYoutubeEmbed(link.trim());
+        return v ? `<div class="video-wrapper ${v.isShorts ? 'is-shorts' : ''}"><iframe src="${v.url}" frameborder="0" allowfullscreen></iframe></div>` : '';
       }).join('');
 
       document.getElementById('details-root').innerHTML = `
@@ -258,10 +219,10 @@
             <div class="logo-group">${headerLogos.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
             <div class="header-text">
               <div class="tag-container">${catHtml} ${memHtml}</div>
-              <h1>${tData[2] ? tData[2].split(',').join(' • ') : 'Unnamed Event'}</h1>
+              <h1>${tData[2] ? tData[2].split(',').join(' • ') : ''}</h1>
               <div class="quick-meta">
                 <span>📅 ${dateDisplay}</span>
-                ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
+                ${tData[3] ? `<span>⏰ ${timeDisplay}</span>` : ''}
                 ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
                 <span style="color:var(--price-red); font-weight:700;">🎟️ ${price}</span>
               </div>
@@ -270,30 +231,14 @@
           <div class="main-content">
             <div class="content-body">
               ${description ? `<div class="description">${description}</div>` : ''}
-              
-              ${tData[10] ? `
-                <div style="margin-bottom:30px;">
-                  <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; opacity:0.6;">Dress Code</h4>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-                    ${tData[10].split(',').map(d => `<span class="dress-pill">👗 ${d.trim()}</span>`).join('')}
-                  </div>
-                </div>` : ''}
-              
-              ${rsvpLink ? `
-                <div class="action-area">
-                  <a href="${rsvpLink}" class="rsvp-btn" target="_blank">RSVP / REGISTER NOW</a>
-                  ${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}
-                </div>` : ''}
-
+              ${tData[10] ? `<div style="margin-bottom:30px;"><div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">${tData[10].split(',').map(d => `<span class="dress-pill">👗 ${d.trim()}</span>`).join('')}</div></div>` : ''}
+              ${rsvpLink ? `<div class="action-area"><a href="${rsvpLink}" class="rsvp-btn" target="_blank">RSVP / REGISTER NOW</a>${tData[11] ? `<a href="${tData[11]}" target="_blank" class="maps-link">View Location on Maps ↗</a>` : ''}</div>` : ''}
               ${videoHtml ? `<div class="video-section">${videoHtml}</div>` : ''}
               ${generateGallery(galleryImages)}
             </div>
           </div>
         </div>`;
-    } catch (err) {
-      console.error(err);
-      document.getElementById('details-root').innerHTML = "Error loading event details.";
-    }
+    } catch (err) { console.error(err); }
   }
   init();
 </script>
