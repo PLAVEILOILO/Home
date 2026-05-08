@@ -8,8 +8,7 @@
 <style>
   :root {
     --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
-    --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7;
-    --price-red: #ff4d4d;
+    --text: #1e1530; --theme-purple: #a87fe8; --accent: #6c5ce7; --price-red: #ff4d4d;
   }
 
   body {
@@ -22,38 +21,31 @@
   .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
   .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
 
-  /* Restored Header */
-  header { text-align: center; margin: 40px 0 30px; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin: 0; color: var(--text); }
+  header { text-align: center; margin: 20px 0 30px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 48px); margin: 0; }
   header p { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-top: 5px; }
 
-  /* Restored Dual/Triple Filter Section */
-  .filter-section { 
-    width: min(900px, 100%); display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-    gap: 15px; margin-bottom: 30px; 
+  .filter-bar { 
+    width: min(900px, 100%); display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 15px; margin-bottom: 30px; padding: 10px;
   }
-  .filter-box { background: white; padding: 12px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--border); }
-  .filter-box label { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.4; color: var(--theme-purple); }
-  .filter-box select { border: none; font-family: 'Outfit'; font-weight: 600; font-size: 14px; outline: none; background: transparent; color: var(--text); cursor: pointer; appearance: none; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; background: white; padding: 12px 18px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+  .filter-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-purple); opacity: 0.5; }
 
-  /* Centered Timeline Container */
+  select { border: none; font-family: inherit; font-weight: 600; font-size: 14px; color: var(--text); outline: none; cursor: pointer; background: transparent; }
+
   .timeline { width: min(900px, 100%); display: flex; flex-direction: column; gap: 20px; }
   
-  /* Restored Event Card Layout */
   .event-card {
     background: var(--surface); border-radius: 24px; display: grid;
-    grid-template-columns: 220px 1fr; border: 2.5px solid transparent;
-    overflow: hidden; transition: all 0.2s; text-decoration: none; color: inherit;
+    grid-template-columns: 240px 1fr; border: 2.5px solid transparent;
+    overflow: hidden; transition: all 0.2s; position: relative;
     box-shadow: 0 4px 20px rgba(168, 127, 232, 0.08);
   }
   .event-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(168, 127, 232, 0.15); }
 
-  .img-container { position: relative; width: 220px; height: 220px; overflow: hidden; background: #eee; flex-shrink: 0; }
-  .event-img { 
-    position: absolute; width: 100%; height: 100%; object-fit: cover; 
-    transition: opacity 0.8s ease-in-out; opacity: 0;
-  }
+  .img-container { position: relative; width: 240px; height: 100%; overflow: hidden; background: #eee; flex-shrink: 0; }
+  .event-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.6s ease-in-out; opacity: 0; }
   .event-img.active { opacity: 1; }
 
   .event-info { padding: 25px; display: flex; flex-direction: column; min-width: 0; }
@@ -63,53 +55,60 @@
   .member-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.05); }
 
   .title-group { margin-bottom: 12px; }
-  .event-title { font-family: 'Playfair Display', serif; font-size: 22px; line-height: 1.2; margin: 0 0 4px 0; color: var(--text); }
-  .title-divider { height: 1px; background: var(--border); border: none; margin: 8px 0; }
+  .event-title { margin: 0 0 4px 0; font-size: 22px; line-height: 1.2; font-family: 'Playfair Display', serif; }
+  .title-divider { height: 1px; background: var(--border); margin: 8px 0; border: none; width: 50px; }
 
-  .details-list { font-size: 14px; opacity: 0.8; line-height: 1.6; margin-bottom: 15px; display: flex; flex-direction: column; gap: 4px; }
+  .details-list { font-size: 14px; opacity: 0.8; display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
   
   .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
   .price-val { color: var(--price-red); font-weight: 700; font-size: 15px; }
-  
+
+  .countdown-box { text-align: right; }
+  .timer-text { display: block; font-size: 11px; font-weight: 600; color: var(--theme-purple); margin-bottom: 4px; text-transform: uppercase; }
   .badge { padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
   .badge-soon { background: #eef5ff; color: #4b92ff; }
   .badge-ended { background: #f5f5f5; color: #999; }
 
-  #backToTop { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; border: none; cursor: pointer; display: none; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-
   @media (max-width: 600px) {
     .event-card { grid-template-columns: 1fr; }
     .img-container { width: 100%; height: 220px; }
-    header h1 { font-size: 32px; }
+    .filter-bar { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
-
 <header>
   <h1>Asterum</h1>
   <p>Timeline & Event Archive</p>
 </header>
 
-<div class="filter-section">
-  <div class="filter-box">
-    <label>Timeline</label>
-    <select id="timeFilter" onchange="renderTimeline()"><option value="all">All Events</option><option value="upcoming">Upcoming</option><option value="past">Past</option></select>
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="filter-label">Timeline</label>
+    <select id="timeFilter" onchange="renderTimeline()">
+      <option value="all">All Events</option>
+      <option value="upcoming">Upcoming</option>
+      <option value="past">Past</option>
+    </select>
   </div>
-  <div class="filter-box">
-    <label>Category</label>
-    <select id="catFilter" onchange="renderTimeline()"><option value="all">All Categories</option></select>
+  <div class="filter-group">
+    <label class="filter-label">Category</label>
+    <select id="catFilter" onchange="renderTimeline()">
+      <option value="all">All Categories</option>
+    </select>
   </div>
-  <div class="filter-box">
-    <label>Sort Order</label>
-    <select id="sortOrder" onchange="renderTimeline()"><option value="desc">Latest First</option><option value="asc">Earliest First</option></select>
+  <div class="filter-group">
+    <label class="filter-label">Sorting</label>
+    <select id="sortOrder" onchange="renderTimeline()">
+      <option value="desc">Latest Added</option>
+      <option value="asc">Earliest Added</option>
+    </select>
   </div>
 </div>
 
 <div class="timeline" id="timelineContainer"></div>
-<button id="backToTop" onclick="scrollToTop()">↑</button>
 
 <script>
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
@@ -129,7 +128,15 @@
     return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
   }
 
-  async function init() {
+  function getCountdown(date) {
+    const diff = new Date(date) - new Date();
+    if (diff < 0) return "";
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    return days > 0 ? `${days}d ${hours}h left` : `${hours}h left`;
+  }
+
+  async function loadTimeline() {
     try {
       const response = await fetch(sheetUrl);
       const csv = await response.text();
@@ -139,22 +146,23 @@
 
       allEvents = rows.map(row => ({
         start: new Date(row[0]),
-        titles: (row[2] || "").split(','),
+        titles: (row[2] || "Untitled").split(','),
         startTime: row[3] || "",
         loc: row[5] || "TBA", 
         imgs: (row[6] || "").split(','),
         cat: row[7] || "Event",
-        minP: row[8], maxP: row[9],
-        id: row[12],
+        minP: row[8] || "0", maxP: row[9] || "0", 
+        id: row[12] || "", 
         members: (row[13] || "").split(',').filter(Boolean)
       }));
 
-      const cats = [...new Set(allEvents.map(e => e.cat.trim()))];
+      const cats = new Set();
+      allEvents.forEach(e => e.cat.split(',').forEach(c => c.trim() && cats.add(c.trim())));
       const catSelect = document.getElementById('catFilter');
-      cats.forEach(c => { if(c){ const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); }});
+      cats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
 
       renderTimeline();
-    } catch (e) { console.error(e); }
+    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading timeline."; }
   }
 
   function renderTimeline() {
@@ -167,46 +175,49 @@
     let filtered = allEvents.filter(ev => {
       const isPast = ev.start < now;
       const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
-      return timeMatch && (catVal === 'all' || ev.cat === catVal);
+      return timeMatch && (catVal === 'all' || ev.cat.includes(catVal));
     });
 
     filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
 
     container.innerHTML = filtered.map(ev => {
       const isPast = ev.start < now;
-      const mStyle = memberStyles[ev.members[0]?.trim()] || memberStyles["PLAVE"];
-      
+      const primaryMember = ev.members[0]?.trim();
+      const mStyle = memberStyles[primaryMember] || memberStyles["PLAVE"];
+
       return `
-        <a href="details.html?id=${ev.id}" class="event-card" style="border-color: ${mStyle.border}">
+        <a href="details.html?id=${ev.id}" class="event-card" style="border-color: ${mStyle.border}; border-width: 2.5px;">
           <div class="img-container">
             ${ev.imgs.map((img, i) => `<img src="${img.trim()}" class="event-img ${i===0?'active':''}" id="img-${ev.id}-${i}">`).join('')}
           </div>
           <div class="event-info">
             <div class="tag-row">
-              <div class="cat-tag">${ev.cat}</div>
+              ${ev.cat.split(',').map(c => `<div class="cat-tag">${c.trim()}</div>`).join('')}
               ${ev.members.map(m => {
                 const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
-                return `<div class="member-tag" style="background:${s.bg}; color:${s.text}">✦ ${m.trim()}</div>`;
+                return `<div class="member-tag" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</div>`;
               }).join('')}
             </div>
-            <div class="title-group">${ev.titles.map((t, i) => `<h2 class="event-title">${t.trim()}</h2>${i < ev.titles.length - 1 ? '<hr class="title-divider">' : ''}`).join('')}</div>
+            <div class="title-group">
+              ${ev.titles.map((t, i) => `<h2 class="event-title">${t.trim()}</h2>${i < ev.titles.length - 1 ? '<hr class="title-divider">' : ''}`).join('')}
+            </div>
             <div class="details-list">
               <div>📅 ${ev.start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})} ${ev.startTime ? ' • ⏰ ' + ev.startTime : ''}</div>
               <div>📍 ${ev.loc}</div>
             </div>
             <div class="status-row">
               <div class="price-val">🎟️ ${formatPrice(ev.minP, ev.maxP)}</div>
-              <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+              <div class="countdown-box">
+                ${!isPast ? `<span class="timer-text">${getCountdown(ev.start)}</span>` : ''}
+                <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
+              </div>
             </div>
           </div>
         </a>`;
     }).join('');
 
-    startImageSwiper(filtered);
-  }
-
-  function startImageSwiper(events) {
-    events.forEach(ev => {
+    // Start Swiper for these filtered cards
+    filtered.forEach(ev => {
       if (ev.imgs.length > 1) {
         let cur = 0;
         setInterval(() => {
@@ -220,10 +231,7 @@
     });
   }
 
-  window.onscroll = () => { document.getElementById('backToTop').style.display = window.scrollY > 300 ? 'block' : 'none'; };
-  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  
-  init();
+  loadTimeline();
 </script>
 </body>
 </html>
