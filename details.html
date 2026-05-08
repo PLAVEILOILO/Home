@@ -35,7 +35,6 @@
   .maps-link { font-size: 13px; color: var(--theme-purple); text-decoration: none; font-weight: 500; }
   .dress-pill { background: #f8f9fa; padding: 4px 12px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: 600; font-size: 12px; color: #666; }
 
-  /* GALLERY GRID & OVERLAY */
   .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 40px; }
   .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); animation: fadeIn 0.6s ease forwards; }
   .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
@@ -88,19 +87,14 @@
     return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
   }
 
-  // UPDATED GALLERY LOGIC
   function generateGallery(images) {
     if (!images.length) return '';
-    
     const limit = 4;
     const remaining = images.length - limit;
-
     let html = '<div class="gallery-grid" id="eventGallery">';
-    
     images.forEach((img, index) => {
       const isHidden = index >= limit;
       const isTrigger = (index === limit - 1 && remaining > 0);
-
       html += `
         <div class="gallery-item" ${isHidden ? 'style="display:none"' : ''}>
           <img src="${img.trim()}" loading="lazy">
@@ -111,7 +105,6 @@
             </div>` : ''}
         </div>`;
     });
-
     html += '</div>';
     return html;
   }
@@ -120,11 +113,7 @@
     const gallery = document.getElementById('eventGallery');
     const trigger = document.getElementById('galleryTrigger');
     const hiddenItems = gallery.querySelectorAll('.gallery-item[style*="display:none"]');
-    
-    hiddenItems.forEach(item => {
-      item.style.display = 'block';
-    });
-
+    hiddenItems.forEach(item => { item.style.display = 'block'; });
     if (trigger) trigger.remove();
   };
 
@@ -154,6 +143,26 @@
         return `<span class="tag-member" style="background:${s.bg}; color:${s.text}; border-color:${s.text}30">✦ ${m.trim()}</span>`;
       }).join('');
 
+      // DATE RANGE LOGIC
+      const startDateRaw = tData[0];
+      const endDateRaw = tData[1];
+      let dateDisplay = "";
+      
+      const opt = { month: 'short', day: 'numeric', year: 'numeric' };
+      const d1 = new Date(startDateRaw);
+      const d2 = endDateRaw ? new Date(endDateRaw) : null;
+
+      if (d2 && d2.getTime() !== d1.getTime() && endDateRaw !== "") {
+          // If month and year are same, format nicely: "Oct 12 – 14, 2026"
+          if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
+              dateDisplay = `${d1.toLocaleDateString('en-US', {month:'short', day:'numeric'})} – ${d2.getDate()}, ${d1.getFullYear()}`;
+          } else {
+              dateDisplay = `${d1.toLocaleDateString('en-US', opt)} – ${d2.toLocaleDateString('en-US', opt)}`;
+          }
+      } else {
+          dateDisplay = d1.toLocaleDateString('en-US', opt);
+      }
+
       const startTime = tData[3];
       const timeDisplay = (tData[3] && tData[4]) ? `${tData[3]} – ${tData[4]}` : (tData[3] || "TBA");
       const price = (tData[8] === "0" || !tData[8]) ? "Free Access" : (tData[8] === tData[9] ? `₱${tData[8]}` : `₱${tData[8]} - ₱${tData[9]}`);
@@ -167,7 +176,7 @@
               <div class="tag-container">${catHtml} ${memHtml}</div>
               <h1>${tData[2].split(',').join(' • ')}</h1>
               <div class="quick-meta">
-                <span>📅 ${new Date(tData[0]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</span>
+                <span>📅 ${dateDisplay}</span>
                 ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
                 ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
                 <span style="color:var(--price-red); font-weight:700;">🎟️ ${price}</span>
