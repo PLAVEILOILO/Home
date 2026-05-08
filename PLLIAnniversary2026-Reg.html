@@ -20,11 +20,17 @@
             background: linear-gradient(175deg, #fffbe6 0%, #fff8f0 55%, #fff0f5 100%);
         }
 
-        #daisy-canvas {
-            position: fixed; inset: 0;
-            pointer-events: none; z-index: 0;
-            opacity: 0.5;
+        /* Notification Toast */
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #ff9800; color: white; padding: 12px 24px;
+            border-radius: 50px; font-weight: 600; font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none; z-index: 1000; animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        #daisy-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
 
         #grass-strip {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -36,24 +42,15 @@
         .card {
             background: rgba(255,255,255,0.92);
             padding: 44px 42px; border-radius: 40px;
-            box-shadow: 0 6px 48px rgba(255,210,80,0.15), 0 1px 4px rgba(255,180,100,0.1);
+            box-shadow: 0 6px 48px rgba(255,210,80,0.15);
             width: 90%; max-width: 480px; text-align: center;
             border: 2px solid rgba(255,224,120,0.7);
             position: relative; z-index: 1;
             backdrop-filter: blur(8px);
         }
 
-        .sun-row { font-size: 20px; letter-spacing: 4px; opacity: 0.5; margin-bottom: 10px; }
         .logo-text { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 46px; color: #e8822a; margin-bottom: 0; }
         .sub-text { font-size: 11px; color: #c96a1a; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 24px; }
-
-        .event-info-box {
-            background: #fffdf0; border-radius: 20px; padding: 14px 16px; margin-bottom: 26px;
-            border: 1.5px dashed #fde68a; display: flex; justify-content: space-around;
-            font-family: 'Fredoka', sans-serif;
-        }
-        .info-item { font-size: 13px; color: #a85c1a; }
-        .info-item b { display: block; color: #d4860f; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
 
         .name-row { display: flex; gap: 10px; margin-top: 10px; }
         input {
@@ -62,7 +59,7 @@
             background: #fffdf5; color: #a85c1a; font-size: 15px; font-family: 'Fredoka', sans-serif;
         }
 
-        .btn {
+        .btn, .dl-btn {
             width: 100%; padding: 17px;
             background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%);
             color: white; border: none; border-radius: 24px; cursor: pointer;
@@ -71,74 +68,62 @@
         }
 
         #ticket-container { display: none; width: 100%; max-width: 800px; text-align: center; position: relative; z-index: 1; }
-        #capture-area { width: 100%; margin: 0 auto 20px; }
-
+        
         .ticket {
             width: 100%; aspect-ratio: 2/3.5;
             border-radius: 36px; position: relative; overflow: hidden;
-            background: white; box-shadow: 0 16px 56px rgba(249,168,37,0.13);
+            background: #fffdf5; box-shadow: 0 16px 56px rgba(249,168,37,0.13);
             text-align: left; display: flex; flex-direction: column;
         }
 
         .member-img { position: absolute; inset: 0; width: 100%; height: 100%; background-size: cover; background-position: center 10%; z-index: 1; }
         
-        /* Fixed gradient overlap for Group Ticket */
+        /* Fixed Gradient - no sharp lines */
         .fade-overlay { 
             position: absolute; inset: 0; z-index: 2; 
-            background: linear-gradient(to top, var(--m-bg) 0%, var(--m-bg) 35%, transparent 75%); 
+            background: linear-gradient(to top, #fffdf5 15%, transparent 65%); 
         }
-        
-        .ticket-bloom { position: absolute; top: -80px; right: -80px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,236,120,0.25) 0%, transparent 68%); z-index: 3; }
 
         .ticket-content { position: relative; z-index: 4; padding: 38px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+        
+        /* New Member Badge Style - Orange Gradient */
+        .member-badge { 
+            background: linear-gradient(135deg, #ff9800, #ed6c02); 
+            color: white !important;
+            padding: 6px 18px; border-radius: 50px; 
+            font-size: 11px; font-weight: 600; 
+            display: inline-block; margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(237, 108, 2, 0.2);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
 
         @media screen and (min-width: 800px) {
             .ticket { aspect-ratio: 800/380; flex-direction: row; }
             .member-img { width: 68%; height: 100%; left: 32%; background-position: center center; }
-            .fade-overlay { background: linear-gradient(to right, var(--m-bg) 35%, transparent 80%); }
+            .fade-overlay { background: linear-gradient(to right, #fffdf5 35%, transparent 75%); }
             .ticket-content { width: 50%; justify-content: space-between; padding: 44px; }
         }
 
         .detail-item { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; color: #d4860f; margin-bottom: 2px; }
         .detail-value { font-size: 13px; font-weight: 600; color: #7a4020; }
-        
-        /* Updated pill styling - Orange gradient theme */
-        .member-badge { 
-            background: linear-gradient(135deg, #ffca28, #f48fb1); 
-            padding: 6px 18px; border-radius: 50px; 
-            font-size: 11px; font-weight: 600; 
-            display: inline-block; margin-bottom: 12px; 
-            color: white; border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 12px rgba(232, 130, 42, 0.2);
-        }
-
         #display-name { font-size: 38px; font-weight: 800; font-family: 'Fredoka'; line-height: 1; color: #7a4020; margin: 0; }
-
-        .dl-btn { width: 100%; padding: 17px; background: linear-gradient(135deg, #ffd54f 0%, #f48fb1 100%); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 17px; font-weight: 600; font-family: 'Fredoka', sans-serif; }
     </style>
 </head>
 <body>
 
+<div id="toast">Successfully Registered! 🧺✨</div>
 <canvas id="daisy-canvas"></canvas>
 
 <div id="grass-strip">
     <svg viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <g fill="#5aad4e" opacity="0.55"><polygon points="0,72 18,72 9,28"/><polygon points="30,72 52,72 41,18"/><polygon points="88,72 108,72 98,12"/><polygon points="145,72 165,72 155,22"/><polygon points="210,72 228,72 219,16"/><polygon points="270,72 290,72 280,20"/><polygon points="338,72 356,72 347,14"/><polygon points="400,72 418,72 409,22"/><polygon points="462,72 480,72 471,18"/><polygon points="528,72 546,72 537,10"/><polygon points="592,72 610,72 601,20"/><polygon points="658,72 675,72 667,16"/><polygon points="722,72 740,72 731,8"/><polygon points="788,72 805,72 797,24"/><polygon points="852,72 870,72 861,14"/><polygon points="918,72 935,72 927,20"/><polygon points="982,72 999,72 991,18"/><polygon points="1048,72 1065,72 1057,10"/><polygon points="1113,72 1130,72 1122,22"/><polygon points="1178,72 1195,72 1187,16"/><polygon points="1243,72 1260,72 1252,20"/><polygon points="1308,72 1325,72 1317,12"/><polygon points="1373,72 1390,72 1382,24"/><polygon points="1425,72 1440,72 1433,28"/></g>
         <g fill="#72c95e" opacity="0.75"><polygon points="5,72 25,72 15,34"/><polygon points="40,72 58,72 49,22"/><polygon points="100,72 120,72 110,16"/><polygon points="160,72 178,72 169,46"/><polygon points="222,72 240,72 231,36"/><polygon points="285,72 303,72 294,44"/><polygon points="350,72 368,72 359,18"/><polygon points="414,72 432,72 423,24"/><polygon points="478,72 496,72 487,38"/><polygon points="542,72 560,72 551,42"/><polygon points="607,72 625,72 616,34"/><polygon points="672,72 690,72 681,46"/><polygon points="737,72 755,72 746,36"/><polygon points="803,72 821,72 812,40"/><polygon points="868,72 886,72 877,32"/><polygon points="933,72 951,72 942,44"/><polygon points="998,72 1016,72 1007,38"/><polygon points="1063,72 1081,72 1072,42"/><polygon points="1128,72 1146,72 1137,34"/><polygon points="1193,72 1211,72 1202,40"/><polygon points="1258,72 1276,72 1267,36"/><polygon points="1323,72 1341,72 1332,44"/><polygon points="1388,72 1406,72 1397,30"/></g>
-        <rect x="0" y="60" width="1440" height="12" fill="#72c95e" opacity="0.6"/>
     </svg>
 </div>
 
 <div id="form-container" class="card">
-    <div class="sun-row">🌼 ☀️ 🌼</div>
     <div class="logo-text">PLLIcnic 🧺</div>
     <div class="sub-text">Anniversary Event</div>
-    <div class="event-info-box">
-        <div class="info-item"><b>Where</b>Asterum Park</div>
-        <div class="info-item"><b>When</b>June 20, 2026</div>
-        <div class="info-item"><b>Time</b>4:00 PM</div>
-    </div>
     <div class="name-row">
         <input type="text" id="firstName" placeholder="First Name">
         <input type="text" id="lastName" placeholder="Last Name">
@@ -148,10 +133,9 @@
 
 <div id="ticket-container">
     <div id="capture-area">
-        <div id="ticket-body" class="ticket" style="--m-bg: #fffdf5;">
+        <div id="ticket-body" class="ticket">
             <div id="member-photo" class="member-img"></div>
             <div class="fade-overlay"></div>
-            <div class="ticket-bloom"></div>
             <div class="ticket-content">
                 <div>
                     <div id="member-tag" class="member-badge">✦ MEMBER</div>
@@ -174,7 +158,7 @@
 </div>
 
 <script>
-// DAISY ANIMATION 
+// DAISY ANIMATION CODE
 (function() {
     const canvas = document.getElementById('daisy-canvas');
     const ctx = canvas.getContext('2d');
@@ -217,46 +201,53 @@
     loop();
 })();
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfFoSMdou6RTF1yoTpnAwWA54QY6CkVMaodbKgcKzDC9sos6shLKUm0O3EzFg45Kv5/exec';
+const APPS_SCRIPT_URL = 'PASTE_YOUR_URL_HERE'; // <--- PUT YOUR URL HERE
 
 const memberData = {
-    "Yejun": { bg: "#eef7ff", img: "https://lh3.googleusercontent.com/u/0/d/1f_5pCcNu6yWJIZoanqRMGBoVPJY33Cke" },
-    "Noah": { bg: "#f9f0ff", img: "https://lh3.googleusercontent.com/u/0/d/136FYbU-u4U0Cw8AJQKYUfzpzNQrMDKhW" },
-    "Bamby": { bg: "#fff5f8", img: "https://lh3.googleusercontent.com/u/0/d/1X9VM3HhF8cYvU6A6k0jXGEEaK6JpGZQ7" },
-    "Eunho": { bg: "#fff4f3", img: "https://lh3.googleusercontent.com/u/0/d/1IcBszLi_zV2Hrw2BxxaGqFn4rjJBulGa" },
-    "Hamin": { bg: "#f4fcf0", img: "https://lh3.googleusercontent.com/u/0/d/1K21sm_dz9BgkXesEJEuPZn8MyQ0Tjr9K" },
-    "PLAVE (Group)": { bg: "#fffdf5", img: "https://lh3.googleusercontent.com/u/0/d/1pVg2CfjS-7elfpIfvyCT_oV_QaYPZDy9" }
+    "Yejun": "https://lh3.googleusercontent.com/u/0/d/1f_5pCcNu6yWJIZoanqRMGBoVPJY33Cke",
+    "Noah": "https://lh3.googleusercontent.com/u/0/d/136FYbU-u4U0Cw8AJQKYUfzpzNQrMDKhW",
+    "Bamby": "https://lh3.googleusercontent.com/u/0/d/1X9VM3HhF8cYvU6A6k0jXGEEaK6JpGZQ7",
+    "Eunho": "https://lh3.googleusercontent.com/u/0/d/1IcBszLi_zV2Hrw2BxxaGqFn4rjJBulGa",
+    "Hamin": "https://lh3.googleusercontent.com/u/0/d/1K21sm_dz9BgkXesEJEuPZn8MyQ0Tjr9K",
+    "PLAVE (Group)": "https://lh3.googleusercontent.com/u/0/d/1pVg2CfjS-7elfpIfvyCT_oV_QaYPZDy9"
 };
 
 async function pullGacha() {
     const first = document.getElementById('firstName').value.trim();
     const last = document.getElementById('lastName').value.trim();
     if (!first || !last) return alert("Please fill in both names! ♡");
-    
-    // Smooth transition logic
+    const btn = document.querySelector('.btn');
+    btn.innerText = 'Checking... 🌼'; btn.disabled = true;
+
     try {
         const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ first, last }) });
         const data = await res.json();
-        const memberName = data.member;
-        const result = memberData[memberName] || memberData["PLAVE (Group)"];
         
-        document.getElementById('ticket-body').style.setProperty('--m-bg', result.bg);
-        document.getElementById('member-photo').style.backgroundImage = `url('${result.img}')`;
+        const memberName = data.member;
+        const imgUrl = memberData[memberName] || memberData["PLAVE (Group)"];
+        
+        document.getElementById('member-photo').style.backgroundImage = `url('${imgUrl}')`;
         document.getElementById('member-tag').innerText = "✦ " + memberName.toUpperCase();
         document.getElementById('display-name').innerText = first.toUpperCase();
         document.getElementById('ticket-id').innerText = data.passId;
 
+        // Show Success Toast
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('ticket-container').style.display = 'block';
     } catch (err) {
-        alert("Connection failed. Please refresh and try again! ♡");
+        alert("Something went wrong. Check your Script URL! ♡");
+        btn.innerText = 'Register & Check Pass 🎟️'; btn.disabled = false;
     }
 }
 
 function downloadImage() {
-    html2canvas(document.getElementById('capture-area'), { useCORS: true, scale: 3 }).then(canvas => {
+    html2canvas(document.getElementById('capture-area'), { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'PLLIcnic_Pass.png';
+        link.download = `PLLIcnic_Pass_${document.getElementById('firstName').value}.png`;
         link.href = canvas.toDataURL();
         link.click();
     });
