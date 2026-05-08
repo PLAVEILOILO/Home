@@ -1,201 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asterum | Event Details</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Asterum Timeline | PLAVE Iloilo</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { 
-    --bg: #faf7ff; --surface: #ffffff; --text: #1e1530; 
-    --theme-purple: #7a4ed9; --accent: #6c5ce7; 
-    --border: rgba(180,160,220,0.2); 
-    --price-red: #ff4d4d;
+  :root {
+    --bg: #faf7ff; --surface: #ffffff; --border: rgba(180,160,220,0.2);
+    --text: #1e1530; --theme-purple: #a87fe8;
   }
-  
-  body { 
-    font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); 
-    margin: 0; padding: 20px; min-height: 100vh;
+
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+  .bg-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .orb { position: absolute; border-radius: 50%; filter: blur(90px); width: 400px; height: 400px; opacity: 0.3; }
+  .orb-1 { background: #ddd0fa; top: -10%; left: -10%; }
+  .orb-2 { background: #fbd5e8; bottom: -5%; right: -5%; }
+
+  header { text-align: center; margin: 20px 0 30px; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(32px, 8vw, 42px); margin: 0; font-weight: 700; }
+  header em { font-style: italic; font-weight: 400; }
+
+  .filter-bar { width: min(850px, 100%); display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 120px; }
+  .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--theme-purple); padding-left: 5px; }
+
+  select { padding: 10px 15px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); font-family: inherit; font-size: 13px; outline: none; cursor: pointer; }
+
+  .timeline { width: min(850px, 100%); display: flex; flex-direction: column; gap: 16px; }
+  .event-link { text-decoration: none; color: inherit; display: block; }
+
+  .event-card {
+    background: var(--surface); border-radius: 24px; display: grid;
+    grid-template-columns: 240px 1fr; border: 1px solid var(--border);
+    overflow: hidden; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
   }
+  .event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(168, 127, 232, 0.12); }
+
+  .img-container { width: 240px; height: 100%; background: #f0f0f0; }
+  .event-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+
+  .event-info { padding: 24px; display: flex; flex-direction: column; }
   
-  /* Container Centering Fix */
-  .container { 
-    width: min(1000px, 100%); 
-    background: var(--surface); 
-    padding: 40px; 
-    border-radius: 32px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.05); 
-    box-sizing: border-box; 
-    margin: 20px auto; 
-    position: relative;
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+  
+  /* MATCHED SHAPE: Rectangular for Categories */
+  .tag-cat { padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1px solid transparent; }
+  
+  /* MATCHED SHAPE: Pills for Members */
+  .tag-member { padding: 4px 12px; border-radius: 20px; font-size: 9px; font-weight: 700; text-transform: uppercase; border: 1.5px solid transparent; }
+
+  .event-title { margin: 0 0 16px 0; font-size: 24px; font-family: 'Playfair Display', serif; line-height: 1.2; color: #1e1530; }
+
+  .details-list { font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
+  .detail-item { display: flex; align-items: flex-start; gap: 10px; line-height: 1.4; color: #555; }
+  .detail-icon { min-width: 20px; font-size: 14px; text-align: center; }
+  
+  .dress-container { display: flex; flex-wrap: wrap; gap: 6px; }
+  .dress-pill { 
+    background: #f8f9fa; padding: 2px 10px; border-radius: 6px; 
+    border: 1px solid #e9ecef; font-weight: 600; font-size: 11px; color: #666;
   }
-  
-  .header-flex { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 30px; }
-  .header-flex.is-centered { flex-direction: column; text-align: center; justify-content: center; }
-  
-  .logo-group { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-  .event-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--theme-purple); background: #eee; }
-  
-  .header-text { flex: 1; min-width: 0; }
-  .header-text h1 { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 42px); margin: 5px 0; line-height: 1.1; font-weight: 700; }
-  
-  .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .header-flex.is-centered .tag-container { justify-content: center; }
-  
-  /* Synced Colors from Timeline */
-  .cat-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-  .cat-birthday { background: #e0f7fa; color: #00838f; }
-  .cat-anniversary { background: #fff8e1; color: #ff8f00; }
-  .cat-event { background: #e8eaf6; color: #283593; }
-  .cat-default { background: #f3edff; color: var(--theme-purple); }
 
-  .member-badge { padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(0,0,0,0.08); }
+  .status-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 18px; border-top: 1px dashed var(--border); }
+  .meta-item { font-size: 14px; font-weight: 700; color: #963252; letter-spacing: -0.2px; }
+  .badge { padding: 5px 14px; border-radius: 10px; font-size: 10px; font-weight: 800; }
+  .badge-soon { background: var(--theme-purple); color: white; }
+  .badge-ended { background: #f1f3f5; color: #adb5bd; }
 
-  .quick-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; margin-top: 15px; font-weight: 400; color: #555; }
-  .header-flex.is-centered .quick-meta { justify-content: center; }
-
-  .main-content { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; }
-  .main-content.is-centered { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; text-align: center; }
-
-  .description { line-height: 1.8; font-size: 17px; white-space: pre-line; margin-bottom: 30px; color: #333; }
-  
-  .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-  .gallery-item { position: relative; aspect-ratio: 3/2; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
-  .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-  .more-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
-
-  .sidebar { display: flex; flex-direction: column; gap: 20px; }
-  .rsvp-btn { display: block; text-align: center; background: var(--accent); color: white; padding: 18px; border-radius: 16px; text-decoration: none; font-weight: 700; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); }
-  .rsvp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3); }
-  
-  .back-btn { text-decoration: none; color: var(--theme-purple); font-weight: 600; font-size: 14px; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 5px; }
-
-  @media (max-width: 768px) {
-    .main-content { grid-template-columns: 1fr !important; }
-    .header-flex { flex-direction: column; text-align: center; }
-    .tag-container, .quick-meta { justify-content: center; }
+  @media (max-width: 600px) {
+    .event-card { grid-template-columns: 1fr; }
+    .img-container { width: 100%; height: 200px; }
   }
 </style>
 </head>
 <body>
 
-<div id="details-root"></div>
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<header><h1>Asterum <em>Timeline</em></h1></header>
+
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="filter-label">Timeline</label>
+    <select id="timeFilter" onchange="filterEvents()"><option value="all">All</option><option value="upcoming">Upcoming</option><option value="past">Past</option></select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Category</label>
+    <select id="catFilter" onchange="filterEvents()"><option value="all">All Categories</option></select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Sort</label>
+    <select id="sortOrder" onchange="filterEvents()"><option value="asc">Earliest</option><option value="desc" selected>Latest</option></select>
+  </div>
+</div>
+
+<div class="timeline" id="timelineContainer"></div>
 
 <script>
-  const SPREADSHEET_ID = '2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW';
-  const TIMELINE_GID = '1296117535';
-  const DETAILS_GID = '1063823403';
+  const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT3T18h7TYjysdK7Dkguh_k7Q3j9qTQFsMSzrw8jqonpsPn0Re-I7F5t6TEP9RPtBD2labTVj5l0cjW/pub?gid=1296117535&single=true&output=csv';
+  let allEvents = [];
 
-  const memberStyles = {
-    "Yejun": { border: "#4B92FF", bg: "#eef5ff", text: "#4B92FF" },
-    "Noah": { border: "#A076FF", bg: "#f5f0ff", text: "#A076FF" },
-    "Bamby": { border: "#FF7EB3", bg: "#fff0f6", text: "#FF7EB3" },
-    "Eunho": { border: "#FF4D4D", bg: "#fff0f0", text: "#FF4D4D" },
-    "Hamin": { border: "#2ECC71", bg: "#e9f9ee", text: "#2ECC71" },
-    "PLAVE": { border: "#7a4ed9", bg: "#f3edff", text: "#7a4ed9" }
+  // MATCHED PALETTE
+  const memberPalette = {
+    "Yejun": { bg: "#0055fb15", text: "#0055fb" },
+    "Noah": { bg: "#ac7dfa15", text: "#ac7dfa" },
+    "Bamby": { bg: "#ff76a215", text: "#ff76a2" },
+    "Eunho": { bg: "#ff2f2f15", text: "#ff2f2f" },
+    "Hamin": { bg: "#2be24f15", text: "#1fa138" }
   };
 
-  function getCatClass(cat) {
-    const c = cat.toLowerCase();
-    if (c.includes('birthday')) return 'cat-birthday';
-    if (c.includes('anniversary')) return 'cat-anniversary';
-    if (c.includes('event')) return 'cat-event';
-    return 'cat-default';
-  }
+  const categoryPalette = {
+    "Anniversary": { bg: "#e9ecef", text: "#495057", border: "#dee2e6" },
+    "Birthdays": { bg: "#fff9db", text: "#f59f00", border: "#ffe066" },
+    "Online Viewing": { bg: "#d0ebff", text: "#1971c2", border: "#a5d8ff" },
+    "Fan Gathering": { bg: "#f3f0ff", text: "#6741d9", border: "#d0bfff" }
+  };
 
-  function formatPrice(min, max) {
-    if (!min || min === "0" || min.toLowerCase() === "free") return "Free Access";
-    return min === max ? `₱${Number(min).toLocaleString()}` : `₱${Number(min).toLocaleString()} - ₱${Number(max).toLocaleString()}`;
-  }
-
-  async function fetchCSV(gid) {
-    const response = await fetch(`https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${gid}&single=true&output=csv`);
-    const csv = await response.text();
-    return csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim()));
-  }
-
-  async function init() {
-    const params = new URLSearchParams(window.location.search);
-    const eventId = params.get('id');
-    if (!eventId) return;
-
+  async function loadTimeline() {
     try {
-      const [tRows, dRows] = await Promise.all([fetchCSV(TIMELINE_GID), fetchCSV(DETAILS_GID)]);
-      const tData = tRows.find(r => r[12] === eventId);
-      const dData = dRows.find(r => r[0] === eventId);
+      const response = await fetch(sheetUrl);
+      const csv = await response.text();
+      const rows = csv.split(/\r?\n/).map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/"/g, '').trim())).filter(row => row.length > 5 && row[0] !== "Start Date");
 
-      if (!tData) return;
+      allEvents = rows.map(row => ({
+        start: new Date(row[0]),
+        end: row[1] ? new Date(row[1]) : null,
+        titles: (row[2] || "Untitled").split(',').map(t => t.trim()),
+        startTime: row[3] || "",
+        loc: row[5] || "TBA", 
+        img: row[6] || "", 
+        cat: row[7] || "Event",
+        minP: row[8] || "0", 
+        maxP: row[9] || "0",
+        dress: row[10] || "",
+        id: row[12] || "",
+        members: row[13] ? row[13].split(',').map(m => m.trim()) : []
+      }));
 
-      const hasSidebar = !!(dData && dData[2]);
-      const categories = tData[7].split(',').filter(Boolean);
-      const members = (tData[13] || "").split(',').filter(Boolean);
-      const images = tData[6].split(',').filter(Boolean);
-      const highlights = dData && dData[3] ? dData[3].split(',').filter(Boolean) : [];
+      const uniqueCats = [...new Set(allEvents.flatMap(e => e.cat.split(',').map(c => c.trim())))].filter(Boolean);
+      const catSelect = document.getElementById('catFilter');
+      uniqueCats.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; catSelect.appendChild(opt); });
+
+      filterEvents();
+    } catch (e) { document.getElementById('timelineContainer').innerHTML = "Error loading Asterum data."; }
+  }
+
+  function filterEvents() {
+    const timeVal = document.getElementById('timeFilter').value;
+    const catVal = document.getElementById('catFilter').value;
+    const sortVal = document.getElementById('sortOrder').value;
+    const container = document.getElementById('timelineContainer');
+    const now = new Date(); now.setHours(0,0,0,0);
+
+    let filtered = allEvents.filter(ev => {
+      const eventEnd = ev.end || ev.start;
+      const isPast = eventEnd < now;
+      const timeMatch = (timeVal === 'all') || (timeVal === 'past' && isPast) || (timeVal === 'upcoming' && !isPast);
+      const catMatch = (catVal === 'all') || (ev.cat.split(',').map(c => c.trim()).includes(catVal));
+      return timeMatch && catMatch;
+    });
+
+    filtered.sort((a, b) => sortVal === 'asc' ? a.start - b.start : b.start - a.start);
+
+    container.innerHTML = filtered.map(ev => {
+      const eventEnd = ev.end || ev.start;
+      const isPast = eventEnd < now;
       
-      // Time Logic: Start Time is index 3, End Time is index 4
-      const startTime = tData[3];
-      const endTime = tData[4]; 
-      const timeDisplay = (startTime && endTime) ? `${startTime} – ${endTime}` : (startTime || "TBA");
-
-      const catHtml = categories.map(c => `<span class="cat-badge ${getCatClass(c)}">${c.trim()}</span>`).join('');
-      const memHtml = members.map(m => {
-        const s = memberStyles[m.trim()] || memberStyles["PLAVE"];
-        return `<span class="member-badge" style="background:${s.bg}; color:${s.text}; border-color:${s.border}44">✦ ${m.trim()}</span>`;
+      const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+      const shortOptions = { month: 'short', day: 'numeric' };
+      let dateDisplay = ev.start.toLocaleDateString('en-US', dateOptions);
+      if (ev.end && ev.end.getTime() !== ev.start.getTime()) {
+          dateDisplay = `${ev.start.toLocaleDateString('en-US', shortOptions)} — ${ev.end.toLocaleDateString('en-US', dateOptions)}`;
+      }
+      
+      // RENDER CATEGORY TAGS (Rectangular)
+      const categoryTags = ev.cat.split(',').map(c => {
+          const style = categoryPalette[c.trim()] || { bg: "#f1f3f5", text: "#495057", border: "#dee2e6" };
+          return `<div class="tag-cat" style="background: ${style.bg}; color: ${style.text}; border-color: ${style.border};">${c.trim()}</div>`;
       }).join('');
 
-      document.getElementById('details-root').innerHTML = `
-        <div class="container">
-          <a href="asterum-timeline.html" class="back-btn">← Back to Timeline</a>
-          
-          <div class="header-flex ${!hasSidebar ? 'is-centered' : ''}">
-            <div class="logo-group">${images.map(img => `<img src="${img.trim()}" class="event-logo">`).join('')}</div>
-            <div class="header-text">
-              <div class="tag-container">${catHtml} ${memHtml}</div>
-              ${tData[2].split(',').map(t => `<h1>${t.trim()}</h1>`).join('')}
-              <div class="quick-meta">
-                <span>📅 ${new Date(tData[0]).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</span>
-                ${startTime ? `<span>⏰ ${timeDisplay}</span>` : ''}
-                ${tData[5] && tData[5] !== 'TBA' ? `<span>📍 ${tData[5]}</span>` : ''}
-                <span style="color:var(--price-red); font-weight:600;">🎟️ ${formatPrice(tData[8], tData[9])}</span>
+      // RENDER MEMBER TAGS (Pills)
+      const memberTags = ev.members.map(m => {
+          const style = memberPalette[m] || { bg: "#eee", text: "#666" };
+          return `<div class="tag-member" style="background: ${style.bg}; color: ${style.text}; border-color: ${style.text}30;">${m}</div>`;
+      }).join('');
+
+      const dressTags = ev.dress ? ev.dress.split(',').map(d => `<span class="dress-pill">${d.trim()}</span>`).join('') : '';
+
+      const priceDisplay = (ev.minP === "0" || !ev.minP) ? "Free Access" : 
+                           (ev.minP === ev.maxP) ? `₱${Number(ev.minP).toLocaleString()}` : 
+                           `₱${Number(ev.minP).toLocaleString()} - ₱${Number(ev.maxP).toLocaleString()}`;
+
+      return `
+        <a href="details.html?id=${encodeURIComponent(ev.id)}" class="event-link">
+          <div class="event-card">
+            <div class="img-container"><img src="${ev.img}" class="event-img" onerror="this.style.opacity='0'"></div>
+            <div class="event-info">
+              <div class="tag-row">${categoryTags}${memberTags}</div>
+              <h2 class="event-title">${ev.titles.join(' • ')}</h2>
+              <div class="details-list">
+                <div class="detail-item"><span class="detail-icon">📅</span> <span>${dateDisplay}</span></div>
+                ${ev.startTime ? `<div class="detail-item"><span class="detail-icon">🕒</span> <span>${ev.startTime}</span></div>` : ''}
+                <div class="detail-item"><span class="detail-icon">📍</span> <span>${ev.loc}</span></div>
+                ${ev.dress ? `<div class="detail-item"><span class="detail-icon">👗</span> <div class="dress-container">${dressTags}</div></div>` : ''}
+              </div>
+              <div class="status-row">
+                <div class="meta-item">🎟️ ${priceDisplay}</div>
+                <span class="badge ${isPast ? 'badge-ended' : 'badge-soon'}">${isPast ? 'ENDED' : 'SOON'}</span>
               </div>
             </div>
           </div>
-
-          <div class="main-content ${!hasSidebar ? 'is-centered' : ''}">
-            <div class="content-body">
-              ${dData && dData[1] ? `<div class="description">${dData[1]}</div>` : ''}
-              
-              ${tData[10] ? `
-                <div style="margin-bottom:30px;">
-                  <h4 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; opacity:0.6; letter-spacing:1px;">Dress Code</h4>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; ${!hasSidebar ? 'justify-content:center;' : ''}">
-                    ${tData[10].split(',').map(d => `<span style="background:#f0f0f0; padding:6px 14px; border-radius:100px; font-size:12px; font-weight:600;">👗 ${d.trim()}</span>`).join('')}
-                  </div>
-                </div>` : ''}
-
-              ${highlights.length ? `
-                <div class="gallery-grid">
-                  ${highlights.slice(0, 4).map((img, i) => `
-                    <div class="gallery-item">
-                      <img src="${img.trim()}">
-                      ${(i === 3 && highlights.length > 4) ? `<div class="more-overlay">+${highlights.length - 4} More</div>` : ''}
-                    </div>
-                  `).join('')}
-                </div>` : ''}
-            </div>
-            ${hasSidebar ? `
-              <div class="sidebar">
-                <a href="${dData[2]}" class="rsvp-btn" target="_blank">RSVP / REGISTER</a>
-                ${tData[11] ? `<a href="${tData[11]}" target="_blank" style="text-align:center; font-size:13px; color:var(--theme-purple); text-decoration:none; font-weight:500;">View Location on Maps ↗</a>` : ''}
-              </div>` : ''}
-          </div>
-        </div>
-      `;
-    } catch (err) {
-      document.getElementById('details-root').innerHTML = "<div class='container' style='text-align:center;'>Error loading event details.</div>";
-    }
+        </a>`;
+    }).join('');
   }
-  init();
+  loadTimeline();
 </script>
 </body>
 </html>
